@@ -4,6 +4,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { SkillsSection } from '@/components/SkillsSection'
+import { ProjectsSection } from '@/components/ProjectsSection'
+import { ContactSection } from '@/components/ContactSection'
 
 interface Role {
   title: string
@@ -82,6 +85,15 @@ function App() {
           <a href="#experience" className="text-muted-foreground hover:text-accent-foreground">
             Experience
           </a>
+          <a href="#skills" className="text-muted-foreground hover:text-accent-foreground">
+            Skills
+          </a>
+          <a href="#projects" className="text-muted-foreground hover:text-accent-foreground">
+            Projects
+          </a>
+          <a href="#contact" className="text-muted-foreground hover:text-accent-foreground">
+            Contact
+          </a>
         </nav>
       </header>
 
@@ -148,6 +160,10 @@ function App() {
             ))}
           </Accordion>
         </section>
+
+        <SkillsSection />
+        <ProjectsSection />
+        <ContactSection />
       </main>
     </>
   )
