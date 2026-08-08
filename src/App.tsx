@@ -7,10 +7,11 @@ import {
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { ContactSection } from '@/components/ContactSection'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface Role {
   title: string
-  company: string
+  company?: string
   dates: string
   description: string
 }
@@ -18,7 +19,6 @@ interface Role {
 const EXPERIENCE: Role[] = [
   {
     title: 'Senior Software Engineer',
-    company: '',
     dates: 'May 2023 to Present',
     description: 'Frontend development in React.js',
   },
@@ -78,23 +78,26 @@ function App() {
     <>
       <header className="flex items-center justify-between border-b border-border py-6">
         <span className="font-semibold">Roger Li</span>
-        <nav aria-label="Primary" className="flex gap-6">
-          <a href="#about" className="text-muted-foreground hover:text-accent-foreground">
-            About
-          </a>
-          <a href="#experience" className="text-muted-foreground hover:text-accent-foreground">
-            Experience
-          </a>
-          <a href="#skills" className="text-muted-foreground hover:text-accent-foreground">
-            Skills
-          </a>
-          <a href="#projects" className="text-muted-foreground hover:text-accent-foreground">
-            Projects
-          </a>
-          <a href="#contact" className="text-muted-foreground hover:text-accent-foreground">
-            Contact
-          </a>
-        </nav>
+        <div className="flex items-center gap-6">
+          <nav aria-label="Primary" className="flex gap-6">
+            <a href="#about" className="text-muted-foreground hover:text-accent-foreground">
+              About
+            </a>
+            <a href="#experience" className="text-muted-foreground hover:text-accent-foreground">
+              Experience
+            </a>
+            <a href="#skills" className="text-muted-foreground hover:text-accent-foreground">
+              Skills
+            </a>
+            <a href="#projects" className="text-muted-foreground hover:text-accent-foreground">
+              Projects
+            </a>
+            <a href="#contact" className="text-muted-foreground hover:text-accent-foreground">
+              Contact
+            </a>
+          </nav>
+          <ThemeToggle />
+        </div>
       </header>
 
       <main className="flex flex-col gap-16 py-12">
