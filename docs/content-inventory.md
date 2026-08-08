@@ -18,16 +18,33 @@ Raw source content pulled from the live site as a starting point for building th
 - Email: li.rojie@gmail.com
 
 ## Experience
-Job titles listed on the site, in order (most recent first). **Companies and dates are not shown on the public page** — they're likely only in the downloadable resume PDF. Roger: fill these in, or point me at the resume PDF and I'll pull them from there.
+Pulled from the accordion panels' markup (client rendered, collapsed by default — not visible in a plain text scrape). Most recent first.
 
-1. Senior Software Engineer
-2. Product Manager
-3. Product Manager
-4. Solution Engineer
-5. Full Stack Engineer
-6. Integration Engineer
-7. Bioengineer
-8. Research Assistant
+1. **Senior Software Engineer** — May 2023 to Present
+   Frontend development in React.js
+
+2. **Product Manager** — Jumbo, May 2022 to May 2023
+   Launched multiple features onto iOS and helped transition the product from B2C to B2B2C. Built weekly roadmaps for engineers, and focused on prioritizing protecting user data. High emphasis on analytics to iterate the product to meet our internal KPI goals.
+
+3. **Product Manager** — VidMob, Oct 2020 to Present
+   Planned the roadmap for 3 teams, acting as both the product owner and scrum master. Focused on the business' main objectives by collaborating with clients and evaluating data to identify the next best value add to the product. Continued supporting ancillary responsibilities from the previous two roles at the company.
+
+4. **Solution Engineer** — VidMob, Oct 2019 to Oct 2021
+   Architected solutions using POCs to help product teams understand cost, risks, and value on prospective new features. Completely transformed the API documentation strategy and set up a public-facing documentation strategy as well. Helped our partnerships team with all things technical when it came to prospecting new integrations.
+
+5. **Full Stack Engineer** — VidMob, May 2017 to Sept 2019
+   Architected and executed multiple new features and systems in order to deliver value to our end users. Revamped the entire email notification system, built approximately a dozen integrations to remove manual workflows, and eventually was an engineering team lead.
+
+6. **Integration Engineer** — Epic Systems, Feb 2016 to Nov 2016
+   Guided clients implementing new software by recommending specific configurations tailored to their custom needs in order to provide the most value to them by predetermined launch dates. Prioritized work between multiple clients and job responsibilities.
+
+7. **Bioengineer** — Healmet, Aug 2015 to Jan 2016
+   Helped plan a prototype for a product that would assist in detecting basic vitals, such as heart rate, oxygen saturation, and EKG (similar to what modern Apple Watches are capable of doing).
+
+8. **Research Assistant** — University Hospitals Cleveland Medical Center, Aug 2013 to May 2015
+   Assisted a laboratory focused on OCT imaging of coronary arteries. Helped with managing patient data so that it was handled securely while also improving systems to make keeping track of them more intuitive.
+
+Note: dates on the original site have a couple of small overlaps/inconsistencies as written (e.g. "Product Manager (VidMob)" says "Oct 2020 to Present" while a more recent role above it is also "Present"; "Full Stack Engineer" says "VIdMob" with a typo). Carried over as-is — flag to Roger if these should be corrected.
 
 ## Education
 - B.S. Biomedical Engineering — Case Western Reserve University, Class of 2015
