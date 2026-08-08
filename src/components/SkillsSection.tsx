@@ -22,6 +22,7 @@ const SKILL_GROUPS: SkillGroup[] = [
   {
     label: 'Other',
     skills: [
+      'AI Coding',
       'Scrum Dev Cycle',
       'Data Modeling',
       'Image/Signal Processing',
