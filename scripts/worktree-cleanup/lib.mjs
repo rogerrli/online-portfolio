@@ -54,6 +54,24 @@ export function getIssueInfo(issueNumber) {
   }
 }
 
+// The repo merges PRs via squash, so a merged branch's commits are never an
+// ancestor of main (squash produces a brand-new commit hash) — ask GitHub
+// directly whether a PR for this branch merged, falling back to ancestry
+// for branches that predate the PR workflow (merged via direct commit/merge commit).
+function isBranchMerged(branch) {
+  try {
+    const out = execFileSync(
+      "gh",
+      ["pr", "list", "--head", branch, "--state", "merged", "--json", "number", "--limit", "1"],
+      { cwd: REPO_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
+    );
+    if (JSON.parse(out).length > 0) return true;
+  } catch {
+    // fall through to ancestry check
+  }
+  return gitOrNull(["merge-base", "--is-ancestor", branch, "main"]) !== null;
+}
+
 // Discovers worktrees whose branch is fully merged into main.
 // Returns { candidates, dirtySkipped, unmerged } — candidates are safe to clean up.
 export function discoverWorktrees() {
@@ -69,9 +87,7 @@ export function discoverWorktrees() {
   for (const wt of worktrees) {
     if (wt.path === REPO_ROOT || !wt.branch) continue;
 
-    const isMerged =
-      gitOrNull(["merge-base", "--is-ancestor", wt.branch, "main"]) !== null;
-    if (!isMerged) {
+    if (!isBranchMerged(wt.branch)) {
       unmerged.push({ worktreePath: wt.path, branch: wt.branch });
       continue;
     }
@@ -107,7 +123,10 @@ export function removeWorktreeAndBranch(entry) {
     gitOrNull(["worktree", "unlock", entry.worktreePath]);
   }
   git(["worktree", "remove", entry.worktreePath]);
-  git(["branch", "-d", entry.branch]);
+  // -D (not -d): squash-merged branches aren't an ancestor of main, so git's
+  // own "-d" safety check would refuse even though we already verified via
+  // GitHub that the PR merged.
+  git(["branch", "-D", entry.branch]);
 
   const remoteRef = gitOrNull(["ls-remote", "--heads", "origin", entry.branch]);
   if (remoteRef) {
