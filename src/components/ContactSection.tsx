@@ -54,7 +54,10 @@ export function ContactSection() {
                 {...(link.external
                   ? { target: '_blank', rel: 'noopener noreferrer' }
                   : {})}
-                className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
+                className={cn(
+                  buttonVariants({ variant: 'outline' }),
+                  'gap-2 hover:border-accent hover:bg-accent hover:text-accent-foreground',
+                )}
               >
                 <Icon aria-hidden="true" className="size-4" />
                 {link.label}

@@ -81,19 +81,19 @@ function App() {
         <span className="font-semibold">Roger Li</span>
         <div className="flex items-center gap-6">
           <nav aria-label="Primary" className="flex gap-6">
-            <a href="#about" className="text-muted-foreground hover:text-accent-foreground">
+            <a href="#about" className="text-muted-foreground hover:text-accent-text">
               About
             </a>
-            <a href="#experience" className="text-muted-foreground hover:text-accent-foreground">
+            <a href="#experience" className="text-muted-foreground hover:text-accent-text">
               Experience
             </a>
-            <a href="#skills" className="text-muted-foreground hover:text-accent-foreground">
+            <a href="#skills" className="text-muted-foreground hover:text-accent-text">
               Skills
             </a>
-            <a href="#projects" className="text-muted-foreground hover:text-accent-foreground">
+            <a href="#projects" className="text-muted-foreground hover:text-accent-text">
               Projects
             </a>
-            <a href="#contact" className="text-muted-foreground hover:text-accent-foreground">
+            <a href="#contact" className="text-muted-foreground hover:text-accent-text">
               Contact
             </a>
           </nav>
@@ -125,7 +125,7 @@ function App() {
                 Email
               </dt>
               <dd>
-                <a href="mailto:li.rojie@gmail.com" className="underline underline-offset-3 hover:text-accent-foreground">
+                <a href="mailto:li.rojie@gmail.com" className="underline underline-offset-3 hover:text-accent-text">
                   li.rojie@gmail.com
                 </a>
               </dd>
@@ -135,7 +135,7 @@ function App() {
                 Phone
               </dt>
               <dd>
-                <a href="tel:+17342331177" className="underline underline-offset-3 hover:text-accent-foreground">
+                <a href="tel:+17342331177" className="underline underline-offset-3 hover:text-accent-text">
                   734-233-1177
                 </a>
               </dd>
@@ -148,7 +148,7 @@ function App() {
           <Accordion className="border-t border-border">
             {EXPERIENCE.map((role, i) => (
               <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
-                <AccordionTrigger className="py-4 text-base font-medium">
+                <AccordionTrigger className="py-4 text-base font-medium hover:text-accent-text">
                   <span className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
                     <span>{role.title}</span>
                     {role.company && (
