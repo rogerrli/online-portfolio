@@ -22,6 +22,7 @@ Recruiters, hiring managers, and potential collaborators doing a first-pass eval
 
 ## Stack
 - Vite + React + TypeScript, strict mode.
+- Tailwind CSS v4 for styling; [shadcn/ui](https://ui.shadcn.com) components built on [Base UI](https://base-ui.com) primitives (`npx shadcn add <component>` to add more).
 - `oxlint` for linting, `tsc -b` for typechecking — both run in CI on every push/PR.
 - Deployed on Vercel, auto-deploy from `main`.
 - [AGENTS.md](./AGENTS.md) captures the UI/interaction guidelines (Vercel's web-interface-guidelines) the build should follow.
