@@ -1,0 +1,147 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json",
+  "basics": {
+    "name": "Roger Li",
+    "label": "Senior Software Engineer",
+    "email": "li.rojie@gmail.com",
+    "url": "https://liroger.com",
+    "summary": "Software engineer with a winding path through bioengineering research, software, and product management — comfortable going deep on code while staying fluent with the people who aren't writing it.",
+    "location": {
+      "city": "Brooklyn",
+      "region": "New York",
+      "countryCode": "US"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "lirojie",
+        "url": "https://www.linkedin.com/in/lirojie/"
+      },
+      {
+        "network": "GitHub",
+        "username": "rogerrli",
+        "url": "https://github.com/rogerrli"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "",
+      "position": "Senior Software Engineer",
+      "startDate": "2023-05-01",
+      "summary": "Frontend development in React, using Tailwind and Base UI. Building with Claude Code and Cursor — including parallelizing work across git worktrees — as part of day-to-day workflow."
+    },
+    {
+      "name": "Jumbo",
+      "position": "Product Manager",
+      "startDate": "2022-05-01",
+      "endDate": "2023-05-01",
+      "summary": "Shipped multiple iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for engineers with a strong focus on protecting user data, and used analytics to steer the product toward KPI goals."
+    },
+    {
+      "name": "VidMob",
+      "position": "Product Manager",
+      "startDate": "2020-10-01",
+      "summary": "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move."
+    },
+    {
+      "name": "VidMob",
+      "position": "Solution Engineer",
+      "startDate": "2019-10-01",
+      "endDate": "2021-10-01",
+      "summary": "Built proof-of-concepts so product teams could weigh cost, risk, and value before committing to new features. Overhauled API docs, including a new public-facing version. Technical lead for partnerships scoping new integrations."
+    },
+    {
+      "name": "VidMob",
+      "position": "Full Stack Engineer",
+      "startDate": "2017-05-01",
+      "endDate": "2019-09-01",
+      "summary": "Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations to cut manual workflows, and eventually led the engineering team."
+    },
+    {
+      "name": "Epic Systems",
+      "position": "Integration Engineer",
+      "startDate": "2016-02-01",
+      "endDate": "2016-11-01",
+      "summary": "Guided clients through new software rollouts, recommending configurations tailored to their needs and hitting fixed launch dates."
+    },
+    {
+      "name": "Healmet",
+      "position": "Bioengineer",
+      "startDate": "2015-08-01",
+      "endDate": "2016-01-01",
+      "summary": "Helped plan a prototype for detecting basic vitals — heart rate, oxygen saturation, EKG — similar to what an Apple Watch does today."
+    },
+    {
+      "name": "University Hospitals Cleveland Medical Center",
+      "position": "Research Assistant",
+      "startDate": "2013-08-01",
+      "endDate": "2015-05-01",
+      "summary": "Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured."
+    }
+  ],
+  "education": [
+    {
+      "institution": "Case Western Reserve University",
+      "area": "Biomedical Engineering",
+      "studyType": "B.S.",
+      "endDate": "2015-05-01"
+    }
+  ],
+  "certificates": [
+    { "name": "Certified Scrum Manager" },
+    { "name": "Certified Scrum Product Owner" }
+  ],
+  "skills": [
+    {
+      "name": "Languages",
+      "keywords": [
+        "Groovy / Grails",
+        "Python (OpenCV)",
+        "MySQL",
+        "React JS",
+        "Angular JS",
+        "HTML/CSS",
+        "Java",
+        "MATLAB"
+      ]
+    },
+    {
+      "name": "Other",
+      "keywords": [
+        "AI Coding",
+        "Scrum Dev Cycle",
+        "Data Modeling",
+        "Image/Signal Processing",
+        "Postman Expert",
+        "Jira & Confluence",
+        "GitHub"
+      ]
+    },
+    {
+      "name": "API Experience",
+      "keywords": [
+        "OAuth1 and OAuth2",
+        "Amazon (Ads)",
+        "Box",
+        "Dropbox",
+        "Facebook Graph/Marketing",
+        "Google Drive",
+        "HubSpot",
+        "Instagram",
+        "Intercom",
+        "JW Player",
+        "MailChimp/Mandrill",
+        "Pinterest (Ads)",
+        "Salesforce",
+        "Slack",
+        "Snapchat (Ads)",
+        "Spotify (Ads)",
+        "TikTok (Ads)",
+        "Twitter (Ads)",
+        "VidMob",
+        "Vimeo"
+      ]
+    }
+  ]
+}

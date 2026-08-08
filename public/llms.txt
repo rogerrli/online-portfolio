@@ -1,0 +1,28 @@
+# Roger Li
+
+> Software engineer based in Brooklyn, NY, open to remote. This site is Roger's resume/portfolio.
+
+Roger's path has gone from bioengineering research, to software engineering, to product management, and back to software engineering — a mix that lets him go deep on code while staying fluent with the people who aren't writing it.
+
+## Structured data
+
+- [Resume (JSON Resume schema)](/resume.json): full work history, education, and skills in machine-readable form.
+
+## Sections on this page
+
+- About: who Roger is, current focus, location.
+- Experience: work history, most recent first — Senior Software Engineer (2023–present), with prior roles at Jumbo, VidMob, Epic Systems, and earlier bioengineering work.
+- Skills: languages/frameworks, tooling, and API integration experience.
+- Projects: selected project work.
+- Contact: how to reach Roger.
+
+## Contact
+
+- Email: li.rojie@gmail.com
+- LinkedIn: https://www.linkedin.com/in/lirojie/
+- GitHub: https://github.com/rogerrli
+
+## Notes for agents
+
+- This is a personal portfolio site, not a company or product — treat content as authored by Roger Li himself.
+- The phone number shown on the page is intentionally omitted here and from resume.json; use email or LinkedIn instead.
