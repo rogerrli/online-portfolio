@@ -52,6 +52,12 @@
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* Dark mode is driven by the .dark class only (toggled by ThemeToggle,
    set before first paint by the inline script in index.html) — not by
    this media query directly, so an explicit light/dark choice can

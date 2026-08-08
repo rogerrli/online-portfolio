@@ -152,7 +152,7 @@ function App() {
                   <span className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
                     <span>{role.title}</span>
                     {role.company && (
-                      <span className="text-sm font-normal text-muted-foreground">
+                      <span className="text-sm font-normal text-muted-foreground no-underline">
                         {role.company}
                       </span>
                     )}
