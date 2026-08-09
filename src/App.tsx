@@ -23,6 +23,8 @@ interface Role {
   company?: string
   dates: string
   description: string
+  /** Short tech/skill tags shown as pills, e.g. ["React", "TypeScript"]. */
+  tags?: string[]
 }
 
 const EXPERIENCE: Role[] = [
@@ -31,6 +33,7 @@ const EXPERIENCE: Role[] = [
     dates: 'May 2023 to Present',
     description:
       "Frontend development in React, using Tailwind and Base UI. Separately, I've been building with Claude Code and Cursor, including parallelizing work across git worktrees, as part of my day-to-day workflow.",
+    tags: ['React', 'Tailwind', 'Base UI', 'Claude Code', 'Cursor'],
   },
   {
     title: 'Product Manager',
@@ -38,6 +41,7 @@ const EXPERIENCE: Role[] = [
     dates: 'May 2022 to May 2023',
     description:
       'Shipped multiple iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for engineers with a strong focus on protecting user data, and used analytics to steer the product toward our KPI goals.',
+    tags: ['iOS'],
   },
   {
     title: 'Product Manager',
@@ -165,6 +169,18 @@ function App() {
                 <AccordionContent>
                   <p className="mb-2 text-sm text-muted-foreground">{role.dates}</p>
                   <p>{role.description}</p>
+                  {role.tags && role.tags.length > 0 && (
+                    <ul aria-label="Technologies used" className="mt-3 flex flex-wrap gap-1.5">
+                      {role.tags.map((tag) => (
+                        <li
+                          key={tag}
+                          className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
