@@ -175,6 +175,25 @@ function App() {
         <ProjectsSection />
         <ContactSection />
       </main>
+
+      <footer className="border-t border-border py-6 text-xs text-muted-foreground">
+        <p>
+          Built to be legible to AI agents, too:{' '}
+          <a
+            href="/llms.txt"
+            className="underline underline-offset-3 hover:text-accent-text"
+          >
+            llms.txt
+          </a>
+          {' '}&middot;{' '}
+          <a
+            href="/resume.json"
+            className="underline underline-offset-3 hover:text-accent-text"
+          >
+            resume.json
+          </a>
+        </p>
+      </footer>
     </>
   )
 }
