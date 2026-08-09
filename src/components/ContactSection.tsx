@@ -1,4 +1,4 @@
-import { ExternalLink, Mail, Phone } from 'lucide-react'
+import { Download, ExternalLink, Mail, Phone } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { buttonVariants } from '@/components/ui/button'
@@ -9,6 +9,7 @@ interface ContactLink {
   href: string
   icon: LucideIcon
   external?: boolean
+  download?: string
 }
 
 const CONTACT_LINKS: ContactLink[] = [
@@ -34,6 +35,12 @@ const CONTACT_LINKS: ContactLink[] = [
     icon: ExternalLink,
     external: true,
   },
+  {
+    label: 'Résumé (PDF)',
+    href: '/resume.pdf',
+    icon: Download,
+    download: 'Roger-Li-Resume.pdf',
+  },
 ]
 
 export function ContactSection() {
@@ -54,6 +61,7 @@ export function ContactSection() {
                 {...(link.external
                   ? { target: '_blank', rel: 'noopener noreferrer' }
                   : {})}
+                {...(link.download ? { download: link.download } : {})}
                 className={cn(
                   buttonVariants({ variant: 'outline' }),
                   'gap-2 hover:border-accent hover:bg-accent hover:text-accent-foreground',

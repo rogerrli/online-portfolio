@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "npm run generate:resume-pdf",
     "dev": "vite",
+    "prebuild": "npm run generate:resume-pdf",
     "build": "tsc -b && vite build",
+    "generate:resume-pdf": "node scripts/generate-resume-pdf.mjs",
     "typecheck": "tsc -b",
     "lint": "oxlint",
     "preview": "vite preview"
@@ -17,6 +20,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.30.0",
+    "pdfkit": "^0.19.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "shadcn": "^4.16.2",
@@ -26,6 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
+    "@types/pdfkit": "^0.17.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
