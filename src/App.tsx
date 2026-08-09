@@ -42,7 +42,7 @@ const EXPERIENCE: Role[] = [
   {
     title: 'Product Manager',
     company: 'VidMob',
-    dates: 'Oct 2020 to Present',
+    dates: 'Oct 2020 to April 2022',
     description:
       "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move. Kept a hand in the two prior roles at the company as needed.",
   },
