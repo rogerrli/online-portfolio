@@ -12,19 +12,12 @@ import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 
-interface NavLink {
-  href: string
-  label: string
-  download?: string
-}
-
-const NAV_LINKS: NavLink[] = [
+const NAV_LINKS = [
   { href: '#about', label: 'About' },
   { href: '#experience', label: 'Experience' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
   { href: '#contact', label: 'Contact' },
-  { href: '/resume.pdf', label: 'Resume', download: 'Roger-Li-Resume.pdf' },
 ]
 
 interface Role {
@@ -103,16 +96,21 @@ function App() {
               <a
                 key={link.href}
                 href={link.href}
-                {...(link.download ? { download: link.download } : {})}
-                className="inline-flex items-center gap-1 text-muted-foreground hover:text-accent-text"
+                className="text-muted-foreground hover:text-accent-text"
               >
-                {link.download && (
-                  <Download aria-hidden="true" className="size-3.5" />
-                )}
                 {link.label}
               </a>
             ))}
           </nav>
+          <span aria-hidden="true" className="hidden h-4 w-px bg-border md:block" />
+          <a
+            href="/resume.pdf"
+            download="Roger-Li-Resume.pdf"
+            className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          >
+            <Download aria-hidden="true" className="size-3.5" />
+            Resume
+          </a>
           <ThemeToggle />
           <MobileNav links={NAV_LINKS} />
         </div>
