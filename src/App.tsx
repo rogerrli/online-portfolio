@@ -154,9 +154,9 @@ function App() {
               <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
                 <AccordionTrigger className="py-4 text-base font-medium hover:text-accent-text">
                   <span className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                    <span>{role.title}</span>
+                    <span className="group-hover/accordion-trigger:underline">{role.title}</span>
                     {role.company && (
-                      <span className="text-sm font-normal text-muted-foreground no-underline">
+                      <span className="text-sm font-normal text-muted-foreground">
                         {role.company}
                       </span>
                     )}
