@@ -41,7 +41,7 @@ const EXPERIENCE: Role[] = [
     dates: 'May 2022 to May 2023',
     description:
       'Shipped multiple iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for engineers with a strong focus on protecting user data, and used analytics to steer the product toward our KPI goals.',
-    tags: ['iOS'],
+    tags: ['iOS', 'Analytics', 'Product Strategy', 'A/B Testing'],
   },
   {
     title: 'Product Manager',
