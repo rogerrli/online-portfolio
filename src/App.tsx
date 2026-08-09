@@ -10,6 +10,8 @@ import { BeyondWorkSection } from '@/components/BeyondWorkSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
+import { useActiveSection } from '@/hooks/useActiveSection'
+import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '#about', label: 'About' },
@@ -19,6 +21,8 @@ const NAV_LINKS = [
   { href: '#beyond-work', label: 'Beyond Work' },
   { href: '#contact', label: 'Contact' },
 ]
+
+const SECTION_IDS = NAV_LINKS.map((link) => link.href.slice(1))
 
 interface Role {
   title: string
@@ -86,24 +90,33 @@ const EXPERIENCE: Role[] = [
 ]
 
 function App() {
+  const activeId = useActiveSection(SECTION_IDS)
+
   return (
     <>
-      <header className="flex items-center justify-between border-b border-border py-6">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background py-6">
         <span className="font-semibold">Roger Li</span>
         <div className="flex items-center gap-6">
           <nav aria-label="Primary" className="hidden gap-6 md:flex">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-muted-foreground hover:text-accent-text"
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = activeId === link.href.slice(1)
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? 'true' : undefined}
+                  className={cn(
+                    'text-muted-foreground hover:text-accent-text',
+                    isActive && 'text-accent-text',
+                  )}
+                >
+                  {link.label}
+                </a>
+              )
+            })}
           </nav>
           <ThemeToggle />
-          <MobileNav links={NAV_LINKS} />
+          <MobileNav links={NAV_LINKS} activeHref={`#${activeId ?? ''}`} />
         </div>
       </header>
 
