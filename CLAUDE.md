@@ -5,6 +5,7 @@
 - MUST: PR description references the issue it closes (e.g. `Closes #16`) so merging closes it automatically.
 - MUST: Merge PRs via squash merge (the only strategy enabled on this repo) — keeps `main` history linear, one commit per change.
 - MUST: Before starting work, check for overlap with other in-flight work (`git worktree list`, `gh pr list`) — one issue/area in flight at a time to avoid conflicting concurrent edits.
+- MUST: Before starting implementation on an issue, check it has no assignee and no claim comment (`gh issue view <n> --json assignees,comments`); if either is set, another session already has it — pick a different issue. Otherwise claim it: `gh issue edit <n> --add-assignee @me` plus a comment naming the worktree/branch in use.
 - MUST: Verify the PR's CI run (`ci.yml`: typecheck, lint, build) is green before merging.
 - SHOULD: Keep a PR scoped to a single issue — don't bundle unrelated changes into one PR.
 - MUST: Never commit secrets or `.env*` files — use Vercel environment variables for anything sensitive.
