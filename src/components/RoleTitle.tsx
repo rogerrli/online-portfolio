@@ -77,13 +77,15 @@ export function RoleTitle({ titles }: { titles: string[] }) {
       {/* Sizer: in-flow but invisible, holds the current title's text so the
           container's width/height track it (the animated column below is
           absolutely positioned and can't size its own ancestor). `block
-          leading-none` pins its height to exactly 1x font-size, so it can't
-          drift from the h1's inherited line-height and leave the column
-          under- or over-clipped. */}
+          leading-[1.2]` pins its height to a fixed multiple of font-size, so
+          it can't drift from the h1's inherited line-height — 1.2 rather
+          than 1 (leading-none) because descenders like the "g" in
+          "engineer" get clipped by neighboring rows in the stack at exactly
+          1x line-height. */}
       <span
         ref={sizerRef}
         aria-hidden="true"
-        className="invisible block leading-none whitespace-nowrap"
+        className="invisible block leading-[1.2] whitespace-nowrap"
       >
         {frames[index]}.
       </span>
@@ -101,7 +103,7 @@ export function RoleTitle({ titles }: { titles: string[] }) {
         style={{ transform: `translateY(${-index * frameHeight}px)` }}
       >
         {frames.map((title, i) => (
-          <span key={i} className="block leading-none whitespace-nowrap">
+          <span key={i} className="block leading-[1.2] whitespace-nowrap">
             {title}.
           </span>
         ))}
