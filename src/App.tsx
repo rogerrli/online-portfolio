@@ -6,20 +6,25 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 
-const NAV_LINKS = [
+interface NavLink {
+  href: string
+  label: string
+  download?: string
+}
+
+const NAV_LINKS: NavLink[] = [
   { href: '#about', label: 'About' },
   { href: '#experience', label: 'Experience' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
   { href: '#contact', label: 'Contact' },
+  { href: '/resume.pdf', label: 'Resume', download: 'Roger-Li-Resume.pdf' },
 ]
 
 interface Role {
@@ -98,21 +103,16 @@ function App() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-muted-foreground hover:text-accent-text"
+                {...(link.download ? { download: link.download } : {})}
+                className="inline-flex items-center gap-1 text-muted-foreground hover:text-accent-text"
               >
+                {link.download && (
+                  <Download aria-hidden="true" className="size-3.5" />
+                )}
                 {link.label}
               </a>
             ))}
           </nav>
-          <a
-            href="/resume.pdf"
-            download="Roger-Li-Resume.pdf"
-            aria-label="Download résumé (PDF)"
-            className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
-          >
-            <Download aria-hidden="true" className="size-3.5" />
-            <span className="hidden sm:inline">Résumé</span>
-          </a>
           <ThemeToggle />
           <MobileNav links={NAV_LINKS} />
         </div>

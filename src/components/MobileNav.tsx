@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Popover } from '@base-ui/react/popover'
-import { Menu } from 'lucide-react'
+import { Download, Menu } from 'lucide-react'
 
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 interface NavLink {
   href: string
   label: string
+  download?: string
 }
 
 interface MobileNavProps {
@@ -33,9 +34,13 @@ export function MobileNav({ links }: MobileNavProps) {
                 <a
                   key={link.href}
                   href={link.href}
+                  {...(link.download ? { download: link.download } : {})}
                   onClick={() => setOpen(false)}
-                  className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-accent-text"
+                  className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-accent-text"
                 >
+                  {link.download && (
+                    <Download aria-hidden="true" className="size-3.5" />
+                  )}
                   {link.label}
                 </a>
               ))}

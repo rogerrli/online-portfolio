@@ -36,7 +36,7 @@ const CONTACT_LINKS: ContactLink[] = [
     external: true,
   },
   {
-    label: 'Résumé (PDF)',
+    label: 'Resume (PDF)',
     href: '/resume.pdf',
     icon: Download,
     download: 'Roger-Li-Resume.pdf',

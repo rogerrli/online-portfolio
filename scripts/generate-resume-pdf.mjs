@@ -31,7 +31,7 @@ const doc = new PDFDocument({
   size: "LETTER",
   margins: { top: 56, bottom: 56, left: 56, right: 56 },
   info: {
-    Title: `${resume.basics.name} – Résumé`,
+    Title: `${resume.basics.name} – Resume`,
     Author: resume.basics.name,
   },
 });
