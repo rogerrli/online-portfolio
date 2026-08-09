@@ -8,3 +8,4 @@
 - MUST: Verify the PR's CI run (`ci.yml`: typecheck, lint, build) is green before merging.
 - SHOULD: Keep a PR scoped to a single issue — don't bundle unrelated changes into one PR.
 - MUST: Never commit secrets or `.env*` files — use Vercel environment variables for anything sensitive.
+- MUST: Never merge a PR yourself, even if CI is green and it's mergeable — open it, verify checks, and stop. Only Roger merges.
