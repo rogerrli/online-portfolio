@@ -6,18 +6,24 @@ import {
 } from '@/components/ui/accordion'
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
+import { BeyondWorkSection } from '@/components/BeyondWorkSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 import { RoleTitle } from '@/components/RoleTitle'
+import { useActiveSection } from '@/hooks/useActiveSection'
+import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '#about', label: 'About' },
   { href: '#experience', label: 'Experience' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
+  { href: '#beyond-work', label: 'Beyond Work' },
   { href: '#contact', label: 'Contact' },
 ]
+
+const SECTION_IDS = NAV_LINKS.map((link) => link.href.slice(1))
 
 interface Role {
   title: string
@@ -91,31 +97,40 @@ const ROLE_TITLES = Array.from(
 )
 
 function App() {
+  const activeId = useActiveSection(SECTION_IDS)
+
   return (
     <>
-      <header className="flex items-center justify-between border-b border-border py-6">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background py-6">
         <span className="font-semibold">Roger Li</span>
         <div className="flex items-center gap-6">
           <nav aria-label="Primary" className="hidden gap-6 md:flex">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-muted-foreground hover:text-accent-text"
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = activeId === link.href.slice(1)
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? 'true' : undefined}
+                  className={cn(
+                    'text-muted-foreground hover:text-accent-text',
+                    isActive && 'text-accent-text',
+                  )}
+                >
+                  {link.label}
+                </a>
+              )
+            })}
           </nav>
           <ThemeToggle />
-          <MobileNav links={NAV_LINKS} />
+          <MobileNav links={NAV_LINKS} activeHref={`#${activeId ?? ''}`} />
         </div>
       </header>
 
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
           <h1 className="mb-4 text-4xl font-medium tracking-tight sm:text-5xl">
-            Hi, I&rsquo;m Roger, <RoleTitle titles={ROLE_TITLES} />
+            Hi, I&rsquo;m Roger: <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
             My path here has been a little winding: bioengineering
@@ -151,6 +166,16 @@ function App() {
                 </a>
               </dd>
             </div>
+            <div>
+              <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+                Education
+              </dt>
+              <dd>
+                B.S. Biomedical Engineering, Case Western Reserve University
+                &middot; Certified Scrum Manager &middot; Certified Scrum
+                Product Owner
+              </dd>
+            </div>
           </dl>
         </section>
 
@@ -159,18 +184,20 @@ function App() {
           <Accordion className="border-t border-border">
             {EXPERIENCE.map((role, i) => (
               <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
-                <AccordionTrigger className="py-4 text-base font-medium hover:text-accent-text">
-                  <span className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                <AccordionTrigger className="items-center py-4 text-base font-medium hover:text-accent-text">
+                  <span className="flex flex-1 flex-col items-start gap-0.5 pr-3 sm:flex-row sm:items-baseline sm:gap-3">
                     <span className="group-hover/accordion-trigger:underline">{role.title}</span>
                     {role.company && (
-                      <span className="text-sm font-normal text-muted-foreground">
+                      <span className="text-sm font-normal text-muted-foreground no-underline">
                         {role.company}
                       </span>
                     )}
+                    <span className="text-sm font-normal text-muted-foreground no-underline sm:ml-auto">
+                      {role.dates}
+                    </span>
                   </span>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <p className="mb-2 text-sm text-muted-foreground">{role.dates}</p>
                   <p>{role.description}</p>
                 </AccordionContent>
               </AccordionItem>
@@ -180,8 +207,28 @@ function App() {
 
         <SkillsSection />
         <ProjectsSection />
+        <BeyondWorkSection />
         <ContactSection />
       </main>
+
+      <footer className="border-t border-border py-6 text-xs text-muted-foreground">
+        <p>
+          Built to be legible to AI agents, too:{' '}
+          <a
+            href="/llms.txt"
+            className="underline underline-offset-3 hover:text-accent-text"
+          >
+            llms.txt
+          </a>
+          {' '}&middot;{' '}
+          <a
+            href="/resume.json"
+            className="underline underline-offset-3 hover:text-accent-text"
+          >
+            resume.json
+          </a>
+        </p>
+      </footer>
     </>
   )
 }
