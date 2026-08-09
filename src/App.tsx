@@ -12,6 +12,7 @@ import { BeyondWorkSection } from '@/components/BeyondWorkSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
+import { RoleTitle } from '@/components/RoleTitle'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { cn } from '@/lib/utils'
 
@@ -101,6 +102,12 @@ const EXPERIENCE: Role[] = [
   },
 ]
 
+// Deduplicated, lowercased titles for the cycling hero heading — derived
+// from EXPERIENCE so the two stay in sync.
+const ROLE_TITLES = Array.from(
+  new Set(EXPERIENCE.map((role) => role.title.replace(/^Senior\s+/, '').toLowerCase())),
+)
+
 function App() {
   const activeId = useActiveSection(SECTION_IDS)
 
@@ -143,8 +150,8 @@ function App() {
 
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
-          <h1 className="mb-4 text-4xl font-medium tracking-tight text-balance sm:text-5xl">
-            Hi, I&rsquo;m Roger, a software engineer.
+          <h1 className="mb-4 text-4xl font-medium tracking-tight sm:text-5xl">
+            Hi, I&rsquo;m Roger: <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
             My path here has been a little winding: bioengineering
