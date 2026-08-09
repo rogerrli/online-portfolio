@@ -70,7 +70,11 @@ export function RoleTitle({ titles }: { titles: string[] }) {
 
   return (
     <span
-      className="relative inline-block overflow-hidden align-bottom"
+      // translate-y compensates for leading-[1.2] below: the extra line-height
+      // is split evenly above and below the glyphs, so align-bottom (which
+      // anchors this box's bottom edge, not the text's baseline) otherwise
+      // leaves the title sitting visibly above the rest of the sentence.
+      className="relative inline-block translate-y-[0.15em] overflow-hidden align-bottom"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
