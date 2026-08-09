@@ -21,7 +21,7 @@ const EXPERIENCE: Role[] = [
     title: 'Senior Software Engineer',
     dates: 'May 2023 to Present',
     description:
-      "Frontend development in React, using Tailwind and Base UI. Separately, I've been building with Claude Code and Cursor — including parallelizing work across git worktrees — as part of my day-to-day workflow.",
+      "Frontend development in React, using Tailwind and Base UI. Separately, I've been building with Claude Code and Cursor, including parallelizing work across git worktrees, as part of my day-to-day workflow.",
   },
   {
     title: 'Product Manager',
@@ -63,7 +63,7 @@ const EXPERIENCE: Role[] = [
     company: 'Healmet',
     dates: 'Aug 2015 to Jan 2016',
     description:
-      'Helped plan a prototype for detecting basic vitals — heart rate, oxygen saturation, EKG — similar to what an Apple Watch does today.',
+      'Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG) similar to what an Apple Watch does today.',
   },
   {
     title: 'Research Assistant',
@@ -104,12 +104,12 @@ function App() {
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
           <h1 className="mb-4 text-4xl font-medium tracking-tight text-balance sm:text-5xl">
-            Hi, I&rsquo;m Roger &mdash; a software engineer.
+            Hi, I&rsquo;m Roger, a software engineer.
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
-            My path here has been a little winding &mdash; bioengineering
-            research, then software, then product, now back to software
-            &mdash; and that mix is what makes me useful: I can go deep on
+            My path here has been a little winding: bioengineering
+            research, then software, then product, now back to software,
+            and that mix is what makes me useful: I can go deep on
             code and still talk fluently with the people who aren&rsquo;t
             writing it.
           </p>

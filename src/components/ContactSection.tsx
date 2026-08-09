@@ -41,7 +41,7 @@ export function ContactSection() {
     <section id="contact">
       <h2 className="mb-2 text-2xl font-medium tracking-tight">Contact</h2>
       <p className="mb-6 max-w-[60ch] text-muted-foreground">
-        Best way to reach me is email &mdash; happy to talk about roles,
+        Best way to reach me is email, happy to talk about roles,
         projects, or anything in between.
       </p>
       <ul className="flex flex-wrap gap-3">
