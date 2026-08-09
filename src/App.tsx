@@ -49,6 +49,7 @@ const EXPERIENCE: Role[] = [
     dates: 'Oct 2020 to Present',
     description:
       "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move. Kept a hand in the two prior roles at the company as needed.",
+    tags: ['Roadmapping', 'Scrum'],
   },
   {
     title: 'Solution Engineer',
@@ -56,6 +57,7 @@ const EXPERIENCE: Role[] = [
     dates: 'Oct 2019 to Oct 2021',
     description:
       'Built proof-of-concepts so product teams could weigh cost, risk, and value before committing to new features. Overhauled our API docs, including a new public-facing version. Served as the technical lead for partnerships scoping new integrations.',
+    tags: ['API Design', 'Postman', 'OAuth1/OAuth2', 'Documentation'],
   },
   {
     title: 'Full Stack Engineer',
@@ -63,6 +65,7 @@ const EXPERIENCE: Role[] = [
     dates: 'May 2017 to Sept 2019',
     description:
       'Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations to cut manual workflows, and eventually led the engineering team.',
+    tags: ['React JS', 'Angular JS', 'Groovy/Grails', 'Java', 'MySQL', 'HTML/CSS'],
   },
   {
     title: 'Integration Engineer',
@@ -70,6 +73,7 @@ const EXPERIENCE: Role[] = [
     dates: 'Feb 2016 to Nov 2016',
     description:
       'Guided clients through new software rollouts, recommending configurations tailored to their needs and hitting fixed launch dates. Juggled this across multiple clients at once.',
+    tags: ['Client Implementation', 'Healthcare IT', 'Configuration', 'Project Management'],
   },
   {
     title: 'Bioengineer',
@@ -77,6 +81,7 @@ const EXPERIENCE: Role[] = [
     dates: 'Aug 2015 to Jan 2016',
     description:
       'Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG) similar to what an Apple Watch does today.',
+    tags: ['Signal Processing', 'MATLAB', 'Hardware Prototyping', 'EKG'],
   },
   {
     title: 'Research Assistant',
@@ -84,6 +89,7 @@ const EXPERIENCE: Role[] = [
     dates: 'Aug 2013 to May 2015',
     description:
       'Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured.',
+    tags: ['Image Processing', 'OCT Imaging'],
   },
 ]
 
