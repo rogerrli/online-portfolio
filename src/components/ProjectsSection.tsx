@@ -17,7 +17,7 @@ interface Project {
 // project is just pushing a new object here — no layout changes needed.
 const PROJECTS: Project[] = [
   {
-    title: 'Example Project — replace me',
+    title: 'Example Project (replace me)',
     description:
       'Add a real project here: what you built, your role, and the impact/outcome. Aim for 2-4 sentences.',
     tags: ['Replace', 'with', 'tech stack'],
