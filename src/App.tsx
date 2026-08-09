@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion'
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
+import { BeyondWorkSection } from '@/components/BeyondWorkSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
@@ -15,6 +16,7 @@ const NAV_LINKS = [
   { href: '#experience', label: 'Experience' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
+  { href: '#beyond-work', label: 'Beyond Work' },
   { href: '#contact', label: 'Contact' },
 ]
 
@@ -144,6 +146,16 @@ function App() {
                 </a>
               </dd>
             </div>
+            <div>
+              <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+                Education
+              </dt>
+              <dd>
+                B.S. Biomedical Engineering, Case Western Reserve University
+                &middot; Certified Scrum Manager &middot; Certified Scrum
+                Product Owner
+              </dd>
+            </div>
           </dl>
         </section>
 
@@ -175,6 +187,7 @@ function App() {
 
         <SkillsSection />
         <ProjectsSection />
+        <BeyondWorkSection />
         <ContactSection />
       </main>
 
