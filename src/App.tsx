@@ -92,7 +92,7 @@ function App() {
 
   return (
     <>
-      <header className="flex items-center justify-between border-b border-border py-6">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background py-6">
         <span className="font-semibold">Roger Li</span>
         <div className="flex items-center gap-6">
           <nav aria-label="Primary" className="hidden gap-6 md:flex">
