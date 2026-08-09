@@ -162,7 +162,7 @@ function App() {
                   <span className="text-sm text-muted-foreground sm:ml-auto">{role.dates}</span>
                 </div>
                 <AccordionTrigger className="py-1.5 text-sm font-normal text-muted-foreground hover:text-accent-text">
-                  Details
+                  <span className="sr-only">Show details for {role.title}{role.company ? ` at ${role.company}` : ''}</span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <p>{role.description}</p>
