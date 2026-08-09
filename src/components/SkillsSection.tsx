@@ -102,7 +102,7 @@ export function SkillsSection() {
               type="button"
               variant="ghost"
               size="sm"
-              className="h-auto px-2.5 py-1 text-sm font-normal text-muted-foreground"
+              className="h-auto px-2.5 py-1 text-sm font-normal text-muted-foreground aria-expanded:bg-transparent aria-expanded:text-muted-foreground"
               onClick={() => setApiExpanded((expanded) => !expanded)}
               aria-expanded={apiExpanded}
             >
