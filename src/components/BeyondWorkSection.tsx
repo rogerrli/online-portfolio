@@ -1,15 +1,18 @@
 interface Interest {
+  emoji: string
   label: string
   description: string
 }
 
 const INTERESTS: Interest[] = [
   {
+    emoji: '🔧',
     label: 'Machine Shop',
     description:
       'I like building things with my hands, too — I keep a small home machine shop for personal projects.',
   },
   {
+    emoji: '🎲',
     label: 'Dungeon Master',
     description:
       "I've run tabletop D&D campaigns for years — different medium, same instinct for building systems people want to explore.",
@@ -24,7 +27,7 @@ export function BeyondWorkSection() {
         {INTERESTS.map((interest) => (
           <div key={interest.label}>
             <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-              {interest.label}
+              <span aria-hidden="true">{interest.emoji}</span> {interest.label}
             </dt>
             <dd className="max-w-[60ch]">{interest.description}</dd>
           </div>
