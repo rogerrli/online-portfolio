@@ -8,6 +8,15 @@ import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { MobileNav } from '@/components/MobileNav'
+
+const NAV_LINKS = [
+  { href: '#about', label: 'About' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#skills', label: 'Skills' },
+  { href: '#projects', label: 'Projects' },
+  { href: '#contact', label: 'Contact' },
+]
 
 interface Role {
   title: string
@@ -80,24 +89,19 @@ function App() {
       <header className="flex items-center justify-between border-b border-border py-6">
         <span className="font-semibold">Roger Li</span>
         <div className="flex items-center gap-6">
-          <nav aria-label="Primary" className="flex gap-6">
-            <a href="#about" className="text-muted-foreground hover:text-accent-text">
-              About
-            </a>
-            <a href="#experience" className="text-muted-foreground hover:text-accent-text">
-              Experience
-            </a>
-            <a href="#skills" className="text-muted-foreground hover:text-accent-text">
-              Skills
-            </a>
-            <a href="#projects" className="text-muted-foreground hover:text-accent-text">
-              Projects
-            </a>
-            <a href="#contact" className="text-muted-foreground hover:text-accent-text">
-              Contact
-            </a>
+          <nav aria-label="Primary" className="hidden gap-6 md:flex">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-muted-foreground hover:text-accent-text"
+              >
+                {link.label}
+              </a>
+            ))}
           </nav>
           <ThemeToggle />
+          <MobileNav links={NAV_LINKS} />
         </div>
       </header>
 
