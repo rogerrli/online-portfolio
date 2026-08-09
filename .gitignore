@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Generated from public/resume.json at build/dev time — see scripts/generate-resume-pdf.mjs
+public/resume.pdf
+
 # Worktree cleanup job output (local machine state, not project content)
 .claude/worktree-cleanup-report.json
 

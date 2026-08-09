@@ -1,3 +1,5 @@
+import { Download } from 'lucide-react'
+
 import {
   Accordion,
   AccordionContent,
@@ -115,6 +117,15 @@ function App() {
               )
             })}
           </nav>
+          <span aria-hidden="true" className="hidden h-4 w-px bg-border md:block" />
+          <a
+            href="/resume.pdf"
+            download="Roger-Li-Resume.pdf"
+            className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          >
+            <Download aria-hidden="true" className="size-3.5" />
+            Resume
+          </a>
           <ThemeToggle />
           <MobileNav links={NAV_LINKS} activeHref={`#${activeId ?? ''}`} />
         </div>
