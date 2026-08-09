@@ -15,6 +15,9 @@ dist-ssr
 # Worktree cleanup job output (local machine state, not project content)
 .claude/worktree-cleanup-report.json
 
+# Git worktrees created by Claude Code sessions (local machine state, not project content)
+.claude/worktrees/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
