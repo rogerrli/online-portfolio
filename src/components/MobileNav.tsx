@@ -34,7 +34,7 @@ export function MobileNav({ links }: MobileNavProps) {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-accent-foreground"
+                  className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-accent-text"
                 >
                   {link.label}
                 </a>

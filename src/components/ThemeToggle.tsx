@@ -23,6 +23,7 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
+      className="hover:text-accent-text"
       aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
       onClick={toggle}
     >
