@@ -1,9 +1,13 @@
+import { Download } from 'lucide-react'
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { ContactSection } from '@/components/ContactSection'
@@ -100,6 +104,15 @@ function App() {
               </a>
             ))}
           </nav>
+          <a
+            href="/resume.pdf"
+            download="Roger-Li-Resume.pdf"
+            aria-label="Download résumé (PDF)"
+            className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
+          >
+            <Download aria-hidden="true" className="size-3.5" />
+            <span className="hidden sm:inline">Résumé</span>
+          </a>
           <ThemeToggle />
           <MobileNav links={NAV_LINKS} />
         </div>
