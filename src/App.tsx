@@ -153,7 +153,7 @@ function App() {
             {EXPERIENCE.map((role, i) => (
               <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
                 <AccordionTrigger className="items-center py-4 text-base font-medium hover:text-accent-text">
-                  <span className="flex flex-1 flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                  <span className="flex flex-1 flex-col items-start gap-0.5 pr-3 sm:flex-row sm:items-baseline sm:gap-3">
                     <span className="group-hover/accordion-trigger:underline">{role.title}</span>
                     {role.company && (
                       <span className="text-sm font-normal text-muted-foreground no-underline">
