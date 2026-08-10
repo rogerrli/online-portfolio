@@ -1,13 +1,14 @@
-import { Download, ExternalLink, Mail, Phone } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { Download, Mail, Phone } from 'lucide-react'
+import type { ComponentType, SVGProps } from 'react'
 
+import { GithubIcon, LinkedinIcon } from '@/components/icons/brand-icons'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 interface ContactLink {
   label: string
   href: string
-  icon: LucideIcon
+  icon: ComponentType<SVGProps<SVGSVGElement>>
   external?: boolean
   download?: string
 }
@@ -26,13 +27,13 @@ const CONTACT_LINKS: ContactLink[] = [
   {
     label: 'LinkedIn',
     href: 'https://www.linkedin.com/in/lirojie/',
-    icon: ExternalLink,
+    icon: LinkedinIcon,
     external: true,
   },
   {
     label: 'GitHub',
     href: 'https://github.com/rogerrli',
-    icon: ExternalLink,
+    icon: GithubIcon,
     external: true,
   },
   {
