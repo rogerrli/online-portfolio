@@ -166,8 +166,8 @@ function App() {
                 Location
               </dt>
               <dd>
-                Brooklyn, New York{' '}
-                <span className="text-muted-foreground">&middot; open to remote</span>
+                Brooklyn, New York
+                <span className="block text-sm text-muted-foreground">open to remote</span>
               </dd>
             </div>
             <div>
