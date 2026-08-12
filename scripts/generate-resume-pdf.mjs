@@ -29,7 +29,7 @@ function formatRange(startDate, endDate) {
 
 const doc = new PDFDocument({
   size: "LETTER",
-  margins: { top: 56, bottom: 56, left: 56, right: 56 },
+  margins: { top: 50, bottom: 44, left: 54, right: 54 },
   info: {
     Title: `${resume.basics.name} – Resume`,
     Author: resume.basics.name,
@@ -37,8 +37,44 @@ const doc = new PDFDocument({
 });
 doc.pipe(createWriteStream(path.join(REPO_ROOT, "public", "resume.pdf")));
 
+// The resume is meant to fit on a single page. If content grows past it, fail
+// the build rather than quietly shipping a two-page PDF.
+doc.on("pageAdded", () => {
+  throw new Error(
+    "resume.pdf overflowed onto a second page — trim resume.json or tighten the layout in this script.",
+  );
+});
+
 const ACCENT = "#404040";
 const MUTED = "#666666";
+
+const LEFT = doc.page.margins.left;
+const CONTENT_WIDTH =
+  doc.page.width - doc.page.margins.left - doc.page.margins.right;
+// Room for the widest date range ("Oct 2019 – Present") at DATE_SIZE.
+const DATE_SIZE = 9;
+const DATE_COLUMN = 90;
+
+// Draws a bold title on the left and a muted date range flush right, sharing one
+// line. Stacking them cost ~13pt per entry, which is what pushed the PDF over.
+function entryRow(title, dates, titleSize) {
+  const top = doc.y;
+  doc
+    .font("Helvetica")
+    .fontSize(DATE_SIZE)
+    .fillColor(MUTED)
+    .text(dates, LEFT, top + (titleSize - DATE_SIZE) * 0.7, {
+      width: CONTENT_WIDTH,
+      align: "right",
+      lineBreak: false,
+    });
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(titleSize)
+    .fillColor("black")
+    .text(title, LEFT, top, { width: CONTENT_WIDTH - DATE_COLUMN });
+  doc.x = LEFT;
+}
 
 doc.font("Helvetica-Bold").fontSize(22).fillColor("black").text(resume.basics.name);
 doc.font("Helvetica").fontSize(13).fillColor(ACCENT).text(resume.basics.label);
@@ -50,13 +86,13 @@ const contactParts = [
   ...resume.basics.profiles.map((p) => `${p.network}: ${p.username}`),
 ];
 doc.font("Helvetica").fontSize(9.5).fillColor(MUTED).text(contactParts.join("   ·   "));
-doc.moveDown(1);
+doc.moveDown(0.9);
 
 if (resume.basics.summary) {
   doc.font("Helvetica").fontSize(10.5).fillColor("black").text(resume.basics.summary, {
     align: "left",
   });
-  doc.moveDown(1.2);
+  doc.moveDown(0.85);
 }
 
 function sectionHeading(title) {
@@ -64,12 +100,12 @@ function sectionHeading(title) {
     characterSpacing: 0.5,
   });
   doc
-    .moveTo(doc.x, doc.y + 2)
+    .moveTo(LEFT, doc.y + 2)
     .lineTo(doc.page.width - doc.page.margins.right, doc.y + 2)
     .strokeColor("#cccccc")
     .lineWidth(1)
     .stroke();
-  doc.moveDown(0.6);
+  doc.moveDown(0.5);
 }
 
 if (resume.work?.length) {
@@ -77,18 +113,12 @@ if (resume.work?.length) {
   for (const job of resume.work) {
     const titleLine = job.name ? `${job.position} — ${job.name}` : job.position;
 
-    doc.font("Helvetica-Bold").fontSize(11).fillColor("black").text(titleLine);
-    doc
-      .font("Helvetica")
-      .fontSize(9.5)
-      .fillColor(MUTED)
-      .text(formatRange(job.startDate, job.endDate));
+    entryRow(titleLine, formatRange(job.startDate, job.endDate), 11);
 
-    doc.moveDown(0.2);
     if (job.summary) {
       doc.font("Helvetica").fontSize(10).fillColor("black").text(job.summary);
     }
-    doc.moveDown(0.7);
+    doc.moveDown(0.5);
   }
 }
 
@@ -96,12 +126,8 @@ if (resume.education?.length) {
   sectionHeading("Education");
   for (const edu of resume.education) {
     const line = [edu.studyType, edu.area].filter(Boolean).join(" ");
-    doc.font("Helvetica-Bold").fontSize(10.5).fillColor("black").text(edu.institution);
-    doc
-      .font("Helvetica")
-      .fontSize(10)
-      .fillColor(MUTED)
-      .text(`${line} — ${formatDate(edu.endDate)}`);
+    entryRow(edu.institution, formatDate(edu.endDate), 10.5);
+    doc.font("Helvetica").fontSize(10).fillColor(MUTED).text(line);
     doc.moveDown(0.5);
   }
 }
@@ -113,7 +139,7 @@ if (resume.certificates?.length) {
     .fontSize(10)
     .fillColor("black")
     .text(resume.certificates.map((c) => c.name).join("   ·   "));
-  doc.moveDown(0.9);
+  doc.moveDown(0.7);
 }
 
 if (resume.skills?.length) {
@@ -127,8 +153,13 @@ if (resume.skills?.length) {
       .font("Helvetica")
       .fillColor(MUTED)
       .text(group.keywords.join(", "));
-    doc.moveDown(0.3);
+    doc.moveDown(0.25);
   }
 }
 
 doc.end();
+
+const filled =
+  (doc.y - doc.page.margins.top) /
+  (doc.page.height - doc.page.margins.top - doc.page.margins.bottom);
+console.log(`resume.pdf: 1 page, ${Math.round(filled * 100)}% filled`);
