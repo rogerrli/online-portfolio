@@ -51,7 +51,10 @@ export function ProjectsSection() {
       <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Projects</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {PROJECTS.map((project, i) => (
-          <Card key={`${project.title}-${i}`}>
+          <Card
+            key={`${project.title}-${i}`}
+            className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-accent/40"
+          >
             <CardHeader>
               <h3 className="font-heading text-base leading-snug font-medium">
                 {project.title}
