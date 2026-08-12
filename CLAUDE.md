@@ -1,6 +1,6 @@
 # Workflow
 
-- MUST: Do all work on a feature branch and open a PR — NEVER commit directly to `main`.
+- MUST: Do all work on a feature branch **in its own worktree** and open a PR — NEVER commit directly to `main`, and never edit files in the primary checkout. A `PreToolUse` hook (`scripts/hooks/require-worktree.py`) enforces this: edits outside a worktree are blocked, except `.claude/` local config.
 - MUST: Branch/worktree naming follows `issue-<N>-<slug>` (worktree dir) / `worktree-issue-<N>-<slug>` (branch) for work tied to a GitHub issue.
 - MUST: PR description references the issue it closes (e.g. `Closes #16`) so merging closes it automatically.
 - MUST: Merge PRs via squash merge (the only strategy enabled on this repo) — keeps `main` history linear, one commit per change.
