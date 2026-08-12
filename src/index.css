@@ -62,6 +62,30 @@
   }
 }
 
+/* Header résumé button. The sweep spends most of the cycle parked off the
+   right edge, so it reads as an occasional glint rather than a spinner. */
+@keyframes resume-shimmer {
+  0% {
+    transform: translateX(-50%);
+  }
+  35%,
+  100% {
+    transform: translateX(500%);
+  }
+}
+
+@keyframes resume-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7) rotate(-15deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(15deg);
+  }
+}
+
 /* Dark mode is driven by the .dark class only (toggled by ThemeToggle,
    set before first paint by the inline script in index.html) — not by
    this media query directly, so an explicit light/dark choice can

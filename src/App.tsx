@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { Download, Sparkles } from 'lucide-react'
 
 import {
   Accordion,
@@ -139,8 +139,25 @@ function App() {
           <a
             href="/resume.pdf"
             download="Roger-Li-Resume.pdf"
-            className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            className="group relative inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-sm font-medium text-accent-foreground shadow-sm transition-shadow hover:shadow-[0_0_18px_-4px_var(--accent)]"
           >
+            {/* Shimmer: a soft light bar that sweeps across the pill every few
+                seconds. Clipped by its own rounded, overflow-hidden layer so
+                the sparkles below can still sit outside the pill's edge. */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 overflow-hidden rounded-full"
+            >
+              <span className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/35 blur-[3px] motion-safe:animate-[resume-shimmer_4.5s_ease-in-out_infinite]" />
+            </span>
+            <Sparkles
+              aria-hidden="true"
+              className="absolute -top-1 -left-1 size-3 text-accent opacity-0 transition-opacity group-hover:opacity-100 motion-safe:group-hover:animate-[resume-twinkle_1.4s_ease-in-out_infinite]"
+            />
+            <Sparkles
+              aria-hidden="true"
+              className="absolute -right-1 -bottom-1 size-2.5 text-accent opacity-0 transition-opacity group-hover:opacity-100 motion-safe:group-hover:animate-[resume-twinkle_1.4s_ease-in-out_0.7s_infinite]"
+            />
             <Download aria-hidden="true" className="size-3.5" />
             Resume
           </a>
