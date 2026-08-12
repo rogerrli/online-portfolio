@@ -1,14 +1,3 @@
-import { Badge } from '@/components/ui/badge'
-
-const PRACTICES = [
-  'Claude Code',
-  'Cursor',
-  'Git Worktrees',
-  'Custom Skills',
-  'Scheduled Routines',
-  'Agent Orchestration',
-]
-
 export function WorkingWithAiSection() {
   return (
     <section id="working-with-ai">
@@ -39,18 +28,6 @@ export function WorkingWithAiSection() {
           time on how a fleet of agents gets organized and handed off
           between &mdash; not just what one agent can do in isolation.
         </p>
-        <ul aria-label="AI tools and practices" className="flex flex-wrap gap-2">
-          {PRACTICES.map((practice) => (
-            <li key={practice}>
-              <Badge
-                variant="secondary"
-                className="h-auto px-2.5 py-1 text-sm font-normal"
-              >
-                {practice}
-              </Badge>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   )
