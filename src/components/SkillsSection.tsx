@@ -28,6 +28,10 @@ const SKILL_GROUPS: SkillGroup[] = [
       'Jira & Confluence',
     ],
   },
+  {
+    label: 'Certifications',
+    skills: ['Certified Scrum Manager', 'Certified Scrum Product Owner'],
+  },
 ]
 
 const API_EXPERIENCE_PREVIEW = [
