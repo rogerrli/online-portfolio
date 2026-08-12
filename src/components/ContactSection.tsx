@@ -3,6 +3,7 @@ import type { ComponentType, SVGProps } from 'react'
 
 import { GithubIcon, LinkedinIcon } from '@/components/icons/brand-icons'
 import { buttonVariants } from '@/components/ui/button'
+import { useHasFinePointer } from '@/hooks/useHasFinePointer'
 import { cn } from '@/lib/utils'
 
 interface ContactLink {
@@ -11,6 +12,8 @@ interface ContactLink {
   icon: ComponentType<SVGProps<SVGSVGElement>>
   external?: boolean
   download?: string
+  /** Only makes sense as a link on devices that can actually dial. */
+  touchOnly?: boolean
 }
 
 const CONTACT_LINKS: ContactLink[] = [
@@ -23,6 +26,7 @@ const CONTACT_LINKS: ContactLink[] = [
     label: '734-233-1177',
     href: 'tel:+17342331177',
     icon: Phone,
+    touchOnly: true,
   },
   {
     label: 'LinkedIn',
@@ -45,6 +49,8 @@ const CONTACT_LINKS: ContactLink[] = [
 ]
 
 export function ContactSection() {
+  const hasFinePointer = useHasFinePointer()
+
   return (
     <section id="contact">
       <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Contact</h2>
@@ -55,6 +61,24 @@ export function ContactSection() {
       <ul className="flex flex-wrap gap-3">
         {CONTACT_LINKS.map((link) => {
           const Icon = link.icon
+          const isNonInteractive = link.touchOnly && hasFinePointer
+
+          if (isNonInteractive) {
+            return (
+              <li key={link.label}>
+                <span
+                  className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'gap-2 cursor-default hover:bg-transparent',
+                  )}
+                >
+                  <Icon aria-hidden="true" className="size-4" />
+                  {link.label}
+                </span>
+              </li>
+            )
+          }
+
           return (
             <li key={link.label}>
               <a
