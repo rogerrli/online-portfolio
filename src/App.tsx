@@ -57,13 +57,13 @@ const EXPERIENCE: Role[] = [
   {
     title: 'Product Manager',
     company: 'VidMob',
-    dates: 'Oct 2020 to April 2022',
+    dates: 'Sep 2020 to April 2022',
     description:
       "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move. Kept a hand in the two prior roles at the company as needed.",
     tags: ['Roadmapping', 'Scrum'],
   },
   {
-    title: 'Solution Engineer',
+    title: 'Solutions Engineer',
     company: 'VidMob',
     dates: 'Oct 2019 to Oct 2021',
     description:
@@ -79,7 +79,7 @@ const EXPERIENCE: Role[] = [
     tags: ['React JS', 'Angular JS', 'Groovy/Grails', 'Java', 'MySQL', 'HTML/CSS'],
   },
   {
-    title: 'Integration Engineer',
+    title: 'Integration Engineer - Project Manager',
     company: 'Epic Systems',
     dates: 'Feb 2016 to Nov 2016',
     description:
