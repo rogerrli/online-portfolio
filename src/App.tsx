@@ -15,6 +15,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 import { RoleTitle } from '@/components/RoleTitle'
 import { useActiveSection } from '@/hooks/useActiveSection'
+import { useHasFinePointer } from '@/hooks/useHasFinePointer'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -111,6 +112,7 @@ const ROLE_TITLES = Array.from(
 
 function App() {
   const activeId = useActiveSection(SECTION_IDS)
+  const hasFinePointer = useHasFinePointer()
 
   return (
     <>
@@ -205,9 +207,13 @@ function App() {
                 Phone
               </dt>
               <dd>
-                <a href="tel:+17342331177" className="underline underline-offset-3 hover:text-accent-text">
-                  734-233-1177
-                </a>
+                {hasFinePointer ? (
+                  '734-233-1177'
+                ) : (
+                  <a href="tel:+17342331177" className="underline underline-offset-3 hover:text-accent-text">
+                    734-233-1177
+                  </a>
+                )}
               </dd>
             </div>
             <div>
