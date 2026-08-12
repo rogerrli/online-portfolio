@@ -51,8 +51,8 @@ const MUTED = "#666666";
 const LEFT = doc.page.margins.left;
 const CONTENT_WIDTH =
   doc.page.width - doc.page.margins.left - doc.page.margins.right;
-// Room for the widest date range ("Oct 2019 – Present") at DATE_SIZE.
 const DATE_SIZE = 9;
+// Room for the widest date range ("Oct 2019 – Present") at DATE_SIZE.
 const DATE_COLUMN = 90;
 
 // Draws a bold title on the left and a muted date range flush right, sharing one
