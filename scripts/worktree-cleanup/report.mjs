@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import path from "node:path";
-import { discoverWorktrees, REPO_ROOT } from "./lib.mjs";
+import { evidenceFor, inspectWorktrees, REPO_ROOT } from "./lib.mjs";
 
 const REPORT_FILE = path.join(REPO_ROOT, ".claude", "worktree-cleanup-report.json");
 
@@ -17,63 +17,53 @@ function notify(title, message) {
   }
 }
 
-const { candidates, dirtySkipped, unmerged } = discoverWorktrees();
+const entries = inspectWorktrees();
+const removable = entries.filter((e) => e.removable);
+const heldBack = entries.filter((e) => !e.removable);
 
-const report = {
-  generatedAt: new Date().toISOString(),
-  candidates,
-  dirtySkipped,
-};
-
-writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2) + "\n");
+const generatedAt = new Date().toISOString();
+writeFileSync(
+  REPORT_FILE,
+  JSON.stringify({ generatedAt, removable, heldBack }, null, 2) + "\n",
+);
 
 const lines = [];
-lines.push(`Worktree cleanup report — ${report.generatedAt}`);
+lines.push(`Worktree cleanup report — ${generatedAt}`);
 lines.push("");
 
-if (candidates.length === 0) {
-  lines.push("No merged worktrees ready for cleanup.");
+if (removable.length === 0) {
+  lines.push("Nothing to clean up: no worktree has a closed issue and a clean tree.");
 } else {
-  lines.push(`${candidates.length} worktree(s) merged into main and ready to clean up:`);
-  for (const c of candidates) {
-    const issuePart = c.issueNumber
-      ? `issue #${c.issueNumber} (${c.issueState ?? "unknown"}): ${c.issueTitle ?? ""}`
-      : "no linked issue";
-    lines.push(`  - ${c.branch} — ${issuePart}`);
+  lines.push(`${removable.length} worktree(s) confirmed safe to remove:`);
+  for (const entry of removable) {
+    lines.push("");
+    lines.push(`  ${entry.branch}`);
+    for (const line of evidenceFor(entry)) {
+      lines.push(`    ✓ ${line}`);
+    }
   }
   lines.push("");
+  lines.push("Nothing was removed. To act on it, tell Claude \"clean up the merged worktrees\", or run:");
   lines.push(
-    "Tell Claude which to clean up, e.g. \"clean up worktree issue 16\", or run:",
-  );
-  lines.push(
-    `  node scripts/worktree-cleanup/cleanup.mjs ${candidates
-      .map((c) => c.issueNumber ?? c.branch)
+    `  node scripts/worktree-cleanup/cleanup.mjs ${removable
+      .map((e) => e.issueNumber ?? e.branch)
       .join(" ")}`,
   );
 }
 
-if (dirtySkipped.length > 0) {
+if (heldBack.length > 0) {
   lines.push("");
-  lines.push(`${dirtySkipped.length} worktree(s) merged but skipped (uncommitted changes):`);
-  for (const c of dirtySkipped) {
-    lines.push(`  - ${c.branch} at ${c.worktreePath}`);
+  lines.push(`${heldBack.length} worktree(s) kept:`);
+  for (const entry of heldBack) {
+    lines.push(`  - ${entry.branch} — ${entry.blockers.join("; ")}`);
   }
 }
 
-if (unmerged.length > 0) {
-  lines.push("");
-  lines.push(`${unmerged.length} worktree(s) still active (branch not merged into main):`);
-  for (const u of unmerged) {
-    lines.push(`  - ${u.branch}`);
-  }
-}
+console.log(lines.join("\n"));
 
-const summary = lines.join("\n");
-console.log(summary);
-
-if (candidates.length > 0) {
+if (removable.length > 0) {
   notify(
     "Worktree cleanup report ready",
-    `${candidates.length} merged worktree(s) ready to clean up — see ${path.basename(REPORT_FILE)}`,
+    `${removable.length} worktree(s) confirmed safe to remove — see ${path.basename(REPORT_FILE)}`,
   );
 }

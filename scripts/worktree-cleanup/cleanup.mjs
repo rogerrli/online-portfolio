@@ -1,8 +1,4 @@
-import {
-  closeIssueGracefully,
-  discoverWorktrees,
-  removeWorktreeAndBranch,
-} from "./lib.mjs";
+import { evidenceFor, inspectWorktrees, removeWorktreeAndBranch } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 
@@ -14,39 +10,32 @@ if (args.length === 0) {
   process.exit(1);
 }
 
-const { candidates, dirtySkipped } = discoverWorktrees();
+const entries = inspectWorktrees();
+const removable = entries.filter((e) => e.removable);
 
 const wantAll = args.length === 1 && args[0] === "all";
 const targets = wantAll
-  ? candidates
-  : candidates.filter(
-      (c) => args.includes(c.issueNumber) || args.includes(c.branch),
-    );
+  ? removable
+  : removable.filter((e) => args.includes(e.issueNumber) || args.includes(e.branch));
 
 if (targets.length === 0) {
-  const dirtyMatch = dirtySkipped.filter(
-    (c) => args.includes(c.issueNumber) || args.includes(c.branch),
+  const heldBack = entries.filter(
+    (e) => !e.removable && (args.includes(e.issueNumber) || args.includes(e.branch)),
   );
-  if (dirtyMatch.length > 0) {
-    console.error(
-      "Requested worktree(s) have uncommitted changes and were not touched:",
-    );
-    for (const d of dirtyMatch) console.error(`  - ${d.branch} at ${d.worktreePath}`);
+  if (heldBack.length > 0) {
+    console.error("Requested worktree(s) are not safe to remove:");
+    for (const entry of heldBack) {
+      console.error(`  - ${entry.branch} — ${entry.blockers.join("; ")}`);
+    }
   } else {
-    console.error("No matching, merged, clean worktrees found for: " + args.join(", "));
+    console.error("No matching removable worktrees found for: " + args.join(", "));
   }
   process.exit(1);
 }
 
 for (const entry of targets) {
   console.log(`Cleaning up ${entry.branch} (${entry.worktreePath})`);
+  for (const line of evidenceFor(entry)) console.log(`  ✓ ${line}`);
   removeWorktreeAndBranch(entry);
   console.log("  worktree + branch removed");
-
-  const result = closeIssueGracefully(entry);
-  if (result.acted) {
-    console.log(`  issue #${entry.issueNumber} commented + closed`);
-  } else {
-    console.log(`  issue not modified (${result.reason})`);
-  }
 }
