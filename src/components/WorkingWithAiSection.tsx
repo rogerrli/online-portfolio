@@ -3,7 +3,7 @@ export function WorkingWithAiSection() {
     <section id="working-with-ai">
       <h2 className="mb-2 text-2xl font-medium tracking-tight">Working with AI</h2>
       <div className="flex flex-col gap-4 border-t border-border pt-6">
-        <p>
+        <p className="max-w-[60ch]">
           AI is part of how I build software day to day, not just a talking
           point &mdash; this site itself, including this section, was built
           collaboratively with Claude Code. The commit history&rsquo;s public
@@ -19,7 +19,7 @@ export function WorkingWithAiSection() {
           </a>
           .
         </p>
-        <p className="text-muted-foreground">
+        <p className="max-w-[60ch] text-muted-foreground">
           In practice that means running several Claude Code sessions in
           parallel, each on its own git worktree, working separate issues
           without stepping on each other. I write custom Claude Code skills

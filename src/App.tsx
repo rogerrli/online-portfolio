@@ -173,7 +173,7 @@ function App() {
             <br />
             <RoleTitle titles={ROLE_TITLES} />
           </h1>
-          <p className="mb-8 text-muted-foreground">
+          <p className="mb-8 max-w-[60ch] text-muted-foreground">
             My path here has been a little winding: bioengineering
             research, then software, then product, now back to software,
             and that mix is what makes me useful: I can go deep on
