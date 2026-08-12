@@ -105,9 +105,20 @@ const EXPERIENCE: Role[] = [
 ]
 
 // Deduplicated, lowercased titles for the cycling hero heading — derived
-// from EXPERIENCE so the two stay in sync.
+// from EXPERIENCE so the two stay in sync. Dual titles are trimmed to the
+// part before the dash ("Integration Engineer - Project Manager" reads as
+// "integration engineer"): the hero is a list of roles, and the full string
+// is long enough to wrap, which forces the heading to reserve a whole extra
+// line for the one title that needs it.
 const ROLE_TITLES = Array.from(
-  new Set(EXPERIENCE.map((role) => role.title.replace(/^Senior\s+/, '').toLowerCase())),
+  new Set(
+    EXPERIENCE.map((role) =>
+      role.title
+        .replace(/^Senior\s+/, '')
+        .replace(/\s+-\s+.*$/, '')
+        .toLowerCase(),
+    ),
+  ),
 )
 
 function App() {
