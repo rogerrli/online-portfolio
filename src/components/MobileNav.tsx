@@ -22,12 +22,12 @@ export function MobileNav({ links, activeHref }: MobileNavProps) {
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger
         aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-        className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'md:hidden')}
+        className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'rail:hidden')}
       >
         <Menu aria-hidden="true" className="size-4" />
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={8} align="end" className="md:hidden">
+        <Popover.Positioner sideOffset={8} align="end" className="rail:hidden">
           <Popover.Popup className="flex w-44 origin-[var(--transform-origin)] flex-col gap-1 rounded-lg border border-border bg-popover p-2 text-popover-foreground shadow-md outline-none transition-[scale,opacity] duration-100 ease-out data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
             <nav aria-label="Primary" className="flex flex-col">
               {links.map((link) => {
