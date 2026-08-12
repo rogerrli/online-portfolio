@@ -220,11 +220,7 @@ function App() {
               <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Education
               </dt>
-              <dd>
-                B.S. Biomedical Engineering, Case Western Reserve University
-                &middot; Certified Scrum Manager &middot; Certified Scrum
-                Product Owner
-              </dd>
+              <dd>B.S. Biomedical Engineering, Case Western Reserve University</dd>
             </div>
           </dl>
         </section>
