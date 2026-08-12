@@ -14,6 +14,7 @@ Roger's path has gone from bioengineering research, to software engineering, to 
 - Experience: work history, most recent first — Senior Software Engineer (2023–present), with prior roles at Jumbo, VidMob, Epic Systems, and earlier bioengineering work.
 - Skills: languages/frameworks, tooling, and API integration experience.
 - Projects: selected project work.
+- Working with AI: how Roger uses AI in his actual engineering workflow — Claude Code, Cursor, parallel git worktrees, custom Claude Code skills, scheduled routines, and agent orchestration. This site itself was built collaboratively with Claude Code.
 - Contact: how to reach Roger.
 
 ## Contact
