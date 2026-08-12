@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/accordion'
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
+import { WorkingWithAiSection } from '@/components/WorkingWithAiSection'
 import { BeyondWorkSection } from '@/components/BeyondWorkSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -21,6 +22,7 @@ const NAV_LINKS = [
   { href: '#experience', label: 'Experience' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
+  { href: '#working-with-ai', label: 'Working with AI' },
   { href: '#beyond-work', label: 'Beyond Work' },
   { href: '#contact', label: 'Contact' },
 ]
@@ -40,8 +42,7 @@ const EXPERIENCE: Role[] = [
   {
     title: 'Senior Software Engineer',
     dates: 'May 2023 to Present',
-    description:
-      "Frontend development in React, using Tailwind and Base UI. Separately, I've been building with Claude Code and Cursor, including parallelizing work across git worktrees, as part of my day-to-day workflow.",
+    description: 'Frontend development in React, using Tailwind and Base UI.',
     tags: ['React', 'Tailwind', 'Base UI', 'Claude Code', 'Cursor'],
   },
   {
@@ -242,6 +243,7 @@ function App() {
 
         <SkillsSection />
         <ProjectsSection />
+        <WorkingWithAiSection />
         <BeyondWorkSection />
         <ContactSection />
       </main>
