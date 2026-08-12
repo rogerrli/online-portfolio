@@ -172,7 +172,6 @@ function App() {
         <section id="about">
           <h1 className="mb-4 font-heading text-4xl font-medium tracking-tight sm:text-5xl">
             Hi, I&rsquo;m Roger:
-            <br />
             <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">

@@ -33,10 +33,20 @@ export function RoleTitle({ titles }: { titles: string[] }) {
   // without a visible jump.
   const frames = [...titles, titles[0]]
 
+  // Every frame is sized to the *tallest* title rather than to its own text,
+  // so the block reserves room for the longest one up front and its height
+  // never changes as the cycle advances. Without this the heading grows a
+  // line whenever a title long enough to wrap comes around, shoving the rest
+  // of the page down and back up.
   useLayoutEffect(() => {
     const el = sizerRef.current
     if (!el) return
-    const update = () => setFrameHeight(el.getBoundingClientRect().height)
+    const update = () =>
+      setFrameHeight(
+        Math.max(
+          ...[...el.children].map((c) => c.getBoundingClientRect().height),
+        ),
+      )
     update()
     const observer = new ResizeObserver(update)
     observer.observe(el)
@@ -65,33 +75,35 @@ export function RoleTitle({ titles }: { titles: string[] }) {
   }, [transitionEnabled])
 
   if (reducedMotion) {
-    return <span>{titles[0]}.</span>
+    return <span className="block">{titles[0]}.</span>
   }
 
   return (
+    // `block` so the title always starts its own line and spans the full
+    // heading width — that width is what the titles wrap against.
     <span
-      // translate-y compensates for leading-[1.2] below: the extra line-height
-      // is split evenly above and below the glyphs, so align-bottom (which
-      // anchors this box's bottom edge, not the text's baseline) otherwise
-      // leaves the title sitting visibly above the rest of the sentence.
-      className="relative inline-block translate-y-[0.15em] overflow-hidden align-bottom"
+      className="relative block overflow-hidden"
+      style={{ height: frameHeight || undefined }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Sizer: in-flow but invisible, holds the current title's text so the
-          container's width/height track it (the animated column below is
-          absolutely positioned and can't size its own ancestor). `block
-          leading-[1.2]` pins its height to a fixed multiple of font-size, so
-          it can't drift from the h1's inherited line-height — 1.2 rather
-          than 1 (leading-none) because descenders like the "g" in
-          "engineer" get clipped by neighboring rows in the stack at exactly
-          1x line-height. */}
+      {/* Sizer: out of flow (the container's height is set explicitly above)
+          and invisible, holding every title at the container's own width so
+          each one's wrapped height can be measured. `leading-[1.2]` pins line
+          height to a fixed multiple of font-size so it can't drift from the
+          h1's inherited line-height — 1.2 rather than 1 (leading-none)
+          because descenders like the "g" in "engineer" get clipped by
+          neighboring rows in the stack at exactly 1x line-height. */}
       <span
         ref={sizerRef}
         aria-hidden="true"
-        className="invisible block leading-[1.2] whitespace-nowrap"
+        className="invisible absolute inset-x-0 top-0 block"
       >
-        {frames[index]}.
+        {titles.map((title, i) => (
+          <span key={i} className="block leading-[1.2]">
+            {title}.
+          </span>
+        ))}
       </span>
       <span className="sr-only">{titles.join(', ')}</span>
       {/* A single column of every title stacked in normal flow, shifted up
@@ -107,7 +119,11 @@ export function RoleTitle({ titles }: { titles: string[] }) {
         style={{ transform: `translateY(${-index * frameHeight}px)` }}
       >
         {frames.map((title, i) => (
-          <span key={i} className="block leading-[1.2] whitespace-nowrap">
+          <span
+            key={i}
+            className="block leading-[1.2]"
+            style={{ height: frameHeight || undefined }}
+          >
             {title}.
           </span>
         ))}
