@@ -150,7 +150,7 @@ function App() {
 
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
-          <h1 className="mb-4 text-4xl font-medium tracking-tight sm:text-5xl">
+          <h1 className="mb-4 font-heading text-4xl font-medium tracking-tight sm:text-5xl">
             Hi, I&rsquo;m Roger: <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
@@ -162,13 +162,13 @@ function App() {
           </p>
           <dl className="flex flex-wrap gap-8">
             <div>
-              <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Location
               </dt>
               <dd>Brooklyn, New York &middot; open to remote</dd>
             </div>
             <div>
-              <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Email
               </dt>
               <dd>
@@ -178,7 +178,7 @@ function App() {
               </dd>
             </div>
             <div>
-              <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Phone
               </dt>
               <dd>
@@ -188,7 +188,7 @@ function App() {
               </dd>
             </div>
             <div>
-              <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Education
               </dt>
               <dd>
@@ -201,7 +201,7 @@ function App() {
         </section>
 
         <section id="experience">
-          <h2 className="mb-2 text-2xl font-medium tracking-tight">Experience</h2>
+          <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Experience</h2>
           <Accordion className="border-t border-border">
             {EXPERIENCE.map((role, i) => (
               <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
@@ -213,7 +213,7 @@ function App() {
                         {role.company}
                       </span>
                     )}
-                    <span className="text-sm font-normal text-muted-foreground no-underline sm:ml-auto">
+                    <span className="font-mono text-sm font-normal text-muted-foreground no-underline sm:ml-auto">
                       {role.dates}
                     </span>
                   </span>
@@ -225,7 +225,7 @@ function App() {
                       {role.tags.map((tag) => (
                         <li
                           key={tag}
-                          className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+                          className="rounded-full border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground"
                         >
                           {tag}
                         </li>
