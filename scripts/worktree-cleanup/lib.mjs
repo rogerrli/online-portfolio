@@ -20,12 +20,32 @@ function gitOrNull(args, cwd = REPO_ROOT) {
   }
 }
 
+function gh(args) {
+  try {
+    const out = execFileSync("gh", args, {
+      cwd: REPO_ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    return JSON.parse(out);
+  } catch {
+    return null;
+  }
+}
+
+// `git worktree list` always reports the primary checkout first; flagging it here
+// keeps the primary out of the candidate set even when this script is itself run
+// from inside a worktree (where REPO_ROOT points at that worktree, not the primary).
 function parseWorktrees(porcelain) {
   const worktrees = [];
   let current = null;
   for (const line of porcelain.split("\n")) {
     if (line.startsWith("worktree ")) {
-      current = { path: line.slice("worktree ".length), locked: false };
+      current = {
+        path: line.slice("worktree ".length),
+        locked: false,
+        primary: worktrees.length === 0,
+      };
       worktrees.push(current);
     } else if (line.startsWith("branch ")) {
       current.branch = line.slice("branch ".length).replace(/^refs\/heads\//, "");
@@ -42,63 +62,65 @@ export function issueNumberFromBranch(branch) {
 }
 
 export function getIssueInfo(issueNumber) {
-  try {
-    const out = execFileSync(
-      "gh",
-      ["issue", "view", issueNumber, "--json", "state,title,url"],
-      { cwd: REPO_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
-    );
-    return JSON.parse(out);
-  } catch {
-    return null;
-  }
+  return gh(["issue", "view", issueNumber, "--json", "state,title,url"]);
 }
 
 // The repo merges PRs via squash, so a merged branch's commits are never an
 // ancestor of main (squash produces a brand-new commit hash) — ask GitHub
 // directly whether a PR for this branch merged, falling back to ancestry
 // for branches that predate the PR workflow (merged via direct commit/merge commit).
-function isBranchMerged(branch) {
-  try {
-    const out = execFileSync(
-      "gh",
-      ["pr", "list", "--head", branch, "--state", "merged", "--json", "number", "--limit", "1"],
-      { cwd: REPO_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
-    );
-    if (JSON.parse(out).length > 0) return true;
-  } catch {
-    // fall through to ancestry check
-  }
+function mergedPrForBranch(branch) {
+  const prs = gh([
+    "pr", "list", "--head", branch, "--state", "merged",
+    "--json", "number,title,mergedAt", "--limit", "1",
+  ]);
+  if (prs?.length > 0) return prs[0];
+  return null;
+}
+
+function isAncestorOfMain(branch) {
   return gitOrNull(["merge-base", "--is-ancestor", branch, "main"]) !== null;
 }
 
-// Discovers worktrees whose branch is fully merged into main.
-// Returns { candidates, dirtySkipped, unmerged } — candidates are safe to clean up.
-export function discoverWorktrees() {
-  gitOrNull(["fetch", "origin", "main", "--quiet"]);
+// Builds the evidence record for every worktree and decides, from that evidence,
+// whether it is safe to remove.
+//
+// The linked GitHub issue is the source of truth: an open issue means the work is
+// still in flight no matter what the branch looks like, so the worktree stays. The
+// remaining checks (clean tree, merged PR) exist to confirm nothing would be lost
+// when the issue says the work is done.
+export function inspectWorktrees() {
+  gitOrNull(["fetch", "origin", "main", "--prune", "--quiet"]);
 
-  const porcelain = git(["worktree", "list", "--porcelain"]);
-  const worktrees = parseWorktrees(porcelain);
-
-  const candidates = [];
-  const dirtySkipped = [];
-  const unmerged = [];
+  const worktrees = parseWorktrees(git(["worktree", "list", "--porcelain"]));
+  const entries = [];
 
   for (const wt of worktrees) {
-    if (wt.path === REPO_ROOT || !wt.branch) continue;
-
-    if (!isBranchMerged(wt.branch)) {
-      unmerged.push({ worktreePath: wt.path, branch: wt.branch });
-      continue;
-    }
-
-    const status = gitOrNull(["status", "--porcelain"], wt.path);
-    const dirty = Boolean(status);
+    if (wt.primary || wt.path === REPO_ROOT || !wt.branch) continue;
 
     const issueNumber = issueNumberFromBranch(wt.branch);
     const issue = issueNumber ? getIssueInfo(issueNumber) : null;
+    const mergedPr = mergedPrForBranch(wt.branch);
+    const ancestor = mergedPr ? false : isAncestorOfMain(wt.branch);
+    const dirty = Boolean(gitOrNull(["status", "--porcelain"], wt.path));
+    const aheadOfMain = Number(
+      gitOrNull(["rev-list", "--count", `origin/main..${wt.branch}`]) ?? "0",
+    );
 
-    const entry = {
+    // Each blocker is a reason the worktree is NOT safe to remove, phrased for
+    // the report so the held-back list explains itself.
+    const blockers = [];
+    if (!issueNumber) {
+      blockers.push("branch name has no issue number — can't confirm the work is done");
+    } else if (!issue) {
+      blockers.push(`issue #${issueNumber} could not be read from GitHub`);
+    } else if (issue.state !== "CLOSED") {
+      blockers.push(`issue #${issueNumber} is still ${issue.state}`);
+    }
+    if (dirty) blockers.push("uncommitted changes in the worktree");
+    if (!mergedPr && !ancestor) blockers.push("no merged PR, and branch is not in main");
+
+    entries.push({
       worktreePath: wt.path,
       branch: wt.branch,
       locked: wt.locked,
@@ -106,16 +128,45 @@ export function discoverWorktrees() {
       issueState: issue?.state ?? null,
       issueTitle: issue?.title ?? null,
       issueUrl: issue?.url ?? null,
-    };
-
-    if (dirty) {
-      dirtySkipped.push(entry);
-    } else {
-      candidates.push(entry);
-    }
+      mergedPrNumber: mergedPr?.number ?? null,
+      mergedPrTitle: mergedPr?.title ?? null,
+      mergedPrMergedAt: mergedPr?.mergedAt ?? null,
+      inMainByAncestry: ancestor,
+      dirty,
+      aheadOfMain,
+      blockers,
+      removable: blockers.length === 0,
+    });
   }
 
-  return { candidates, dirtySkipped, unmerged };
+  return entries;
+}
+
+// The lines that justify removing a worktree — this is what makes the report a
+// confirmation rather than just a list of names.
+export function evidenceFor(entry) {
+  const evidence = [];
+
+  if (entry.issueNumber) {
+    evidence.push(
+      `issue #${entry.issueNumber} is ${entry.issueState}` +
+        (entry.issueTitle ? ` — ${entry.issueTitle}` : ""),
+    );
+  }
+  if (entry.mergedPrNumber) {
+    const when = entry.mergedPrMergedAt?.slice(0, 10) ?? "unknown date";
+    evidence.push(`PR #${entry.mergedPrNumber} merged ${when}`);
+  } else if (entry.inMainByAncestry) {
+    evidence.push("branch is already contained in main");
+  }
+  evidence.push(entry.dirty ? "HAS uncommitted changes" : "working tree is clean");
+  if (entry.aheadOfMain > 0) {
+    evidence.push(
+      `${entry.aheadOfMain} commit(s) not in main — expected after a squash merge`,
+    );
+  }
+
+  return evidence;
 }
 
 export function removeWorktreeAndBranch(entry) {
@@ -132,28 +183,4 @@ export function removeWorktreeAndBranch(entry) {
   if (remoteRef) {
     gitOrNull(["push", "origin", "--delete", entry.branch]);
   }
-}
-
-export function closeIssueGracefully(entry) {
-  if (!entry.issueNumber) return { acted: false, reason: "no linked issue" };
-
-  const issue = getIssueInfo(entry.issueNumber);
-  if (!issue) return { acted: false, reason: "could not read issue" };
-
-  if (issue.state !== "OPEN") {
-    return { acted: false, reason: `issue already ${issue.state}` };
-  }
-
-  const shortSha = gitOrNull(["rev-parse", "--short", "main"]) ?? "main";
-  const body =
-    `Closing automatically: branch \`${entry.branch}\` was merged into ` +
-    `\`main\` (${shortSha}) and its worktree has been cleaned up by the ` +
-    `daily worktree-cleanup job.`;
-
-  execFileSync("gh", ["issue", "comment", entry.issueNumber, "--body", body], {
-    cwd: REPO_ROOT,
-  });
-  execFileSync("gh", ["issue", "close", entry.issueNumber], { cwd: REPO_ROOT });
-
-  return { acted: true };
 }
