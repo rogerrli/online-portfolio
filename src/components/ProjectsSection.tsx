@@ -48,7 +48,7 @@ const PROJECTS: Project[] = [
 export function ProjectsSection() {
   return (
     <section id="projects">
-      <h2 className="mb-2 text-2xl font-medium tracking-tight">Projects</h2>
+      <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Projects</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {PROJECTS.map((project, i) => (
           <Card key={`${project.title}-${i}`}>
@@ -64,7 +64,7 @@ export function ProjectsSection() {
                   {project.tags.map((tag) => (
                     <li
                       key={tag}
-                      className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+                      className="rounded-full border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground"
                     >
                       {tag}
                     </li>

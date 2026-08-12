@@ -60,7 +60,7 @@ function SkillBadge({ skill }: { skill: string }) {
   return (
     <Badge
       variant="secondary"
-      className="h-auto px-2.5 py-1 text-sm font-normal transition-colors hover:bg-accent hover:text-accent-foreground"
+      className="h-auto px-2.5 py-1 font-mono text-sm font-normal transition-colors hover:bg-accent hover:text-accent-foreground"
     >
       {skill}
     </Badge>
@@ -72,11 +72,11 @@ export function SkillsSection() {
 
   return (
     <section id="skills">
-      <h2 className="mb-2 text-2xl font-medium tracking-tight">Skills</h2>
+      <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Skills</h2>
       <dl className="flex flex-col gap-6 border-t border-border pt-6">
         {SKILL_GROUPS.map((group) => (
           <div key={group.label}>
-            <dt className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
+            <dt className="mb-2 font-mono text-xs tracking-wide text-muted-foreground uppercase">
               {group.label}
             </dt>
             <dd className="flex flex-wrap gap-2">
@@ -87,7 +87,7 @@ export function SkillsSection() {
           </div>
         ))}
         <div>
-          <dt className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
+          <dt className="mb-2 font-mono text-xs tracking-wide text-muted-foreground uppercase">
             API Experience
           </dt>
           <dd className="flex flex-wrap items-center gap-2">
