@@ -24,14 +24,14 @@ function formatDate(isoDate) {
 }
 
 function formatRange(startDate, endDate) {
-  return `${formatDate(startDate)} – ${endDate ? formatDate(endDate) : "Present"}`;
+  return `${formatDate(startDate)} - ${endDate ? formatDate(endDate) : "Present"}`;
 }
 
 const doc = new PDFDocument({
   size: "LETTER",
   margins: { top: 50, bottom: 44, left: 54, right: 54 },
   info: {
-    Title: `${resume.basics.name} – Resume`,
+    Title: `${resume.basics.name} Resume`,
     Author: resume.basics.name,
   },
 });
@@ -41,7 +41,7 @@ doc.pipe(createWriteStream(path.join(REPO_ROOT, "public", "resume.pdf")));
 // the build rather than quietly shipping a two-page PDF.
 doc.on("pageAdded", () => {
   throw new Error(
-    "resume.pdf overflowed onto a second page — trim resume.json or tighten the layout in this script.",
+    "resume.pdf overflowed onto a second page. Trim resume.json or tighten the layout in this script.",
   );
 });
 
@@ -52,7 +52,7 @@ const LEFT = doc.page.margins.left;
 const CONTENT_WIDTH =
   doc.page.width - doc.page.margins.left - doc.page.margins.right;
 const DATE_SIZE = 9;
-// Room for the widest date range ("Oct 2019 – Present") at DATE_SIZE.
+// Room for the widest date range ("Oct 2019 - Present") at DATE_SIZE.
 const DATE_COLUMN = 90;
 
 // Draws a bold title on the left and a muted date range flush right, sharing one
@@ -111,7 +111,7 @@ function sectionHeading(title) {
 if (resume.work?.length) {
   sectionHeading("Experience");
   for (const job of resume.work) {
-    const titleLine = job.name ? `${job.position} — ${job.name}` : job.position;
+    const titleLine = job.name ? `${job.position}, ${job.name}` : job.position;
 
     entryRow(titleLine, formatRange(job.startDate, job.endDate), 11);
 

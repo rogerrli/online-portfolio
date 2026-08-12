@@ -5,7 +5,7 @@
     "label": "Senior Software Engineer",
     "email": "li.rojie@gmail.com",
     "url": "https://liroger.com",
-    "summary": "Software engineer with a winding path through bioengineering research, software, and product management — comfortable going deep on code while staying fluent with the people who aren't writing it.",
+    "summary": "Software engineer with a background in bioengineering research and product management. I build frontend features now, and the PM years mean I can run the roadmap and client conversations around them too.",
     "location": {
       "city": "Brooklyn",
       "region": "New York",
@@ -36,42 +36,42 @@
       "position": "Product Manager",
       "startDate": "2022-05-01",
       "endDate": "2023-05-01",
-      "summary": "Shipped multiple iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for engineers with a strong focus on protecting user data, and used analytics to steer the product toward KPI goals."
+      "summary": "Shipped several iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for the engineers, pushed hard on protecting user data, and used analytics to pick what to build next."
     },
     {
       "name": "VidMob",
       "position": "Product Manager",
       "startDate": "2020-10-01",
       "endDate": "2022-04-01",
-      "summary": "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move."
+      "summary": "Planned the roadmap across 3 teams as both product owner and scrum master. Talked to clients directly and used their feedback and usage data to prioritize the backlog."
     },
     {
       "name": "VidMob",
       "position": "Solution Engineer",
       "startDate": "2019-10-01",
       "endDate": "2021-10-01",
-      "summary": "Built proof-of-concepts so product teams could weigh cost, risk, and value before committing to new features. Overhauled API docs, including a new public-facing version. Technical lead for partnerships scoping new integrations."
+      "summary": "Built proof-of-concepts so product teams knew what a feature would cost before committing to it. Overhauled the API docs and wrote a new public-facing version. Technical lead for partnerships scoping new integrations."
     },
     {
       "name": "VidMob",
       "position": "Full Stack Engineer",
       "startDate": "2017-05-01",
       "endDate": "2019-09-01",
-      "summary": "Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations to cut manual workflows, and eventually led the engineering team."
+      "summary": "Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations that replaced manual work, and eventually led the engineering team."
     },
     {
       "name": "Epic Systems",
       "position": "Integration Engineer",
       "startDate": "2016-02-01",
       "endDate": "2016-11-01",
-      "summary": "Guided clients through new software rollouts, recommending configurations tailored to their needs and hitting fixed launch dates."
+      "summary": "Guided clients through new software rollouts, recommended configurations that fit their workflows, and hit fixed launch dates."
     },
     {
       "name": "Healmet",
       "position": "Bioengineer",
       "startDate": "2015-08-01",
       "endDate": "2016-01-01",
-      "summary": "Helped plan a prototype for detecting basic vitals — heart rate, oxygen saturation, EKG — similar to what an Apple Watch does today."
+      "summary": "Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG), similar to what an Apple Watch does today."
     },
     {
       "name": "University Hospitals Cleveland Medical Center",
