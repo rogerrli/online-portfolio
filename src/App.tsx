@@ -182,7 +182,10 @@ function App() {
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
           <h1 className="mb-4 font-heading text-4xl font-medium tracking-tight sm:text-5xl">
-            Hi, I&rsquo;m Roger:
+            {/* nbsp keeps "your next" intact — it introduces the cycling
+                title below, and breaking after "your" strands "next" alone
+                on a line at narrow widths. */}
+            Hi, I&rsquo;m Roger, your&nbsp;next
             <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
