@@ -29,7 +29,7 @@ export function BeyondWorkSection() {
             <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
               <span aria-hidden="true">{interest.emoji}</span> {interest.label}
             </dt>
-            <dd className="max-w-[60ch]">{interest.description}</dd>
+            <dd>{interest.description}</dd>
           </div>
         ))}
       </dl>

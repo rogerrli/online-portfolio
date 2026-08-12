@@ -48,7 +48,7 @@ export function ContactSection() {
   return (
     <section id="contact">
       <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Contact</h2>
-      <p className="mb-6 max-w-[60ch] text-muted-foreground">
+      <p className="mb-6 text-muted-foreground">
         Best way to reach me is email, happy to talk about roles,
         projects, or anything in between.
       </p>
