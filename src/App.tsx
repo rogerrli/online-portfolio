@@ -165,7 +165,10 @@ function App() {
               <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
                 Location
               </dt>
-              <dd>Brooklyn, New York &middot; open to remote</dd>
+              <dd>
+                Brooklyn, New York{' '}
+                <span className="text-muted-foreground">&middot; open to remote</span>
+              </dd>
             </div>
             <div>
               <dt className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
