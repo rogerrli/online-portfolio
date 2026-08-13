@@ -81,14 +81,6 @@
       "summary": "Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured."
     }
   ],
-  "education": [
-    {
-      "institution": "Case Western Reserve University",
-      "area": "Biomedical Engineering",
-      "studyType": "B.S.",
-      "endDate": "2015-05-01"
-    }
-  ],
   "certificates": [
     { "name": "Certified Scrum Manager" },
     { "name": "Certified Scrum Product Owner" }

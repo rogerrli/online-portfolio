@@ -29,7 +29,7 @@ function formatRange(startDate, endDate) {
 
 const doc = new PDFDocument({
   size: "LETTER",
-  margins: { top: 50, bottom: 44, left: 54, right: 54 },
+  margins: { top: 56, bottom: 50, left: 54, right: 54 },
   info: {
     Title: `${resume.basics.name} Resume`,
     Author: resume.basics.name,
@@ -92,7 +92,7 @@ if (resume.basics.summary) {
   doc.font("Helvetica").fontSize(10.5).fillColor("black").text(resume.basics.summary, {
     align: "left",
   });
-  doc.moveDown(0.85);
+  doc.moveDown(1.1);
 }
 
 function sectionHeading(title) {
@@ -105,7 +105,7 @@ function sectionHeading(title) {
     .strokeColor("#cccccc")
     .lineWidth(1)
     .stroke();
-  doc.moveDown(0.5);
+  doc.moveDown(0.65);
 }
 
 if (resume.work?.length) {
@@ -118,7 +118,7 @@ if (resume.work?.length) {
     if (job.summary) {
       doc.font("Helvetica").fontSize(10).fillColor("black").text(job.summary);
     }
-    doc.moveDown(0.5);
+    doc.moveDown(0.8);
   }
 }
 
@@ -139,7 +139,7 @@ if (resume.certificates?.length) {
     .fontSize(10)
     .fillColor("black")
     .text(resume.certificates.map((c) => c.name).join("   ·   "));
-  doc.moveDown(0.7);
+  doc.moveDown(1.0);
 }
 
 if (resume.skills?.length) {
@@ -153,7 +153,7 @@ if (resume.skills?.length) {
       .font("Helvetica")
       .fillColor(MUTED)
       .text(group.keywords.join(", "));
-    doc.moveDown(0.25);
+    doc.moveDown(0.4);
   }
 }
 
