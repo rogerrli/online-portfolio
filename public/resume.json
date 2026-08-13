@@ -41,13 +41,13 @@
     {
       "name": "VidMob",
       "position": "Product Manager",
-      "startDate": "2020-10-01",
+      "startDate": "2020-09-01",
       "endDate": "2022-04-01",
       "summary": "Planned the roadmap across 3 teams as both product owner and scrum master. Talked to clients directly and used their feedback and usage data to prioritize the backlog."
     },
     {
       "name": "VidMob",
-      "position": "Solution Engineer",
+      "position": "Solutions Engineer",
       "startDate": "2019-10-01",
       "endDate": "2021-10-01",
       "summary": "Built proof-of-concepts so product teams knew what a feature would cost before committing to it. Overhauled the API docs and wrote a new public-facing version. Technical lead for partnerships scoping new integrations."
@@ -61,7 +61,7 @@
     },
     {
       "name": "Epic Systems",
-      "position": "Integration Engineer",
+      "position": "Integration Engineer - Project Manager",
       "startDate": "2016-02-01",
       "endDate": "2016-11-01",
       "summary": "Guided clients through new software rollouts, recommended configurations that fit their workflows, and hit fixed launch dates."
