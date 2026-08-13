@@ -104,11 +104,22 @@ const EXPERIENCE: Role[] = [
   },
 ]
 
-// Deduplicated, lowercased titles for the cycling hero heading — derived
-// from EXPERIENCE so the two stay in sync.
-const ROLE_TITLES = Array.from(
-  new Set(EXPERIENCE.map((role) => role.title.replace(/^Senior\s+/, '').toLowerCase())),
-)
+// Titles for the cycling hero heading. Deliberately hand-written rather
+// than derived from EXPERIENCE: the heading offers a role ("your next …")
+// instead of listing history, so a full résumé of past titles reads as a
+// claim to every one of those careers at once. Two professional entries
+// carry the pitch, then one sincere and one joke widen it past the job.
+//
+// Order matters. The first entry is what loads before the cycle starts and
+// the only one visitors with prefers-reduced-motion ever see, so it leads
+// with the straightest professional title — and the joke sits last, where
+// it lands as a punchline.
+const ROLE_TITLES = [
+  'full stack engineer',
+  'engineer who speaks product',
+  'teammate',
+  'dungeon master',
+]
 
 function App() {
   const activeId = useActiveSection(SECTION_IDS)
@@ -154,8 +165,10 @@ function App() {
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
           <h1 className="mb-4 font-heading text-4xl font-medium tracking-tight sm:text-5xl">
-            Hi, I&rsquo;m Roger:
-            <br />
+            {/* nbsp keeps "your next" intact — it introduces the cycling
+                title below, and breaking after "your" strands "next" alone
+                on a line at narrow widths. */}
+            Hi, I&rsquo;m Roger, your&nbsp;next
             <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
