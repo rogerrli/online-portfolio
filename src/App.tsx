@@ -45,7 +45,8 @@ const EXPERIENCE: Role[] = [
   {
     title: 'Senior Software Engineer',
     dates: 'May 2023 to Present',
-    description: 'Frontend development in React, using Tailwind and Base UI.',
+    description:
+      'Frontend work in React, building the views that render log and telemetry records. Most recently a dark mode pass across the app, which is where I started handing real work to AI tooling.',
     tags: ['React', 'Tailwind', 'Base UI', 'Claude Code', 'Cursor'],
   },
   {
@@ -53,7 +54,7 @@ const EXPERIENCE: Role[] = [
     company: 'Jumbo',
     dates: 'May 2022 to May 2023',
     description:
-      'Shipped multiple iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for engineers with a strong focus on protecting user data, and used analytics to steer the product toward our KPI goals.',
+      "Shipped several iOS features and helped move the product from B2C to B2B2C. The engineering side of that pivot was straightforward. The hard part was convincing other companies to buy what we'd built. Set weekly roadmaps and leaned on analytics to decide what came next.",
     tags: ['iOS', 'Analytics', 'Product Strategy', 'A/B Testing'],
   },
   {
@@ -61,7 +62,7 @@ const EXPERIENCE: Role[] = [
     company: 'VidMob',
     dates: 'Sep 2020 to April 2022',
     description:
-      "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move. Kept a hand in the two prior roles at the company as needed.",
+      'Ran the process across three teams as both product owner and scrum master. This was more organizing and unblocking than deciding what to build, plus a fair amount of talking to clients directly. Kept a hand in my two previous roles at the company as needed.',
     tags: ['Roadmapping', 'Scrum'],
   },
   {
@@ -69,7 +70,7 @@ const EXPERIENCE: Role[] = [
     company: 'VidMob',
     dates: 'Oct 2019 to Oct 2021',
     description:
-      'Built proof-of-concepts so product teams could weigh cost, risk, and value before committing to new features. Overhauled our API docs, including a new public-facing version. Served as the technical lead for partnerships scoping new integrations.',
+      'Built prototypes so product teams knew what a feature would cost before committing to it. Rewrote our API documentation and stood up a public version when a prospective client needed one to evaluate our new RESTful v2. Technical lead for partnerships scoping integrations.',
     tags: ['API Design', 'Postman', 'OAuth1/OAuth2', 'Documentation'],
   },
   {
@@ -77,7 +78,7 @@ const EXPERIENCE: Role[] = [
     company: 'VidMob',
     dates: 'May 2017 to Sept 2019',
     description:
-      'Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations to cut manual workflows, and eventually led the engineering team.',
+      'Designed and built features and systems end to end. Rebuilt the email notification system: the original was never built for the dozens of event types we had queued up to add. Shipped about a dozen integrations, and eventually led the engineering team.',
     tags: ['React JS', 'Angular JS', 'Groovy/Grails', 'Java', 'MySQL', 'HTML/CSS'],
   },
   {
@@ -187,11 +188,12 @@ function App() {
             <RoleTitle titles={ROLE_TITLES} />
           </h1>
           <p className="mb-8 max-w-[60ch] text-muted-foreground">
-            My path here has been a little winding: bioengineering
-            research, then software, then product, now back to software,
-            and that mix is what makes me useful: I can go deep on
-            code and still talk fluently with the people who aren&rsquo;t
-            writing it.
+            I started in bioengineering research, moved into software,
+            spent a few years in product management, then came back to
+            engineering. That last move was about meetings. I was in too
+            many of them, and I missed building something and watching it
+            work. The product years still pay off: I can sit in a roadmap
+            conversation without needing a translator.
           </p>
           <dl className="flex flex-wrap gap-8">
             <div>

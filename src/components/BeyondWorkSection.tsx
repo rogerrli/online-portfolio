@@ -6,16 +6,10 @@ interface Interest {
 
 const INTERESTS: Interest[] = [
   {
-    emoji: '🔧',
-    label: 'Machine Shop',
-    description:
-      'I like building things with my hands, too — I keep a small home machine shop for personal projects.',
-  },
-  {
     emoji: '🎲',
     label: 'Dungeon Master',
     description:
-      "I've run tabletop D&D campaigns for years — different medium, same instinct for building systems people want to explore.",
+      "Five or six years running tabletop D&D for the same group. The best campaign was a replay of Final Fantasy X as a D&D game, which worked far better than it had any right to.",
   },
 ]
 

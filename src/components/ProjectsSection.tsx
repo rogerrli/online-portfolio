@@ -18,7 +18,7 @@ const PROJECTS: Project[] = [
   {
     title: 'This site',
     description:
-      "The old liroger.com was a generic template site that was a pain to keep current. I rebuilt it as a code-owned site (Vite, React, TypeScript, Tailwind, shadcn/Base UI) with content and design tracked as normal commits instead of a page builder. It was also built collaboratively with Claude Code — work planned as GitHub issues, implemented across git worktrees, shipped through PRs — which is what you're looking at right now.",
+      "The old liroger.com was a Squarespace template I mostly left alone, since changing anything was a chore and I was paying a subscription for the privilege. This version is a normal codebase (Vite, React, TypeScript, Tailwind, Base UI) where updating content is a commit rather than a session in a page builder. Built with Claude Code, planned as GitHub issues, shipped through PRs.",
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'Claude Code'],
     links: [
       { href: 'https://online-portfolio-puce.vercel.app', label: 'Live site' },
@@ -28,20 +28,20 @@ const PROJECTS: Project[] = [
   {
     title: 'VidMob — integration platform',
     description:
-      "Teams were losing time to manual, repetitive workflows connecting VidMob to the ad platforms and tools clients relied on. I architected and built roughly a dozen integrations (Groovy/Grails, OAuth1/OAuth2) across platforms like Facebook, Google, and Salesforce, replacing manual handoffs with automated syncs.",
+      "Roughly a dozen integrations in Groovy/Grails, wiring VidMob into the ad platforms and storage tools clients were already using. Amazon Ads was the outlier: their API was inconsistent enough for the industry that I ended up giving Amazon feedback on how it should be shaped.",
     tags: ['Groovy/Grails', 'OAuth1/OAuth2', 'REST APIs'],
   },
   {
     title: 'VidMob — public API documentation',
     description:
-      "VidMob's API documentation was internal-only and inconsistent, which slowed down both new integrations and partnership conversations. I overhauled the documentation strategy end to end and stood up a public-facing version, giving partners and prospects a self-serve technical reference instead of routing every question through an engineer.",
+      "VidMob's API docs were internal-only and inconsistent. When a prospective client needed to evaluate our new RESTful v2, I rewrote the documentation and put a public-facing version behind it.",
     tags: ['API Design', 'Technical Writing', 'Postman'],
   },
   {
     title: 'Jumbo — B2C to B2B2C transition',
     description:
-      "Jumbo needed to evolve its consumer iOS app into a model that also served business partners, without losing the trust of existing users. As product manager, I set weekly roadmaps for the engineering team, prioritized user-data protection through the transition, and used analytics to steer feature decisions toward our KPI goals across several shipped iOS releases.",
-    tags: ['Product Strategy', 'Data Privacy', 'Analytics'],
+      "Jumbo's consumer iOS app needed to work for business partners too. The engineering was the easy part. The real work was convincing those companies to buy it, and what they asked for in those conversations shaped the roadmap more than any planning session did.",
+    tags: ['Product Strategy', 'Partnerships', 'Analytics'],
   },
 ]
 
