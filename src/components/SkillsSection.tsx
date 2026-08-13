@@ -30,7 +30,7 @@ const SKILL_GROUPS: SkillGroup[] = [
   },
   {
     label: 'Certifications',
-    skills: ['Certified Scrum Manager', 'Certified Scrum Product Owner'],
+    skills: ['Certified ScrumMaster', 'Certified Scrum Product Owner'],
   },
 ]
 

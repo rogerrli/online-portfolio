@@ -5,7 +5,7 @@
     "label": "Senior Software Engineer",
     "email": "li.rojie@gmail.com",
     "url": "https://liroger.com",
-    "summary": "Software engineer with a background in bioengineering research and product management. I build frontend features now, and the PM years mean I can run the roadmap and client conversations around them too.",
+    "summary": "Software engineer who came up through bioengineering research and a few years in product management. Builds frontend features now, and knows the roadmap conversations around them.",
     "location": {
       "city": "Brooklyn",
       "region": "New York",
@@ -29,60 +29,60 @@
       "name": "",
       "position": "Senior Software Engineer",
       "startDate": "2023-05-01",
-      "summary": "Frontend development in React, using Tailwind and Base UI."
+      "summary": "Frontend work in React, building the views that render log and telemetry records. Recently a dark mode pass across the app, much of it done with AI tooling."
     },
     {
       "name": "Jumbo",
       "position": "Product Manager",
       "startDate": "2022-05-01",
       "endDate": "2023-05-01",
-      "summary": "Shipped several iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for the engineers, pushed hard on protecting user data, and used analytics to pick what to build next."
+      "summary": "Shipped several iOS features and helped move the product from B2C to B2B2C, where convincing partner companies to buy in was harder than the engineering. Set roadmaps and used analytics to prioritize."
     },
     {
       "name": "VidMob",
       "position": "Product Manager",
       "startDate": "2020-09-01",
       "endDate": "2022-04-01",
-      "summary": "Planned the roadmap across 3 teams as both product owner and scrum master. Talked to clients directly and used their feedback and usage data to prioritize the backlog."
+      "summary": "Ran the process across three teams as product owner and scrum master, more organizing and unblocking than deciding what to build. Talked to clients directly."
     },
     {
       "name": "VidMob",
       "position": "Solutions Engineer",
       "startDate": "2019-10-01",
       "endDate": "2021-10-01",
-      "summary": "Built proof-of-concepts so product teams knew what a feature would cost before committing to it. Overhauled the API docs and wrote a new public-facing version. Technical lead for partnerships scoping new integrations."
+      "summary": "Built prototypes so product teams knew what a feature would cost. Rewrote the API docs and stood up a public version for a client evaluating our new RESTful v2."
     },
     {
       "name": "VidMob",
       "position": "Full Stack Engineer",
       "startDate": "2017-05-01",
       "endDate": "2019-09-01",
-      "summary": "Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations that replaced manual work, and eventually led the engineering team."
+      "summary": "Built features and systems end to end. Rebuilt the email notification system, which couldn't handle the dozens of event types planned for it. Shipped about a dozen integrations, including Amazon Ads, and led the team."
     },
     {
       "name": "Epic Systems",
       "position": "Integration Engineer - Project Manager",
       "startDate": "2016-02-01",
       "endDate": "2016-11-01",
-      "summary": "Guided clients through new software rollouts, recommended configurations that fit their workflows, and hit fixed launch dates."
+      "summary": "Guided clients through software rollouts, recommending configurations that fit their workflows and hitting fixed launch dates."
     },
     {
       "name": "Healmet",
       "position": "Bioengineer",
       "startDate": "2015-08-01",
       "endDate": "2016-01-01",
-      "summary": "Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG), similar to what an Apple Watch does today."
+      "summary": "Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG), much like an Apple Watch does today."
     },
     {
       "name": "University Hospitals Cleveland Medical Center",
       "position": "Research Assistant",
       "startDate": "2013-08-01",
       "endDate": "2015-05-01",
-      "summary": "Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured."
+      "summary": "Supported a lab studying OCT imaging of coronary arteries and improved how patient data was tracked."
     }
   ],
   "certificates": [
-    { "name": "Certified Scrum Manager" },
+    { "name": "Certified ScrumMaster" },
     { "name": "Certified Scrum Product Owner" }
   ],
   "skills": [
