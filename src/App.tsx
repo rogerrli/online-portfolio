@@ -104,22 +104,22 @@ const EXPERIENCE: Role[] = [
   },
 ]
 
-// Deduplicated, lowercased titles for the cycling hero heading — derived
-// from EXPERIENCE so the two stay in sync. Dual titles are trimmed to the
-// part before the dash ("Integration Engineer - Project Manager" reads as
-// "integration engineer"): the hero is a list of roles, and the full string
-// is long enough to wrap, which forces the heading to reserve a whole extra
-// line for the one title that needs it.
-const ROLE_TITLES = Array.from(
-  new Set(
-    EXPERIENCE.map((role) =>
-      role.title
-        .replace(/^Senior\s+/, '')
-        .replace(/\s+-\s+.*$/, '')
-        .toLowerCase(),
-    ),
-  ),
-)
+// Titles for the cycling hero heading. Deliberately hand-written rather
+// than derived from EXPERIENCE: the heading offers a role ("your next …")
+// instead of listing history, so a full résumé of past titles reads as a
+// claim to every one of those careers at once. Two professional entries
+// carry the pitch, then one sincere and one joke widen it past the job.
+//
+// Order matters. The first entry is what loads before the cycle starts and
+// the only one visitors with prefers-reduced-motion ever see, so it leads
+// with the straightest professional title — and the joke sits last, where
+// it lands as a punchline.
+const ROLE_TITLES = [
+  'full stack engineer',
+  'engineer who speaks product',
+  'teammate',
+  'dungeon master',
+]
 
 function App() {
   const activeId = useActiveSection(SECTION_IDS)
