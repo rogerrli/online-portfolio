@@ -14,9 +14,9 @@ import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 import { RoleTitle } from '@/components/RoleTitle'
+import { SectionRail } from '@/components/SectionRail'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { useHasFinePointer } from '@/hooks/useHasFinePointer'
-import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '#about', label: 'About' },
@@ -116,28 +116,9 @@ function App() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background py-6">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background py-6 rail:col-span-2">
         <span className="font-semibold">Roger Li</span>
-        <div className="flex items-center gap-6">
-          <nav aria-label="Primary" className="hidden gap-6 md:flex">
-            {NAV_LINKS.map((link) => {
-              const isActive = activeId === link.href.slice(1)
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  aria-current={isActive ? 'true' : undefined}
-                  className={cn(
-                    'text-muted-foreground hover:text-accent-text',
-                    isActive && 'text-accent-text',
-                  )}
-                >
-                  {link.label}
-                </a>
-              )
-            })}
-          </nav>
-          <span aria-hidden="true" className="hidden h-4 w-px bg-border md:block" />
+        <div className="flex items-center gap-4">
           <a
             href="/resume.pdf"
             download="Roger-Li-Resume.pdf"
@@ -167,6 +148,8 @@ function App() {
           <MobileNav links={NAV_LINKS} activeHref={`#${activeId ?? ''}`} />
         </div>
       </header>
+
+      <SectionRail links={NAV_LINKS} activeId={activeId} />
 
       <main className="flex flex-col gap-16 py-12">
         <section id="about">
@@ -270,7 +253,7 @@ function App() {
         <ContactSection />
       </main>
 
-      <footer className="border-t border-border py-6 text-xs text-muted-foreground">
+      <footer className="border-t border-border py-6 text-xs text-muted-foreground rail:col-start-2">
         <p>
           Built to be legible to AI agents, too:{' '}
           <a

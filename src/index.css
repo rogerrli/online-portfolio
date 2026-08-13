@@ -165,6 +165,13 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Width at which the section rail fits beside the content column. Not one of
+   Tailwind's stock breakpoints because it is derived from the layout maths in
+   the #root grid below rather than from a device class. */
+@theme {
+  --breakpoint-rail: 1160px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -185,4 +192,21 @@
   padding-inline: 20px;
   min-height: 100svh;
   box-sizing: border-box;
+}
+
+/* Once the viewport can fit the section rail beside the content, lay the two
+   out as a centered grid: 160px rail + 40px gutter + the same 920px content
+   column used at every narrower width, so the measure of the prose never
+   changes. 1160px = 160 + 40 + 920 + the 40px of inline padding.
+
+   Keep this in sync with --breakpoint-rail above, which drives the matching
+   `rail:` variants on the rail itself and the mobile nav trigger. */
+@media (min-width: 1160px) {
+  #root {
+    display: grid;
+    grid-template-columns: 160px 920px;
+    column-gap: 40px;
+    align-content: start;
+    width: 1160px;
+  }
 }
