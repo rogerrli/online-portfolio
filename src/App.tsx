@@ -17,6 +17,8 @@ import { RoleTitle } from '@/components/RoleTitle'
 import { SectionRail } from '@/components/SectionRail'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { useHasFinePointer } from '@/hooks/useHasFinePointer'
+import { useIsScrolled } from '@/hooks/useIsScrolled'
+import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '#about', label: 'About' },
@@ -113,11 +115,24 @@ const ROLE_TITLES = Array.from(
 function App() {
   const activeId = useActiveSection(SECTION_IDS)
   const hasFinePointer = useHasFinePointer()
+  const isScrolled = useIsScrolled()
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background py-6 rail:col-span-2">
-        <span className="font-semibold">Roger Li</span>
+      <header
+        className={cn(
+          'sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background rail:col-span-2 motion-safe:transition-[padding] motion-safe:duration-200',
+          isScrolled ? 'py-3' : 'py-6',
+        )}
+      >
+        <span
+          className={cn(
+            'font-semibold motion-safe:transition-[font-size] motion-safe:duration-200',
+            isScrolled && 'text-sm',
+          )}
+        >
+          Roger Li
+        </span>
         <div className="flex items-center gap-4">
           <a
             href="/resume.pdf"
