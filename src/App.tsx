@@ -14,23 +14,25 @@ import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 import { RoleTitle } from '@/components/RoleTitle'
+import { Section } from '@/components/Section'
 import { SectionRail } from '@/components/SectionRail'
+import { TagList } from '@/components/TagList'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { useHasFinePointer } from '@/hooks/useHasFinePointer'
 import { useIsScrolled } from '@/hooks/useIsScrolled'
-import { cn } from '@/lib/utils'
+import { cn, LABEL_CLASS, LINK_CLASS } from '@/lib/utils'
 
 const NAV_LINKS = [
-  { href: '#about', label: 'About' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#projects', label: 'Projects' },
-  { href: '#working-with-ai', label: 'Working with AI' },
-  { href: '#beyond-work', label: 'Beyond Work' },
-  { href: '#contact', label: 'Contact' },
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'working-with-ai', label: 'Working with AI' },
+  { id: 'beyond-work', label: 'Beyond Work' },
+  { id: 'contact', label: 'Contact' },
 ]
 
-const SECTION_IDS = NAV_LINKS.map((link) => link.href.slice(1))
+const SECTION_IDS = NAV_LINKS.map((link) => link.id)
 
 interface Role {
   title: string
@@ -171,7 +173,7 @@ function App() {
             Resume
           </a>
           <ThemeToggle />
-          <MobileNav links={NAV_LINKS} activeHref={`#${activeId ?? ''}`} />
+          <MobileNav links={NAV_LINKS} activeId={activeId} />
         </div>
       </header>
 
@@ -195,49 +197,40 @@ function App() {
           </p>
           <dl className="flex flex-wrap gap-8">
             <div>
-              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-                Location
-              </dt>
+              <dt className={cn('mb-1', LABEL_CLASS)}>Location</dt>
               <dd>
                 Brooklyn, New York
                 <span className="block text-sm text-muted-foreground">open to remote</span>
               </dd>
             </div>
             <div>
-              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-                Email
-              </dt>
+              <dt className={cn('mb-1', LABEL_CLASS)}>Email</dt>
               <dd>
-                <a href="mailto:li.rojie@gmail.com" className="underline underline-offset-3 hover:text-accent-text">
+                <a href="mailto:li.rojie@gmail.com" className={LINK_CLASS}>
                   li.rojie@gmail.com
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-                Phone
-              </dt>
+              <dt className={cn('mb-1', LABEL_CLASS)}>Phone</dt>
               <dd>
                 {hasFinePointer ? (
                   '734-233-1177'
                 ) : (
-                  <a href="tel:+17342331177" className="underline underline-offset-3 hover:text-accent-text">
+                  <a href="tel:+17342331177" className={LINK_CLASS}>
                     734-233-1177
                   </a>
                 )}
               </dd>
             </div>
             <div>
-              <dt className="mb-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-                Education
-              </dt>
+              <dt className={cn('mb-1', LABEL_CLASS)}>Education</dt>
               <dd>B.S. Biomedical Engineering, Case Western Reserve University</dd>
             </div>
           </dl>
         </section>
 
-        <section id="experience">
-          <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Experience</h2>
+        <Section id="experience" title="Experience">
           <Accordion className="border-t border-border">
             {EXPERIENCE.map((role, i) => (
               <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
@@ -256,23 +249,12 @@ function App() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p>{role.description}</p>
-                  {role.tags && role.tags.length > 0 && (
-                    <ul aria-label="Technologies used" className="mt-3 flex flex-wrap gap-1.5">
-                      {role.tags.map((tag) => (
-                        <li
-                          key={tag}
-                          className="rounded-full border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground"
-                        >
-                          {tag}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <TagList tags={role.tags} />
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </section>
+        </Section>
 
         <SkillsSection />
         <ProjectsSection />
@@ -284,17 +266,11 @@ function App() {
       <footer className="border-t border-border py-6 text-xs text-muted-foreground rail:col-start-2">
         <p>
           Built to be legible to AI agents, too:{' '}
-          <a
-            href="/llms.txt"
-            className="underline underline-offset-3 hover:text-accent-text"
-          >
+          <a href="/llms.txt" className={LINK_CLASS}>
             llms.txt
           </a>
           {' '}&middot;{' '}
-          <a
-            href="/resume.json"
-            className="underline underline-offset-3 hover:text-accent-text"
-          >
+          <a href="/resume.json" className={LINK_CLASS}>
             resume.json
           </a>
         </p>

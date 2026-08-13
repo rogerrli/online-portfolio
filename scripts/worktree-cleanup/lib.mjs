@@ -78,6 +78,39 @@ function mergedPrForBranch(branch) {
   return null;
 }
 
+// Both GitHub lookups below are fetched once for the whole run rather than once
+// per worktree: with ~18 worktrees the per-branch version cost ~36 sequential
+// network round trips (~9s).
+//
+// `complete` reports whether the batch is known to hold every record — it is only
+// false if the fetch failed outright or came back full enough to have been
+// truncated. A miss against a complete batch is a real "no such record", so the
+// per-item fallback fires only when the batch can't answer authoritatively, and
+// correctness never depends on BATCH_LIMIT being large enough.
+const BATCH_LIMIT = 200;
+
+function fetchBatch(args, keyOf) {
+  const rows = gh([...args, "--limit", String(BATCH_LIMIT)]);
+  return {
+    map: new Map((rows ?? []).map((row) => [keyOf(row), row])),
+    complete: rows !== null && rows.length < BATCH_LIMIT,
+  };
+}
+
+function fetchMergedPrs() {
+  return fetchBatch(
+    ["pr", "list", "--state", "merged", "--json", "number,title,mergedAt,headRefName"],
+    (pr) => pr.headRefName,
+  );
+}
+
+function fetchIssues() {
+  return fetchBatch(
+    ["issue", "list", "--state", "all", "--json", "number,state,title,url"],
+    (issue) => String(issue.number),
+  );
+}
+
 function isAncestorOfMain(branch) {
   return gitOrNull(["merge-base", "--is-ancestor", branch, "main"]) !== null;
 }
@@ -93,14 +126,21 @@ export function inspectWorktrees() {
   gitOrNull(["fetch", "origin", "main", "--prune", "--quiet"]);
 
   const worktrees = parseWorktrees(git(["worktree", "list", "--porcelain"]));
+  const mergedPrs = fetchMergedPrs();
+  const issues = fetchIssues();
   const entries = [];
 
   for (const wt of worktrees) {
     if (wt.primary || wt.path === REPO_ROOT || !wt.branch) continue;
 
     const issueNumber = issueNumberFromBranch(wt.branch);
-    const issue = issueNumber ? getIssueInfo(issueNumber) : null;
-    const mergedPr = mergedPrForBranch(wt.branch);
+    const issue = !issueNumber
+      ? null
+      : (issues.map.get(issueNumber) ??
+        (issues.complete ? null : getIssueInfo(issueNumber)));
+    const mergedPr =
+      mergedPrs.map.get(wt.branch) ??
+      (mergedPrs.complete ? null : mergedPrForBranch(wt.branch));
     const ancestor = mergedPr ? false : isAncestorOfMain(wt.branch);
     const dirty = Boolean(gitOrNull(["status", "--porcelain"], wt.path));
     const aheadOfMain = Number(

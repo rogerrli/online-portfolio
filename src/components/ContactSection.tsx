@@ -3,6 +3,7 @@ import type { ComponentType, SVGProps } from 'react'
 
 import { GithubIcon, LinkedinIcon } from '@/components/icons/brand-icons'
 import { buttonVariants } from '@/components/ui/button'
+import { Section } from '@/components/Section'
 import { useHasFinePointer } from '@/hooks/useHasFinePointer'
 import { cn } from '@/lib/utils'
 
@@ -52,56 +53,45 @@ export function ContactSection() {
   const hasFinePointer = useHasFinePointer()
 
   return (
-    <section id="contact">
-      <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Contact</h2>
+    <Section id="contact" title="Contact">
       <p className="mb-6 max-w-[60ch] text-muted-foreground">
         Best way to reach me is email, happy to talk about roles,
         projects, or anything in between.
       </p>
       <ul className="flex flex-wrap gap-3">
-        {CONTACT_LINKS.map((link) => {
-          const Icon = link.icon
-          const isNonInteractive = link.touchOnly && hasFinePointer
-
-          if (isNonInteractive) {
-            return (
-              <li key={link.label}>
-                <span
-                  className={cn(
-                    buttonVariants({ variant: 'outline' }),
-                    'gap-2 cursor-default hover:bg-transparent',
-                  )}
-                >
-                  <Icon aria-hidden="true" className="size-4" />
-                  {link.label}
-                </span>
-              </li>
-            )
-          }
-
-          return (
-            <li key={link.label}>
+        {CONTACT_LINKS.map((link) => (
+          <li key={link.label}>
+            {link.touchOnly && hasFinePointer ? (
+              <span
+                className={cn(
+                  buttonVariants({ variant: 'outline' }),
+                  'gap-2 cursor-default hover:bg-transparent',
+                )}
+              >
+                <link.icon aria-hidden="true" className="size-4" />
+                {link.label}
+              </span>
+            ) : (
               <a
                 href={link.href}
-                {...(link.external
-                  ? { target: '_blank', rel: 'noopener noreferrer' }
-                  : {})}
-                {...(link.download ? { download: link.download } : {})}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
+                download={link.download}
                 className={cn(
                   buttonVariants({ variant: 'outline' }),
                   'gap-2 hover:border-accent hover:bg-accent hover:text-accent-foreground',
                 )}
               >
-                <Icon aria-hidden="true" className="size-4" />
+                <link.icon aria-hidden="true" className="size-4" />
                 {link.label}
                 {link.external && (
                   <span className="sr-only"> (opens in new tab)</span>
                 )}
               </a>
-            </li>
-          )
-        })}
+            )}
+          </li>
+        ))}
       </ul>
-    </section>
+    </Section>
   )
 }
