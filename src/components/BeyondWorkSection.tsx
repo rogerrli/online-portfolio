@@ -11,6 +11,17 @@ const INTERESTS: Interest[] = [
     description:
       "Five or six years running tabletop D&D for the same group. The best campaign was a replay of Final Fantasy X as a D&D game, which worked far better than it had any right to.",
   },
+  {
+    emoji: '🎮',
+    label: 'Video Games',
+    description:
+      'A long-running habit, and where more than one campaign idea has come from.',
+  },
+  {
+    emoji: '🍳',
+    label: 'Cooking',
+    description: 'Cooking most nights, and happy to keep doing it.',
+  },
 ]
 
 export function BeyondWorkSection() {

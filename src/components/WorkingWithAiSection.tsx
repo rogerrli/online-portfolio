@@ -30,6 +30,16 @@ export function WorkingWithAiSection() {
           how work is handed between them, which is a different problem
           from making any one agent smarter.
         </p>
+        <p className="max-w-[60ch] text-muted-foreground">
+          The most useful thing I&rsquo;ve learned came from a stretch of
+          failing GitHub CI checks I didn&rsquo;t understand well enough to
+          verify myself. I kept asking &ldquo;but how do you know?&rdquo;,
+          half hoping to be taught. Maybe half the time that question was
+          enough on its own: it would walk the claim back, say it
+          shouldn&rsquo;t have asserted that without checking, go check, and
+          come back with a different answer. I ask it much earlier now,
+          especially about anything I can&rsquo;t check myself.
+        </p>
       </div>
     </section>
   )
