@@ -17,6 +17,24 @@ const matchesArgs = (e) =>
   args.includes(e.issueNumber) || args.includes(e.branch);
 
 const wantAll = args.length === 1 && args[0] === "all";
+
+// One issue can be split across several branches, so an issue number is not a
+// unique handle. Removing a worktree is irreversible (`git branch -D` plus a
+// remote delete), so make the caller name the branch instead of guessing.
+if (!wantAll) {
+  const ambiguous = args
+    .map((arg) => ({ arg, matches: removable.filter((e) => e.issueNumber === arg) }))
+    .filter(({ matches }) => matches.length > 1);
+
+  if (ambiguous.length > 0) {
+    for (const { arg, matches } of ambiguous) {
+      console.error(`"${arg}" matches ${matches.length} worktrees — pass a branch name instead:`);
+      for (const entry of matches) console.error(`  - ${entry.branch}`);
+    }
+    process.exit(1);
+  }
+}
+
 const targets = wantAll ? removable : removable.filter(matchesArgs);
 
 if (targets.length === 0) {

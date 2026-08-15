@@ -91,10 +91,15 @@ const BATCH_LIMIT = 200;
 
 function fetchBatch(args, keyOf) {
   const rows = gh([...args, "--limit", String(BATCH_LIMIT)]);
-  return {
-    map: new Map((rows ?? []).map((row) => [keyOf(row), row])),
-    complete: rows !== null && rows.length < BATCH_LIMIT,
-  };
+  // `gh` lists newest first, and a branch name can be reused across several
+  // PRs — keep the first row per key so a reused branch resolves to its most
+  // recent PR rather than its oldest.
+  const map = new Map();
+  for (const row of rows ?? []) {
+    const key = keyOf(row);
+    if (!map.has(key)) map.set(key, row);
+  }
+  return { map, complete: rows !== null && rows.length < BATCH_LIMIT };
 }
 
 function fetchMergedPrs() {

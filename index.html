@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <script>
       (function () {
-        var stored = localStorage.getItem('theme');
+        // Reading localStorage throws outright when site data is blocked, so
+        // guard it — otherwise this whole script aborts and the page loads
+        // light even for someone whose OS asks for dark.
+        var stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch (e) {}
         var dark =
           stored === 'dark' ||
           (stored !== 'light' &&

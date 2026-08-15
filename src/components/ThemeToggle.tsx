@@ -15,8 +15,14 @@ export function ThemeToggle() {
   function toggle() {
     const next = !dark
     document.documentElement.classList.toggle('dark', next)
-    localStorage.setItem('theme', next ? 'dark' : 'light')
     setDark(next)
+    try {
+      localStorage.setItem('theme', next ? 'dark' : 'light')
+    } catch {
+      // Storage can be unavailable (blocked site data, quota). The theme still
+      // applies to this page view; it just won't survive a reload — which must
+      // not leave the button describing the opposite of what's on screen.
+    }
   }
 
   return (
