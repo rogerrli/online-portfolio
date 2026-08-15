@@ -13,15 +13,14 @@ if (args.length === 0) {
 const entries = inspectWorktrees();
 const removable = entries.filter((e) => e.removable);
 
+const matchesArgs = (e) =>
+  args.includes(e.issueNumber) || args.includes(e.branch);
+
 const wantAll = args.length === 1 && args[0] === "all";
-const targets = wantAll
-  ? removable
-  : removable.filter((e) => args.includes(e.issueNumber) || args.includes(e.branch));
+const targets = wantAll ? removable : removable.filter(matchesArgs);
 
 if (targets.length === 0) {
-  const heldBack = entries.filter(
-    (e) => !e.removable && (args.includes(e.issueNumber) || args.includes(e.branch)),
-  );
+  const heldBack = entries.filter((e) => !e.removable && matchesArgs(e));
   if (heldBack.length > 0) {
     console.error("Requested worktree(s) are not safe to remove:");
     for (const entry of heldBack) {

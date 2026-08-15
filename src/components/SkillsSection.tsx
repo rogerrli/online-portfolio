@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Section } from '@/components/Section'
+import { cn, LABEL_CLASS } from '@/lib/utils'
 
 interface SkillGroup {
   label: string
@@ -34,16 +36,15 @@ const SKILL_GROUPS: SkillGroup[] = [
   },
 ]
 
-const API_EXPERIENCE_PREVIEW = [
+// Ordered most-recognizable first; the first API_PREVIEW_COUNT show by
+// default and the rest sit behind the "show more" toggle.
+const API_EXPERIENCE = [
   'OAuth1 and OAuth2',
   'Facebook Graph/Marketing',
   'Salesforce',
   'Slack',
   'HubSpot',
   'VidMob',
-]
-
-const API_EXPERIENCE_REST = [
   'Amazon (Ads)',
   'Box',
   'Dropbox',
@@ -60,6 +61,8 @@ const API_EXPERIENCE_REST = [
   'Vimeo',
 ]
 
+const API_PREVIEW_COUNT = 6
+
 function SkillBadge({ skill }: { skill: string }) {
   return (
     <Badge
@@ -73,16 +76,16 @@ function SkillBadge({ skill }: { skill: string }) {
 
 export function SkillsSection() {
   const [apiExpanded, setApiExpanded] = useState(false)
+  const visibleApis = apiExpanded
+    ? API_EXPERIENCE
+    : API_EXPERIENCE.slice(0, API_PREVIEW_COUNT)
 
   return (
-    <section id="skills">
-      <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Skills</h2>
+    <Section id="skills" title="Skills">
       <dl className="flex flex-col gap-6 border-t border-border pt-6">
         {SKILL_GROUPS.map((group) => (
           <div key={group.label}>
-            <dt className="mb-2 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-              {group.label}
-            </dt>
+            <dt className={cn('mb-2', LABEL_CLASS)}>{group.label}</dt>
             <dd className="flex flex-wrap gap-2">
               {group.skills.map((skill) => (
                 <SkillBadge key={skill} skill={skill} />
@@ -91,17 +94,11 @@ export function SkillsSection() {
           </div>
         ))}
         <div>
-          <dt className="mb-2 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-            API Experience
-          </dt>
+          <dt className={cn('mb-2', LABEL_CLASS)}>API Experience</dt>
           <dd className="flex flex-wrap items-center gap-2">
-            {API_EXPERIENCE_PREVIEW.map((skill) => (
+            {visibleApis.map((skill) => (
               <SkillBadge key={skill} skill={skill} />
             ))}
-            {apiExpanded &&
-              API_EXPERIENCE_REST.map((skill) => (
-                <SkillBadge key={skill} skill={skill} />
-              ))}
             <Button
               type="button"
               variant="ghost"
@@ -110,11 +107,13 @@ export function SkillsSection() {
               onClick={() => setApiExpanded((expanded) => !expanded)}
               aria-expanded={apiExpanded}
             >
-              {apiExpanded ? 'Show less' : `+${API_EXPERIENCE_REST.length} more`}
+              {apiExpanded
+                ? 'Show less'
+                : `+${API_EXPERIENCE.length - API_PREVIEW_COUNT} more`}
             </Button>
           </dd>
         </div>
       </dl>
-    </section>
+    </Section>
   )
 }

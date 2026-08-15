@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 interface NavLink {
-  href: string
+  id: string
   label: string
 }
 
@@ -23,11 +23,11 @@ export function SectionRail({ links, activeId }: SectionRailProps) {
     >
       <ul className="flex flex-col gap-0.5">
         {links.map((link) => {
-          const isActive = activeId === link.href.slice(1)
+          const isActive = activeId === link.id
           return (
-            <li key={link.href}>
+            <li key={link.id}>
               <a
-                href={link.href}
+                href={`#${link.id}`}
                 aria-current={isActive ? 'true' : undefined}
                 className={cn(
                   'flex items-center gap-2 rounded-md py-1 text-sm text-muted-foreground transition-colors hover:text-accent-text',

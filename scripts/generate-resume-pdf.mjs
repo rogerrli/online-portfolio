@@ -13,14 +13,14 @@ const resume = JSON.parse(
   readFileSync(path.join(REPO_ROOT, "public", "resume.json"), "utf8"),
 );
 
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
+const MONTH_YEAR = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 function formatDate(isoDate) {
-  const [year, month] = isoDate.split("-");
-  return `${MONTHS[Number(month) - 1]} ${year}`;
+  return MONTH_YEAR.format(new Date(isoDate));
 }
 
 function formatRange(startDate, endDate) {

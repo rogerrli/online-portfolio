@@ -1,24 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { cn } from '@/lib/utils'
 
 const HOLD_MS = 2500
 const SLIDE_MS = 350
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
-
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onChange = () => setReduced(query.matches)
-    query.addEventListener('change', onChange)
-    return () => query.removeEventListener('change', onChange)
-  }, [])
-
-  return reduced
-}
 
 export function RoleTitle({ titles }: { titles: string[] }) {
   const reducedMotion = usePrefersReducedMotion()
@@ -114,9 +100,12 @@ export function RoleTitle({ titles }: { titles: string[] }) {
         aria-hidden="true"
         className={cn(
           'absolute inset-x-0 top-0 block',
-          transitionEnabled && 'transition-transform duration-[350ms] ease-out',
+          transitionEnabled && 'transition-transform ease-out',
         )}
-        style={{ transform: `translateY(${-index * frameHeight}px)` }}
+        style={{
+          transform: `translateY(${-index * frameHeight}px)`,
+          transitionDuration: `${SLIDE_MS}ms`,
+        }}
       >
         {frames.map((title, i) => (
           <span

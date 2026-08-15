@@ -1,4 +1,8 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { ExternalLink } from '@/components/ExternalLink'
+import { Section } from '@/components/Section'
+import { TagList } from '@/components/TagList'
+import { cn, LINK_CLASS } from '@/lib/utils'
 
 interface Project {
   title: string
@@ -47,8 +51,7 @@ const PROJECTS: Project[] = [
 
 export function ProjectsSection() {
   return (
-    <section id="projects">
-      <h2 className="mb-2 font-heading text-2xl font-medium tracking-tight">Projects</h2>
+    <Section id="projects" title="Projects">
       <div className="grid gap-4 sm:grid-cols-2">
         {PROJECTS.map((project, i) => (
           <Card
@@ -62,31 +65,17 @@ export function ProjectsSection() {
             </CardHeader>
             <CardContent>
               <p className="break-words text-muted-foreground">{project.description}</p>
-              {project.tags && project.tags.length > 0 && (
-                <ul aria-label="Technologies used" className="mt-3 flex flex-wrap gap-1.5">
-                  {project.tags.map((tag) => (
-                    <li
-                      key={tag}
-                      className="rounded-full border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground"
-                    >
-                      {tag}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <TagList tags={project.tags} />
               {project.links && project.links.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
                   {project.links.map((link) => (
-                    <a
+                    <ExternalLink
                       key={link.href}
                       href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm underline underline-offset-3 hover:text-accent-text"
+                      className={cn('text-sm', LINK_CLASS)}
                     >
                       {link.label}
-                      <span className="sr-only"> (opens in new tab)</span>
-                    </a>
+                    </ExternalLink>
                   ))}
                 </div>
               )}
@@ -94,6 +83,6 @@ export function ProjectsSection() {
           </Card>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }
