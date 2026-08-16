@@ -19,8 +19,12 @@ const MONTH_YEAR = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+// Split the date rather than letting Date parse it: an unpadded value like
+// "2015-8-1" isn't ISO 8601, so Date reads it as local midnight and formatting
+// it back as UTC can land in the previous month.
 function formatDate(isoDate) {
-  return MONTH_YEAR.format(new Date(isoDate));
+  const [year, month] = isoDate.split("-").map(Number);
+  return MONTH_YEAR.format(Date.UTC(year, month - 1, 1));
 }
 
 function formatRange(startDate, endDate) {
