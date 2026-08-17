@@ -12,6 +12,7 @@ export function RoleTitle({ titles }: { titles: string[] }) {
   const [transitionEnabled, setTransitionEnabled] = useState(true)
   const [paused, setPaused] = useState(false)
   const sizerRef = useRef<HTMLSpanElement>(null)
+  const trackRef = useRef<HTMLSpanElement>(null)
   const [frameHeight, setFrameHeight] = useState(0)
 
   // One extra frame at the end duplicates the first title, so the loop can
@@ -54,10 +55,18 @@ export function RoleTitle({ titles }: { titles: string[] }) {
     return () => window.clearTimeout(id)
   }, [index, frames.length])
 
-  useEffect(() => {
+  // Restore the transition only once the snapped-back transform has been
+  // flushed to style. Reading layout forces the browser to adopt
+  // `translateY(0)` as the current computed style while transitions are still
+  // off, so putting the transition back can't animate the jump. A
+  // `requestAnimationFrame` is *not* enough here: it runs before the snapped
+  // frame is painted, so the transition comes back in the same frame the
+  // transform changed and the browser animates the whole way back — the title
+  // stack visibly rewinds through every previous title instead of looping.
+  useLayoutEffect(() => {
     if (transitionEnabled) return
-    const id = window.requestAnimationFrame(() => setTransitionEnabled(true))
-    return () => window.cancelAnimationFrame(id)
+    trackRef.current?.getBoundingClientRect()
+    setTransitionEnabled(true)
   }, [transitionEnabled])
 
   if (reducedMotion) {
@@ -95,12 +104,19 @@ export function RoleTitle({ titles }: { titles: string[] }) {
       {/* A single column of every title stacked in normal flow, shifted up
           by one frame per step. Only this one element ever transitions —
           deliberately not N independently-transformed layers — since that's
-          the simplest version of this "odometer" pattern to render right. */}
+          the simplest version of this "odometer" pattern to render right.
+
+          The paused state is `transition-none`, not merely the absence of
+          `transition-transform`: the duration below is an unconditional inline
+          style, so without an explicit `transition-property: none` the
+          disabled state falls back to the initial `all` and the snap-back
+          animates regardless. */}
       <span
+        ref={trackRef}
         aria-hidden="true"
         className={cn(
           'absolute inset-x-0 top-0 block',
-          transitionEnabled && 'transition-transform ease-out',
+          transitionEnabled ? 'transition-transform ease-out' : 'transition-none',
         )}
         style={{
           transform: `translateY(${-index * frameHeight}px)`,
