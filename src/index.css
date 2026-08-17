@@ -7,25 +7,30 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Light mode is a soft warm paper rather than pure white: the page sits at
+   L=0.97 with a trace of warmth (chroma 0.004 at hue 95), cards lift half a
+   step above it, and the foreground stops short of black. Pure white on a
+   bright display glares, and #000-on-#fff is more contrast than long-form
+   prose needs — everything here still clears WCAG AA comfortably. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --background: oklch(0.97 0.004 95);
+  --foreground: oklch(0.24 0.006 95);
+  --card: oklch(0.985 0.003 95);
+  --card-foreground: oklch(0.24 0.006 95);
+  --popover: oklch(0.985 0.003 95);
+  --popover-foreground: oklch(0.24 0.006 95);
+  --primary: oklch(0.26 0.006 95);
+  --primary-foreground: oklch(0.985 0.003 95);
+  --secondary: oklch(0.938 0.005 95);
+  --secondary-foreground: oklch(0.26 0.006 95);
+  --muted: oklch(0.938 0.005 95);
+  --muted-foreground: oklch(0.48 0.008 95);
   --accent: oklch(0.55 0.19 300);
   --accent-foreground: oklch(0.98 0.01 300);
-  --accent-text: oklch(0.55 0.19 300);
+  --accent-text: oklch(0.52 0.19 300);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.895 0.005 95);
+  --input: oklch(0.895 0.005 95);
   --ring: oklch(0.55 0.19 300);
   --radius: 0.625rem;
 
