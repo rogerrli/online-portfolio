@@ -104,13 +104,19 @@ export function RoleTitle({ titles }: { titles: string[] }) {
       {/* A single column of every title stacked in normal flow, shifted up
           by one frame per step. Only this one element ever transitions —
           deliberately not N independently-transformed layers — since that's
-          the simplest version of this "odometer" pattern to render right. */}
+          the simplest version of this "odometer" pattern to render right.
+
+          The paused state is `transition-none`, not merely the absence of
+          `transition-transform`: the duration below is an unconditional inline
+          style, so without an explicit `transition-property: none` the
+          disabled state falls back to the initial `all` and the snap-back
+          animates regardless. */}
       <span
         ref={trackRef}
         aria-hidden="true"
         className={cn(
           'absolute inset-x-0 top-0 block',
-          transitionEnabled && 'transition-transform ease-out',
+          transitionEnabled ? 'transition-transform ease-out' : 'transition-none',
         )}
         style={{
           transform: `translateY(${-index * frameHeight}px)`,
