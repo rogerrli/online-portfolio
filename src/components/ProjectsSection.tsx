@@ -24,10 +24,7 @@ const PROJECTS: Project[] = [
     description:
       "The old liroger.com was a generic template site that was a pain to keep current. I rebuilt it as a code-owned site (Vite, React, TypeScript, Tailwind, shadcn/Base UI) with content and design tracked as normal commits instead of a page builder. It was also built collaboratively with Claude Code — work planned as GitHub issues, implemented across git worktrees, shipped through PRs — which is what you're looking at right now.",
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'Claude Code'],
-    links: [
-      { href: 'https://online-portfolio-puce.vercel.app', label: 'Live site' },
-      { href: 'https://github.com/rogerrli/online-portfolio', label: 'Source' },
-    ],
+    links: [{ href: 'https://github.com/rogerrli/online-portfolio', label: 'Source' }],
   },
   {
     title: 'VidMob — integration platform',
