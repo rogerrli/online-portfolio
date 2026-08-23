@@ -132,10 +132,16 @@ function App() {
 
   return (
     <>
+      {/* Compacting a sticky header shrinks a box that is still in flow, so
+          the height it drops would pull the whole page up with it — content
+          sliding under the reader mid-scroll, which is what made the compact
+          transition read as a jitter. `mb-6` hands back exactly the 1.5rem of
+          padding `py-3` gives up, so the space the header occupies never
+          changes and nothing below it moves; only the bar itself shrinks. */}
       <header
         className={cn(
-          'sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background rail:col-span-2 motion-safe:transition-[padding] motion-safe:duration-200',
-          isScrolled ? 'py-3' : 'py-6',
+          'sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background rail:col-span-2 motion-safe:transition-[padding,margin] motion-safe:duration-200',
+          isScrolled ? 'mb-6 py-3' : 'py-6',
         )}
       >
         <span
