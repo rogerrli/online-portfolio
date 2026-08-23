@@ -19,11 +19,12 @@ import { SectionRail } from '@/components/SectionRail'
 import { TagList } from '@/components/TagList'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { useIsScrolled } from '@/hooks/useIsScrolled'
-import { cn, LABEL_CLASS, LINK_CLASS } from '@/lib/utils'
+import { cn, LINK_CLASS } from '@/lib/utils'
 
 const NAV_LINKS = [
   { id: 'about', label: 'About' },
   { id: 'experience', label: 'Experience' },
+  { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
   { id: 'projects', label: 'Projects' },
   { id: 'working-with-ai', label: 'Working with AI' },
@@ -219,24 +220,22 @@ function App() {
               </AccordionItem>
             ))}
           </Accordion>
-          {/* Education rides at the tail of the experience list instead of
-              taking a section of its own: school precedes every role above
-              it, so this is where a reverse-chronological list ends, and one
-              line of text does not carry an <h2>. Deliberately not an
-              accordion item — a <dl>, with no chevron, no hover state and
-              nothing focusable — so it can never read as a collapsed row
-              that failed to open. The mono label is what tells the two row
-              kinds apart; the degree and school otherwise echo the title and
-              company above. */}
-          <dl className="flex flex-col items-start gap-0.5 border-t border-border py-4 sm:flex-row sm:items-baseline sm:gap-3">
-            <dt className={LABEL_CLASS}>Education</dt>
-            <dd className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-              <span className="font-medium">B.S. Biomedical Engineering</span>
-              <span className="text-sm text-muted-foreground">
-                Case Western Reserve University
-              </span>
-            </dd>
-          </dl>
+        </Section>
+
+        <Section id="education" title="Education">
+          {/* One row dressed like an experience row minus the disclosure:
+              same three columns (what, where, when), same top rule, so the
+              page's two chronological lists read as siblings. The right
+              padding stands in for the chevron column those rows carry
+              (1rem icon + the trigger's 0.75rem pr-3), without which this
+              date sits 1.75rem further right than every date above it. */}
+          <div className="flex flex-col items-start gap-0.5 border-t border-border py-4 sm:flex-row sm:items-baseline sm:gap-3 sm:pr-7">
+            <span className="font-medium">B.S. Biomedical Engineering</span>
+            <span className="text-sm text-muted-foreground">Case Western Reserve University</span>
+            <span className="font-mono text-sm text-muted-foreground sm:ml-auto">
+              Aug 2011 to May 2015
+            </span>
+          </div>
         </Section>
 
         <SkillsSection />
