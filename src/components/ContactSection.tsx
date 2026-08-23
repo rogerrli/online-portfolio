@@ -55,8 +55,9 @@ export function ContactSection() {
   return (
     <Section id="contact" title="Contact">
       <p className="mb-6 max-w-[60ch] text-muted-foreground">
-        Best way to reach me is email, happy to talk about roles,
-        projects, or anything in between.
+        I&rsquo;m in Brooklyn, New York, and open to remote. Best way to
+        reach me is email, happy to talk about roles, projects, or
+        anything in between.
       </p>
       <ul className="flex flex-wrap gap-3">
         {CONTACT_LINKS.map((link) => (

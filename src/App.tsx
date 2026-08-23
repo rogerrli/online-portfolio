@@ -18,13 +18,13 @@ import { Section } from '@/components/Section'
 import { SectionRail } from '@/components/SectionRail'
 import { TagList } from '@/components/TagList'
 import { useActiveSection } from '@/hooks/useActiveSection'
-import { useHasFinePointer } from '@/hooks/useHasFinePointer'
 import { useIsScrolled } from '@/hooks/useIsScrolled'
-import { cn, LABEL_CLASS, LINK_CLASS } from '@/lib/utils'
+import { cn, LINK_CLASS } from '@/lib/utils'
 
 const NAV_LINKS = [
   { id: 'about', label: 'About' },
   { id: 'experience', label: 'Experience' },
+  { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
   { id: 'projects', label: 'Projects' },
   { id: 'working-with-ai', label: 'Working with AI' },
@@ -127,7 +127,6 @@ const ROLE_TITLES = [
 
 function App() {
   const activeId = useActiveSection(SECTION_IDS)
-  const hasFinePointer = useHasFinePointer()
   const isScrolled = useIsScrolled()
 
   return (
@@ -194,46 +193,13 @@ function App() {
             Hi, I&rsquo;m Roger, your&nbsp;next
             <RoleTitle titles={ROLE_TITLES} />
           </h1>
-          <p className="mb-8 max-w-[60ch] text-muted-foreground">
+          <p className="max-w-[60ch] text-muted-foreground">
             My path here has been a little winding: bioengineering
             research, then software, then product, now back to software,
             and that mix is what makes me useful: I can go deep on
             code and still talk fluently with the people who aren&rsquo;t
             writing it.
           </p>
-          <dl className="flex flex-wrap gap-8">
-            <div>
-              <dt className={cn('mb-1', LABEL_CLASS)}>Location</dt>
-              <dd>
-                Brooklyn, New York
-                <span className="block text-sm text-muted-foreground">open to remote</span>
-              </dd>
-            </div>
-            <div>
-              <dt className={cn('mb-1', LABEL_CLASS)}>Email</dt>
-              <dd>
-                <a href="mailto:li.rojie@gmail.com" className={LINK_CLASS}>
-                  li.rojie@gmail.com
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt className={cn('mb-1', LABEL_CLASS)}>Phone</dt>
-              <dd>
-                {hasFinePointer ? (
-                  '734-233-1177'
-                ) : (
-                  <a href="tel:+17342331177" className={LINK_CLASS}>
-                    734-233-1177
-                  </a>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt className={cn('mb-1', LABEL_CLASS)}>Education</dt>
-              <dd>B.S. Biomedical Engineering, Case Western Reserve University</dd>
-            </div>
-          </dl>
         </section>
 
         <Section id="experience" title="Experience">
@@ -260,6 +226,22 @@ function App() {
               </AccordionItem>
             ))}
           </Accordion>
+        </Section>
+
+        <Section id="education" title="Education">
+          {/* One row dressed like an experience row minus the disclosure:
+              same three columns (what, where, when), same top rule, so the
+              page's two chronological lists read as siblings. The right
+              padding stands in for the chevron column those rows carry
+              (1rem icon + the trigger's 0.75rem pr-3), without which this
+              date sits 1.75rem further right than every date above it. */}
+          <div className="flex flex-col items-start gap-0.5 border-t border-border py-4 sm:flex-row sm:items-baseline sm:gap-3 sm:pr-7">
+            <span className="font-medium">B.S. Biomedical Engineering</span>
+            <span className="text-sm text-muted-foreground">Case Western Reserve University</span>
+            <span className="font-mono text-sm text-muted-foreground sm:ml-auto">
+              Aug 2011 to May 2015
+            </span>
+          </div>
         </Section>
 
         <SkillsSection />
