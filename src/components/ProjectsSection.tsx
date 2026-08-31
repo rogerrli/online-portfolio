@@ -27,6 +27,13 @@ const PROJECTS: Project[] = [
     links: [{ href: 'https://github.com/rogerrli/online-portfolio', label: 'Source' }],
   },
   {
+    title: 'MTA train board',
+    description:
+      "Standing at home, I could never tell which nearby train I'd actually make. So I built a wall-mounted arrival board driven by a custom config of the stations around me: it factors in the walk time to each one so it only surfaces trains I can realistically catch, and shifts focus by time of day to prioritize my work commute in the morning. A Python/FastAPI backend polls the MTA's GTFS-Realtime feeds and serves a fullscreen touchscreen UI. Like this site, it was built collaboratively with Claude Code.",
+    tags: ['Python', 'FastAPI', 'GTFS-Realtime', 'Claude Code'],
+    links: [{ href: 'https://github.com/rogerrli/mta-train-board', label: 'Source' }],
+  },
+  {
     title: 'VidMob — integration platform',
     description:
       "Teams were losing time to manual, repetitive workflows connecting VidMob to the ad platforms and tools clients relied on. I architected and built roughly a dozen integrations (Groovy/Grails, OAuth1/OAuth2) across platforms like Facebook, Google, and Salesforce, replacing manual handoffs with automated syncs.",
