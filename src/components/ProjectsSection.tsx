@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ExternalLink } from '@/components/ExternalLink'
 import { Section } from '@/components/Section'
@@ -16,6 +17,10 @@ interface Project {
   }[]
 }
 
+// Public demo of the MTA train board (Render, default config). Used both for
+// the card's "Live demo" link and the warm-up ping below.
+const MTA_DEMO_URL = 'https://mta-train-board.onrender.com'
+
 // Each array item renders as one card in the grid below, so adding a
 // project is just pushing a new object here — no layout changes needed.
 const PROJECTS: Project[] = [
@@ -31,7 +36,10 @@ const PROJECTS: Project[] = [
     description:
       "Standing at home, I could never tell which nearby train I'd actually make. So I built a wall-mounted arrival board driven by a custom config of the stations around me: it factors in the walk time to each one so it only surfaces trains I can realistically catch, and shifts focus by time of day to prioritize my work commute in the morning. A Python/FastAPI backend polls the MTA's GTFS-Realtime feeds and serves a fullscreen touchscreen UI. Like this site, it was built collaboratively with Claude Code.",
     tags: ['Python', 'FastAPI', 'GTFS-Realtime', 'Claude Code'],
-    links: [{ href: 'https://github.com/rogerrli/mta-train-board', label: 'Source' }],
+    links: [
+      { href: `${MTA_DEMO_URL}/`, label: 'Live demo' },
+      { href: 'https://github.com/rogerrli/mta-train-board', label: 'Source' },
+    ],
   },
   {
     title: 'VidMob — integration platform',
@@ -54,6 +62,15 @@ const PROJECTS: Project[] = [
 ]
 
 export function ProjectsSection() {
+  // Warm the MTA demo on load. It runs on Render's free plan, which spins the
+  // service down when idle and cold-starts (~30–50s) on the next request; this
+  // fire-and-forget ping wakes it while the visitor is still reading, so the
+  // "Live demo" link is likely warm by the time they click. no-cors because we
+  // only need the request to reach the server, not to read the response.
+  useEffect(() => {
+    fetch(`${MTA_DEMO_URL}/api/health`, { mode: 'no-cors' }).catch(() => {})
+  }, [])
+
   return (
     <Section id="projects" title="Projects">
       <div className="grid gap-4 sm:grid-cols-2">
