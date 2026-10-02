@@ -31,17 +31,41 @@ html,body{margin:0}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{background:var(--paper);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.45}
 .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 48px}
-header{display:flex;align-items:flex-end;gap:18px;margin-bottom:22px}
+header{margin-bottom:22px}
+.titlerow{display:flex;align-items:center;gap:16px}
 h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,5vw,3.1rem);line-height:1;margin:0;letter-spacing:-.01em}
-.intro{color:var(--muted);margin:.4rem 0 0;max-width:60ch;white-space:pre-line}
+.intro{color:var(--muted);margin:.7rem 0 0;white-space:pre-line}
 .intro::first-line{color:var(--ink);font-weight:700}
 .cass{width:92px;height:52px;flex:none;color:var(--star)}
 .layout{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:32px;align-items:start}
 .board{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
-.bar{display:flex;gap:10px;align-items:baseline;min-height:3.2em;padding:10px 14px;margin-bottom:10px;background:var(--word);border-radius:6px}
-.bar b{white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(15,1fr);border:2px solid var(--line);background:var(--line);gap:1px;width:100%;aspect-ratio:1;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-.c{position:relative;background:var(--cell);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:clamp(.8rem,2.6vw,1.4rem);text-transform:uppercase;cursor:pointer}
+/* A plain block above the grid by default; on a phone it pins to the bottom and
+   is lifted above the keyboard by --kb (kept current by the visualViewport
+   listener), the way the NYT app does it. */
+.bar{
+  display:flex;align-items:center;gap:0;
+  min-height:3.2em;margin-bottom:10px;
+  background:var(--word);border-radius:6px;
+}
+.bartext{
+  flex:1;min-width:0;display:flex;gap:10px;align-items:center;
+  padding:12px 6px;cursor:pointer;font-size:.95rem;
+}
+.bartext b{white-space:nowrap}
+.bartext span{min-width:0}
+.bar .nav{
+  flex:none;border:0;border-radius:0;background:transparent;color:var(--ink);
+  font-size:1.6rem;line-height:1;padding:0 18px;cursor:pointer;
+}
+.bar .nav{border-radius:6px}
+.bar .nav:hover{background:rgba(0,0,0,.08)}
+.bar .nav:active{background:rgba(0,0,0,.16)}
+/* Rows and columns are both pinned to equal fractions. Without an explicit
+   grid-template-rows the rows are implicit and sized by their content, so typing a
+   letter made that row taller than the empty ones. minmax(0,…) stops a tall glyph
+   from pushing past its share, since a bare 1fr still floors at min-content. */
+.grid{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));border:2px solid var(--line);background:var(--line);gap:1px;width:100%;aspect-ratio:1;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.c{position:relative;background:var(--cell);display:flex;align-items:center;justify-content:center;font-weight:400;line-height:1;overflow:hidden;font-size:clamp(.8rem,2.6vw,1.4rem);text-transform:uppercase;cursor:pointer}
 .c.b{background:var(--line);cursor:default}
 .c.w{background:var(--word)}
 .c.cur{background:var(--cur);color:#1C2647}
@@ -51,11 +75,23 @@ h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,
 button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;cursor:pointer}
 button:hover{background:var(--word)}
 button:focus-visible,.cl li:focus-visible{outline:3px solid var(--cur);outline-offset:2px}
-.status{color:var(--muted);margin-left:auto;align-self:center;font-size:.9rem}
+.status{color:var(--muted);align-self:center;font-size:.9rem}
+/* Destructive, so it sits alone at the very bottom and looks the part. */
+.danger{margin-top:40px;padding-top:22px;border-top:1px solid var(--word);display:flex;justify-content:center}
+.danger button{color:var(--wrong);border-color:var(--wrong)}
+.danger button:hover{background:var(--wrong);color:var(--paper)}
 .clues{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 .cl h2{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.4rem;margin:0 0 8px;padding-bottom:6px;border-bottom:1.5px solid var(--ink)}
 .cl ol{list-style:none;margin:0;padding:0}
-.cl li{display:grid;grid-template-columns:2.4em 1fr;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:.95rem}
+.cl li{display:grid;grid-template-columns:2.4em 1fr;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:.95rem}
+/* The answer so far, under each clue — tap the clue and type straight into it. */
+.cl li .ans{
+  grid-column:2;margin-top:3px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;
+  letter-spacing:.22em;color:var(--ink);white-space:nowrap;overflow-x:auto;
+}
+.cl li .ans .blank{color:var(--muted);opacity:.55}
+.cl li.on .ans{font-weight:700}
 .cl li .k{font-weight:700;display:flex;align-items:flex-start;gap:3px}
 .cl li.on{background:var(--word)}
 .cl li.done .t{opacity:.5}
@@ -67,13 +103,22 @@ button:focus-visible,.cl li:focus-visible{outline:3px solid var(--cur);outline-o
 .cl li.todo .t{font-style:italic;color:var(--muted)}
 .win{display:none;margin-top:14px;padding:12px 14px;border:1.5px solid var(--star);border-radius:6px}
 .win.show{display:block}
-body.master .tools,body.master .win{display:none}
+body.master .tools,body.master .win,body.master .danger{display:none}
 @media print{body.master .c .l{visibility:visible}}
 #kb{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;font-size:16px}
 @media (max-width:860px){
   .layout{grid-template-columns:1fr}
   .board{position:static}
   .clues{grid-template-columns:1fr}
+  /* Pinned above the keyboard. --kb is the keyboard's height, or 0 when closed. */
+  .bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    margin:0;border-radius:0;border-top:1.5px solid var(--line);
+    transform:translateY(calc(var(--kb,0px) * -1));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .bar .nav{border-radius:0}
+  body{padding-bottom:6rem}   /* so the fixed bar never covers the last clue */
 }
 @media (prefers-reduced-motion:no-preference){.c{transition:background .08s}}
 @media print{
@@ -81,7 +126,7 @@ body.master .tools,body.master .win{display:none}
   @page{margin:.5in}
   body{background:#fff}
   .wrap{padding:0;max-width:none}
-  .bar,.tools,.win,#kb{display:none!important}
+  .bar,.tools,.win,.danger,#kb{display:none!important}
   .layout{grid-template-columns:4.6in 1fr;gap:.3in}
   .board{position:static}
   .grid{width:4.6in}
@@ -95,21 +140,27 @@ body.master .tools,body.master .win{display:none}
 <body>
 <div class="wrap">
   <header>
+    <div class="titlerow">
     <svg class="cass" viewBox="0 0 92 52" aria-hidden="true">
       <polyline points="6,14 26,40 46,22 66,44 86,10" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
       <g fill="currentColor"><circle cx="6" cy="14" r="3.2"/><circle cx="26" cy="40" r="2.6"/><circle cx="46" cy="22" r="3.6"/><circle cx="66" cy="44" r="2.8"/><circle cx="86" cy="10" r="3"/></g>
     </svg>
-    <div>
       <h1 id="title"></h1>
-      <p class="intro" id="intro"></p>
     </div>
+    <p class="intro" id="intro"></p>
   </header>
   <div class="layout">
     <div class="board">
-      <div class="bar" id="bar" aria-live="polite"></div>
+      <!-- Rides just above the keyboard on a phone; stays above the grid on a desktop. -->
+      <div class="bar" id="bar" aria-live="polite">
+        <button class="nav" id="prev" type="button" aria-label="Previous clue">&lsaquo;</button>
+        <div class="bartext" id="bartext" role="button" tabindex="0" aria-label="Switch direction">
+          <b id="barnum"></b><span id="barclue"></span>
+        </div>
+        <button class="nav" id="next" type="button" aria-label="Next clue">&rsaquo;</button>
+      </div>
       <div class="grid" id="grid" role="grid" aria-label="Crossword grid"></div>
       <div class="tools">
-        <button id="clear">Clear puzzle</button>
         <span class="status" id="status"></span>
       </div>
       <div class="win" id="win"></div>
@@ -118,6 +169,10 @@ body.master .tools,body.master .win{display:none}
       <section class="cl"><h2>Across</h2><ol id="across"></ol></section>
       <section class="cl"><h2>Down</h2><ol id="down"></ol></section>
     </div>
+  </div>
+
+  <div class="danger">
+    <button id="clear" type="button">Clear puzzle</button>
   </div>
 </div>
 <input id="kb" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-label="Type a letter">
@@ -134,7 +189,7 @@ const CLUES = {
   "1A": "Burn letters?",
   "4A": "Spate",
   "8A": "Fly without an engine",
-  "13A": "The correct answer to quebecois maple pudding",
+  "13A": "The correct answer to Québécois maple pudding",
   "14A": "Longed (for)",
   "16A": "Who you need to get sticky",
   "17A": "Not a fling, in dating-app shorthand",
@@ -160,7 +215,7 @@ const CLUES = {
   "51A": "Overflow (with)",
   "54A": "Ran without going anywhere",
   "55A": "Rocket's children",
-  "57A": "Happy Birth___ <3",
+  "57A": "Happy Birth___ ❤️🎂",
   "58A": "Play ground?",
   "59A": "What Avengers do when assembled",
   "61A": "Like Q9-0 by Mando",
@@ -266,7 +321,7 @@ const liEls=[];
 entries.forEach((e,ei)=>{
   const li=document.createElement("li");li.tabIndex=0;
   const t=CLUES[e.key];if(!t)li.classList.add("todo");if(e.key===SPECIAL)li.classList.add("special");
-  li.innerHTML=`<span class="k">${e.n}${MARKED.includes(e.key)?filmSVG:""}${e.key===SPECIAL?starSVG:""}</span><span class="t"></span>`;
+  li.innerHTML=`<span class="k">${e.n}${MARKED.includes(e.key)?filmSVG:""}${e.key===SPECIAL?starSVG:""}</span><span class="t"></span><span class="ans"></span>`;
   li.querySelector(".t").textContent=(t||"Clue to come")+(MASTER?"  "+e.cells.map(i=>sol[i]).join(""):"");
   const go=()=>{dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];render();focusKb();};
   li.addEventListener("click",go);li.addEventListener("keydown",ev=>{if(ev.key==="Enter")go();});
@@ -280,10 +335,17 @@ function render(){
   cellsEl.forEach((d,i)=>{if(isB(i))return;
     d.querySelector(".l").textContent=fill[i];
     d.classList.toggle("w",e.cells.includes(i));d.classList.toggle("cur",i===cur);d.classList.toggle("bad",bad.has(i));});
-  liEls.forEach((li,j)=>{li.classList.toggle("on",j===ei);li.classList.toggle("done",entries[j].cells.every(i=>fill[i]));});
-  const bar=document.getElementById("bar");
-  bar.innerHTML=`<b>${e.n} ${e.dir==="A"?"Across":"Down"}</b><span></span>`;
-  bar.querySelector("span").textContent=CLUES[e.key]||"Clue to come";
+  liEls.forEach((li,j)=>{
+    li.classList.toggle("on",j===ei);li.classList.toggle("done",entries[j].cells.every(i=>fill[i]));
+    // The answer so far, redrawn only when it actually changed — render() runs on
+    // every keystroke and there are ~160 entries.
+    const s=entries[j].cells.map(i=>fill[i]||"").join("\u0000");
+    const a=li.querySelector(".ans");
+    if(a.dataset.v!==s){a.dataset.v=s;
+      a.innerHTML=entries[j].cells.map(i=>fill[i]?fill[i]:'<span class="blank">·</span>').join("");}
+  });
+  document.getElementById("barnum").textContent=`${e.n} ${e.dir==="A"?"Across":"Down"}`;
+  document.getElementById("barclue").textContent=CLUES[e.key]||"Clue to come";
   const filled=sol.filter((s,i)=>s&&fill[i]).length,total=sol.filter(Boolean).length;
   document.getElementById("status").textContent=filled===total?"All squares filled":`${filled} of ${total} squares filled`;
   const won=sol.every((s,i)=>!s||fill[i]===s);
@@ -315,6 +377,26 @@ kb.addEventListener("keydown",ev=>{
   else if(k==="Tab"||k==="Enter"){ev.preventDefault();nextEntry(ev.shiftKey?-1:1);render();}
   else if(k===" "){ev.preventDefault();toggle();render();}
 });
+// Clue bar: arrows step through the entries, the clue itself flips direction.
+document.getElementById("prev").addEventListener("click",()=>{nextEntry(-1);render();focusKb();});
+document.getElementById("next").addEventListener("click",()=>{nextEntry(1);render();focusKb();});
+document.getElementById("bartext").addEventListener("click",()=>{toggle();render();focusKb();});
+document.getElementById("bartext").addEventListener("keydown",ev=>{
+  if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();toggle();render();focusKb();}
+});
+
+/* The on-screen keyboard covers the bottom of the layout viewport but not the
+   visual one, so the gap between them is the keyboard's height. Without this the
+   bar would sit underneath the keyboard rather than above it. */
+(function trackKeyboard(){
+  const vv=window.visualViewport;if(!vv)return;
+  const place=()=>{
+    const gap=Math.max(0,window.innerHeight-(vv.height+vv.offsetTop));
+    document.documentElement.style.setProperty("--kb",gap+"px");
+  };
+  vv.addEventListener("resize",place);vv.addEventListener("scroll",place);place();
+})();
+
 document.getElementById("clear").addEventListener("click",()=>{
   if(!confirm("Clear every square? This can't be undone."))return;
   fill=Array(N*N).fill("");bad=new Set();save();render();
