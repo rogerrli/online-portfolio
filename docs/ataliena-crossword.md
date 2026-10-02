@@ -47,7 +47,20 @@ Modelled on the NYT app:
   `grid-template-rows` the rows were implicit and content-sized, so one letter took its row
   from 21px to 38px while the rest shrank; a bare `1fr` is not enough either, since it still
   floors at min-content.
+- The arrows skip entries that are already full, so running off the end of the unsolved
+  Acrosses lands on the first unsolved Down, and vice versa. Because `navOrder` wraps, the
+  "no unsolved clues the other way" case falls out for free. (In this grid every square is
+  checked both ways, so that case can't actually arise — a gap always unsolves both its
+  Across and its Down.)
 - Clearing the puzzle sits alone at the very bottom, error-themed, behind a confirm().
+
+## The clock
+
+Time spent lives under its own key, `…-v2-time`, deliberately separate from the grid:
+**clearing the puzzle starts the grid over but not the time already spent on it.** It only
+counts while the tab is actually in front (`visibilitychange`), and stops for good once
+every square is right, turning gold — so it reads as a solve time rather than a stopwatch
+left running. It is written to storage once a second, so a crash costs at most a second.
 
 The gate navigates to the puzzle by **absolute** path (`/ataliena/puzzle.html`), and must
 keep doing so. The QR points at `/ataliena` with no trailing slash, so a relative

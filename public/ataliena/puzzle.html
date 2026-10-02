@@ -82,6 +82,12 @@ button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid v
 @media (hover:hover){button:hover{background:var(--word)}}
 button:focus-visible,.cl li:focus-visible{outline:3px solid var(--cur);outline-offset:2px}
 .status{color:var(--muted);align-self:center;font-size:.9rem}
+.clock{
+  margin-left:auto;align-self:center;color:var(--muted);font-size:.9rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums;
+}
+.clock.stopped{color:var(--star);font-weight:700}
 /* Destructive, so it sits alone at the very bottom and looks the part. */
 .danger{margin-top:40px;padding-top:22px;border-top:1px solid var(--word);display:flex;justify-content:center}
 .danger button{color:var(--wrong);border-color:var(--wrong)}
@@ -168,6 +174,7 @@ body.master .tools,body.master .win,body.master .danger{display:none}
       <div class="grid" id="grid" role="grid" aria-label="Crossword grid"></div>
       <div class="tools">
         <span class="status" id="status"></span>
+        <span class="clock" id="clock" aria-label="Time spent"></span>
       </div>
       <div class="win" id="win"></div>
     </div>
@@ -303,6 +310,33 @@ let fill=Array(N*N).fill(""), bad=new Set();
 if(MASTER){fill=sol.map(s=>s||"");}
 else try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.fill&&s.fill.length===N*N)fill=s.fill;}catch(e){}
 const save=()=>{if(MASTER)return;try{localStorage.setItem(KEY,JSON.stringify({fill}));}catch(e){}};
+
+/* ---- the clock ----
+   Its own key, deliberately: clearing the grid starts the puzzle over but not the
+   time already spent on it. Only counts while the tab is actually in front, and
+   stops for good once every square is right. */
+const CLOCK_KEY=KEY+"-time";
+let spent=0,runningSince=null;
+try{spent=Number(localStorage.getItem(CLOCK_KEY))||0;}catch(e){}
+const solved=()=>sol.every((s,i)=>!s||fill[i]===s);
+const spentNow=()=>spent+(runningSince===null?0:performance.now()-runningSince);
+function clockSave(){if(MASTER)return;try{localStorage.setItem(CLOCK_KEY,String(Math.round(spentNow())));}catch(e){}}
+function clockStop(){if(runningSince!==null){spent+=performance.now()-runningSince;runningSince=null;clockSave();}}
+function clockStart(){if(runningSince===null&&!MASTER&&!solved())runningSince=performance.now();}
+function fmt(ms){
+  const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;
+  return (h?h+":"+String(m).padStart(2,"0"):String(m))+":"+String(s).padStart(2,"0");
+}
+function drawClock(){
+  const done=solved();
+  if(done)clockStop();
+  const el=document.getElementById("clock");
+  el.textContent=fmt(spentNow());
+  el.classList.toggle("stopped",done);
+}
+setInterval(()=>{drawClock();if(runningSince!==null)clockSave();},1000);
+document.addEventListener("visibilitychange",()=>{document.hidden?clockStop():clockStart();});
+window.addEventListener("pagehide",clockStop);
 let cur=entries[0].cells[0], dir="A";
 
 // build
@@ -358,6 +392,7 @@ function render(){
   const filled=sol.filter((s,i)=>s&&fill[i]).length,total=sol.filter(Boolean).length;
   document.getElementById("status").textContent=filled===total?"All squares filled":`${filled} of ${total} squares filled`;
   const won=sol.every((s,i)=>!s||fill[i]===s);
+  drawClock();
   const w=document.getElementById("win");w.textContent=WIN_MESSAGE;w.classList.toggle("show",won);
 }
 function move(dr,dc){let r=Math.floor(cur/N),c=cur%N;do{r+=dr;c+=dc;}while(r>=0&&r<N&&c>=0&&c<N&&isB(r*N+c));if(r>=0&&r<N&&c>=0&&c<N)cur=r*N+c;}
@@ -366,10 +401,20 @@ function move(dr,dc){let r=Math.floor(cur/N),c=cur%N;do{r+=dr;c+=dc;}while(r>=0&
    every Across in order, then every Down, which is what the columns below show. */
 const navOrder=entries.map((_,i)=>i).sort((a,b)=>
   entries[a].dir!==entries[b].dir ? (entries[a].dir==="A"?-1:1) : entries[a].n-entries[b].n);
+const isFilled=e=>e.cells.every(i=>fill[i]);
+/* Step to the next entry with a gap in it, skipping anything already filled. Because
+   navOrder runs every Across then every Down and wraps, running off the end of the
+   unsolved Acrosses lands on the first unsolved Down by itself — and if there are
+   none, it comes back round to the first unsolved Across. */
 function nextEntry(step){
-  const pos=navOrder.indexOf(curEntry());
-  const e=entries[navOrder[(pos+step+navOrder.length)%navOrder.length]];
-  dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];
+  const n=navOrder.length,start=navOrder.indexOf(curEntry());
+  for(let k=1;k<=n;k++){
+    const e=entries[navOrder[(((start+step*k)%n)+n)%n]];
+    if(!isFilled(e)){dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];return;}
+  }
+  // Every entry is full; just move one along so the arrows still do something.
+  const e=entries[navOrder[(((start+step)%n)+n)%n]];
+  dir=e.dir;cur=e.cells[0];
 }
 function type(ch){if(MASTER)return;
   fill[cur]=ch;bad.delete(cur);
@@ -417,8 +462,11 @@ document.getElementById("bartext").addEventListener("keydown",ev=>{
 
 document.getElementById("clear").addEventListener("click",()=>{
   if(!confirm("Clear every square? This can't be undone."))return;
-  fill=Array(N*N).fill("");bad=new Set();save();render();
+  // The clock is untouched on purpose — the grid starts over, the time spent doesn't.
+  // It does need restarting, though, in case a solved puzzle had stopped it.
+  fill=Array(N*N).fill("");bad=new Set();save();clockStart();render();
 });
+clockStart();
 render();
 </script>
 </body>
