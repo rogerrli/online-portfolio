@@ -25,7 +25,14 @@ Modelled on the NYT app:
 
 - Tapping a square selects its clue in the current direction; tapping that square again
   flips direction; tapping the clue bar's text flips it too. Arrows at either end of the
-  bar step through the entries.
+  bar step through the entries, and span its full height — they are tap targets, so they
+  are sized like one (~87x53px).
+- **Switching clue always lands on that clue's first empty square**, whether you got there
+  by arrow, by the clue list, or by flipping direction. `firstEmpty()` is deliberately not
+  folded into `toggle()`: tapping a *different* square should leave you on the square you
+  tapped, and `curEntry()` flips direction only to find a valid entry.
+- Every `:hover` rule is behind `@media (hover:hover)`. A phone leaves `:hover` stuck on
+  whatever it last tapped, which read as the button staying selected after a tap.
 - **The clue bar is pinned above the keyboard on a phone.** The on-screen keyboard covers
   the bottom of the *layout* viewport but not the *visual* one, so the gap between them is
   the keyboard's height; a `visualViewport` listener writes that into `--kb` and the bar
