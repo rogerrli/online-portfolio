@@ -4,322 +4,331 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>First Impressions</title>
+<meta name="theme-color" content="#070B1A">
+<title>Log in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ---------- EDIT ME: title, intro, clues live in the <script> below ---------- */
+/* A night sky, so this page stays dark in both colour schemes on purpose. */
 :root{
-  --paper:#E8ECF6; --ink:#1C2647; --muted:#5B6688; --line:#1C2647;
-  --cell:#FFFFFF; --word:#CBD5F0; --cur:#F2C14E; --wrong:#D2453C; --star:#C9971F;
+  --sky:#070B1A; --sky2:#0E1430; --ink:#E4E8F5; --muted:#8E99BC;
+  --star:#F2C14E; --dim:#48537D; --line:#F2C14E;
   box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --paper:#141A31; --ink:#E4E8F5; --muted:#9AA4C4; --line:#060914;
-    --cell:#232B4A; --word:#34416E; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#141A31; --ink:#E4E8F5; --muted:#9AA4C4; --line:#060914;
-  --cell:#232B4A; --word:#34416E; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
 }
 *,*::before,*::after{box-sizing:inherit}
-html,body{margin:0}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{background:var(--paper);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.45}
-.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 48px}
-header{display:flex;align-items:flex-end;gap:18px;margin-bottom:22px}
-h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,5vw,3.1rem);line-height:1;margin:0;letter-spacing:-.01em}
-.intro{color:var(--muted);margin:.4rem 0 0;max-width:60ch;white-space:pre-line}
-.intro::first-line{color:var(--ink);font-weight:700}
-.cass{width:92px;height:52px;flex:none;color:var(--star)}
-.layout{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:32px;align-items:start}
-.board{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
-.bar{display:flex;gap:10px;align-items:baseline;min-height:3.2em;padding:10px 14px;margin-bottom:10px;background:var(--word);border-radius:6px}
-.bar b{white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(15,1fr);border:2px solid var(--line);background:var(--line);gap:1px;width:100%;aspect-ratio:1;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-.c{position:relative;background:var(--cell);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:clamp(.8rem,2.6vw,1.4rem);text-transform:uppercase;cursor:pointer}
-.c.b{background:var(--line);cursor:default}
-.c.w{background:var(--word)}
-.c.cur{background:var(--cur);color:#1C2647}
-.c.bad .l{color:var(--wrong);text-decoration:line-through;text-decoration-thickness:2px}
-.c .n{position:absolute;top:1px;left:2px;font-size:clamp(.42rem,1.1vw,.62rem);font-weight:400;line-height:1}
-.tools{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;cursor:pointer}
-button:hover{background:var(--word)}
-button:focus-visible,.cl li:focus-visible{outline:3px solid var(--cur);outline-offset:2px}
-.status{color:var(--muted);margin-left:auto;align-self:center;font-size:.9rem}
-.clues{display:grid;grid-template-columns:1fr 1fr;gap:28px}
-.cl h2{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.4rem;margin:0 0 8px;padding-bottom:6px;border-bottom:1.5px solid var(--ink)}
-.cl ol{list-style:none;margin:0;padding:0}
-.cl li{display:grid;grid-template-columns:2.4em 1fr;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:.95rem}
-.cl li .k{font-weight:700;display:flex;align-items:flex-start;gap:3px}
-.cl li.on{background:var(--word)}
-.cl li.done .t{opacity:.5}
-.film{width:.95em;height:.95em;flex:none;margin-top:.22em;color:var(--star)}
-.c.sp::after{content:"";position:absolute;inset:2px;border:2px solid var(--star);pointer-events:none}
-.cl li.special{border:1.5px solid var(--star);margin:4px 0}
-.cl li.special .t{font-weight:700}
-.star{width:1em;height:1em;flex:none;margin-top:.18em;color:var(--star)}
-.cl li.todo .t{font-style:italic;color:var(--muted)}
-.win{display:none;margin-top:14px;padding:12px 14px;border:1.5px solid var(--star);border-radius:6px}
-.win.show{display:block}
-body.master .tools,body.master .win{display:none}
-@media print{body.master .c .l{visibility:visible}}
-#kb{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;font-size:16px}
-@media (max-width:860px){
-  .layout{grid-template-columns:1fr}
-  .board{position:static}
-  .clues{grid-template-columns:1fr}
+html,body{margin:0;height:100%}
+body{
+  background:radial-gradient(130% 90% at 50% 8%,var(--sky2) 0%,var(--sky) 62%);
+  color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,sans-serif;
+  line-height:1.5;
+  min-height:100svh;
+  overflow:hidden;
+  -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
 }
-@media (prefers-reduced-motion:no-preference){.c{transition:background .08s}}
-@media print{
-  :root{--paper:#fff;--ink:#000;--muted:#000;--line:#000;--cell:#fff;--word:#fff;--cur:#fff;--star:#000}
-  @page{margin:.5in}
-  body{background:#fff}
-  .wrap{padding:0;max-width:none}
-  .bar,.tools,.win,#kb{display:none!important}
-  .layout{grid-template-columns:4.6in 1fr;gap:.3in}
-  .board{position:static}
-  .grid{width:4.6in}
-  .c .l{visibility:hidden}
-  .clues{gap:.2in;font-size:9pt}
-  .cl li{padding:1px 0;break-inside:avoid}
-  header{margin-bottom:.2in}
+
+/* ---------- ambient starfield ---------- */
+#field{position:fixed;inset:0;pointer-events:none;z-index:0}
+#field i{position:absolute;display:block;border-radius:50%;background:#fff;opacity:.5}
+@media (prefers-reduced-motion:no-preference){
+  #field i{animation:tw var(--d,4s) ease-in-out var(--delay,0s) infinite}
+  @keyframes tw{0%,100%{opacity:var(--o,.5)}50%{opacity:calc(var(--o,.5) * .25)}}
 }
+
+/* ---------- layout ---------- */
+.wrap{
+  position:relative;z-index:1;
+  min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(20px,5vh,38px);
+  padding:calc(24px + env(safe-area-inset-top,0px)) 22px calc(28px + env(safe-area-inset-bottom,0px));
+  text-align:center;
+}
+h1{
+  font-family:"Young Serif",Georgia,serif;font-weight:400;
+  font-size:clamp(2.1rem,11vw,3rem);line-height:1;margin:0;letter-spacing:-.01em;
+  transition:opacity 1.1s ease;
+}
+.sub{color:var(--muted);margin:0;max-width:30ch;font-size:clamp(.95rem,4vw,1.05rem)}
+.sub b{color:var(--ink);font-weight:700}
+
+/* ---------- constellation ---------- */
+#cass{width:min(94vw,470px);height:auto;display:block;overflow:visible;--lit:0}
+#cass .lk{
+  fill:none;stroke:var(--line);stroke-width:.7;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:1;stroke-dashoffset:1;opacity:.9;
+}
+#cass .st{fill:color-mix(in srgb,var(--star) calc(var(--lit) * 100%),var(--dim))}
+#cass .glow{fill:url(#halo);opacity:calc(var(--lit) * .62)}
+
+/* ---------- the opening tap ---------- */
+/* iOS will not release compass data without a gesture, so the first screen asks
+   for one. "Log in" and the constellation stay hidden until it comes. */
+body[data-state="tap"]{cursor:pointer}
+body[data-state="tap"] h1,
+body[data-state="tap"] #cass{display:none}
+.tapline{
+  font-family:"Young Serif",Georgia,serif;font-weight:400;
+  font-size:clamp(1.45rem,7vw,2rem);color:var(--muted);margin:0;letter-spacing:.01em;
+}
+@media (prefers-reduced-motion:no-preference){
+  .tapline{animation:pulse 2.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+}
+
+body.done #cass .st{fill:#FFF3D2}
+body.done #cass .glow{opacity:.95}
+body.done #cass .lk{
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1);
+}
+@media (prefers-reduced-motion:reduce){
+  body.done #cass .lk{transition:none;stroke-dashoffset:0}
+}
+body[data-state="done"] h1{opacity:.3}
+
+/* ---------- controls ---------- */
+button{
+  font:inherit;font-weight:700;color:var(--sky);background:var(--star);
+  border:0;border-radius:999px;padding:13px 38px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+button:active{transform:scale(.97)}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){
+  #next{animation:rise .7s cubic-bezier(.2,.7,.3,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+}
+
+/* ---------- state machine ---------- */
+[data-step]{display:none;flex-direction:column;align-items:center;gap:18px}
+body[data-state="tap"]     [data-step="tap"],
+body[data-state="desktop"] [data-step="desktop"],
+body[data-state="blocked"] [data-step="blocked"],
+body[data-state="done"]    [data-step="done"]{display:flex}
+
+.note{color:var(--muted);font-size:.82rem;max-width:34ch;margin:0}
+
+#debug{
+  position:fixed;left:8px;bottom:8px;z-index:9;display:none;
+  font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:rgba(7,11,26,.92);border:1px solid #2A3357;border-radius:6px;
+  padding:7px 9px;text-align:left;color:var(--muted);white-space:pre;
+}
+body.dbg #debug{display:block}
 </style>
 </head>
-<body>
-<div class="wrap">
-  <header>
-    <svg class="cass" viewBox="0 0 92 52" aria-hidden="true">
-      <polyline points="6,14 26,40 46,22 66,44 86,10" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
-      <g fill="currentColor"><circle cx="6" cy="14" r="3.2"/><circle cx="26" cy="40" r="2.6"/><circle cx="46" cy="22" r="3.6"/><circle cx="66" cy="44" r="2.8"/><circle cx="86" cy="10" r="3"/></g>
-    </svg>
-    <div>
-      <h1 id="title"></h1>
-      <p class="intro" id="intro"></p>
-    </div>
-  </header>
-  <div class="layout">
-    <div class="board">
-      <div class="bar" id="bar" aria-live="polite"></div>
-      <div class="grid" id="grid" role="grid" aria-label="Crossword grid"></div>
-      <div class="tools">
-        <button id="clear">Clear puzzle</button>
-        <span class="status" id="status"></span>
-      </div>
-      <div class="win" id="win"></div>
-    </div>
-    <div class="clues">
-      <section class="cl"><h2>Across</h2><ol id="across"></ol></section>
-      <section class="cl"><h2>Down</h2><ol id="down"></ol></section>
-    </div>
+<body data-state="tap">
+
+<div id="field" aria-hidden="true"></div>
+
+<main class="wrap">
+
+  <h1>Log in</h1>
+
+  <svg id="cass" viewBox="0 0 104 64" role="img" aria-label="The constellation Cassiopeia">
+    <defs>
+      <radialGradient id="halo">
+        <stop offset="0%" stop-color="#F2C14E" stop-opacity=".85"/>
+        <stop offset="45%" stop-color="#F2C14E" stop-opacity=".28"/>
+        <stop offset="100%" stop-color="#F2C14E" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <path class="lk" pathLength="1" d="M10 20 L30 46 L52 26 L74 48 L94 16"/>
+    <g>
+      <circle class="glow" cx="10" cy="20" r="9"/>  <circle class="st" cx="10" cy="20" r="2.6"/>
+      <circle class="glow" cx="30" cy="46" r="9.5"/><circle class="st" cx="30" cy="46" r="2.8"/>
+      <circle class="glow" cx="52" cy="26" r="10"/> <circle class="st" cx="52" cy="26" r="2.9"/>
+      <circle class="glow" cx="74" cy="48" r="8"/>  <circle class="st" cx="74" cy="48" r="2.3"/>
+      <circle class="glow" cx="94" cy="16" r="7.5"/><circle class="st" cx="94" cy="16" r="2"/>
+    </g>
+  </svg>
+
+  <div data-step="tap">
+    <p class="tapline">Tap to start</p>
   </div>
-</div>
-<input id="kb" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-label="Type a letter">
+
+  <!-- the only screens that say anything at all -->
+  <div data-step="done">
+    <button id="next" type="button">Next</button>
+  </div>
+
+  <div data-step="desktop">
+    <p class="sub"><b>This one needs your phone.</b></p>
+  </div>
+
+  <div data-step="blocked">
+    <p class="sub" id="blockedMsg"></p>
+  </div>
+
+</main>
+
+<div id="debug" aria-hidden="true"></div>
+
 <script>
-/* =================== EDIT HERE =================== */
-const TITLE = "First Impressions";
-const INTRO = "Happy Birthday Natalie :)\nSome of these answers are worth a closer look so you can find the next step";
-const WIN_MESSAGE = "Every square is right. First impressions matter, so grab your 20A and take a closer look";
-// Answers marked with the film icon (the seven photos). VIEWFINDER (20A) is left unmarked on purpose.
-const SPECIAL = "20A"; // the very special answer (VIEWFINDER)
-const MARKED = ["16A", "37A", "67A", "46D", "48D", "52D", "56D"];
-// Clues keyed by number + direction. Anything missing shows as "Clue to come".
-const CLUES = {
-  "1A": "Burn letters?",
-  "4A": "Spate",
-  "8A": "Fly without an engine",
-  "13A": "The correct answer to quebecois maple pudding",
-  "14A": "Longed (for)",
-  "16A": "Who you need to get sticky",
-  "17A": "Not a fling, in dating-app shorthand",
-  "18A": "Renaissance ___",
-  "19A": "Oscar-winning lizard of 2011",
-  "20A": "In order to see the missing clue",
-  "23A": "Harrison who flew the Millennium Falcon",
-  "24A": "Clicks-not-bricks sector",
-  "25A": "C-___",
-  "27A": "Worker with a comb",
-  "28A": "Positive or negative",
-  "31A": "Like most comets",
-  "33A": "Wile E. Coyote's preferred initials",
-  "34A": "Two-word promise",
-  "36A": "Four for forks",
-  "37A": "Locale for a stroll that happened on some \"under\" land?",
-  "40A": "Wash out",
-  "42A": "Yellowfin tuna",
-  "43A": "School booster grp.",
-  "46A": "Reciprocal of cosine",
-  "47A": "Kernel left in the popcorn bag",
-  "50A": "Slayed, in internet slang",
-  "51A": "Overflow (with)",
-  "54A": "Ran without going anywhere",
-  "55A": "Rocket's children",
-  "57A": "Happy Birth___ <3",
-  "58A": "Play ground?",
-  "59A": "What Avengers do when assembled",
-  "61A": "Like Q9-0 by Mando",
-  "64A": "Smidge",
-  "65A": "___ Holiday",
-  "66A": "Couch",
-  "67A": "You'll be saying 'ay, caramba' when you see this facing forward",
-  "68A": "Life ___ (Help, I've fallen and I can't get up!)",
-  "69A": "Count (on)",
-  "70A": "Equinox mo.",
-  "1D": "Water, for salt",
-  "2D": "'___ my tab'",
-  "3D": "Insect that forms living rafts",
-  "4D": "Drawing",
-  "5D": "Playa Bowl fruit",
-  "6D": "___ji of Unit-01",
-  "7D": "What multiple Poppys famously can't be, as a verb",
-  "8D": "[Back off!]",
-  "9D": "Popular Poppy pose",
-  "10D": "Not knightly",
-  "11D": "You have six with Kevin Bacon",
-  "12D": "Weathered",
-  "15D": "___ space",
-  "21D": "Ace",
-  "22D": "Mullet's cousin",
-  "26D": "Ace",
-  "29D": "Spellbound",
-  "30D": "Lyric tribute",
-  "32D": "Cuttlefish fluid",
-  "35D": "Mouths, in Latin",
-  "37D": "Ochoa's Nobel-worthy discovery",
-  "38D": "'Say it ___ so'",
-  "39D": "'New phone ___ dis?'",
-  "40D": "Skincare TikTok darling",
-  "41D": "What hockey players fight for",
-  "43D": "Some roofs",
-  "44D": "No-win situation?",
-  "45D": "Get sigma'd",
-  "46D": "______ season",
-  "48D": "We saw a falcon in the rain here",
-  "49D": "Wyo. is on it in the summer",
-  "52D": "It doesn't run across the Brooklyn Bridge",
-  "53D": "Space blanket material",
-  "56D": "____ party",
-  "60D": "I had to go to the second hospital for this person",
-  "62D": "Only U.S. prez born in Kentucky",
-  "63D": "Cool, in '90s slang",
-};
-/* ================================================= */
+/* ============================ settings ============================ */
+const NORTH_TOL = 10;    // degrees either side of north
+const LEVEL_TOL = 25;    // degrees of tilt still counted as "flat"
+const HOLD_MS   = 3000;  // how long both must be held
+const GLOW_FROM = 70;    // stars begin to answer from this far off north
+/* Absolute, not relative. The QR points at /ataliena with no trailing slash, so a
+   relative "puzzle.html" resolves against / and lands on /puzzle.html — nowhere. */
+const PUZZLE    = "/ataliena/puzzle.html";
+/* The login is not remembered — every visit earns its way in again. The crossword's
+   own answers do persist; that is a separate key, written by the puzzle itself. */
 
-const N=15;
-const LAYOUT="...#....##........#.....#........#.....#...............#.........##....#..........##.........##...#.....####.........####.....#...##.........##..........#....##.........#...##..........#.....#........#.....#........##....#...";
-const SOL_ENC="RkNTRU5GVVRZVlFSQkhWTlBVUlFFQlRSRVlHRVNOVkVSRU5BVEJJVlJKU1ZBUVJFU0JFUVJHTlZZRkNOQU9SUkFCQU1SRUJHTlZZUlFHQUdWUUJHVkFSRkVWSVJFSk5ZWEVWQUZSTlVWQ0dORlJQTkFHQllRWk5WUU5HUkdSUlpWUVlSUVhWR0ZRTkxGR05UUkhBVkdSRllOVkFHTlFFQlpOQUdOT1lSUlpITllSRUdFUllMRlJD";
-const KEY="gift-crossword-first-impressions-v2";
-const MASTER=false; // true = answer key
+const qs = new URLSearchParams(location.search);
+if (qs.has("debug")) document.body.classList.add("dbg");
 
-const rot=s=>s.replace(/[A-Z]/g,c=>String.fromCharCode((c.charCodeAt(0)-52)%26+65));
-const solLetters=rot(atob(SOL_ENC));
-const sol=[];{let k=0;for(let i=0;i<N*N;i++)sol.push(LAYOUT[i]==="#"?null:solLetters[k++]);}
-const isB=i=>LAYOUT[i]==="#";
-
-// numbering and entries
-const num=Array(N*N).fill(0), entries=[], cellEntry=Array.from({length:N*N},()=>({A:null,D:null}));
-let n=0;
-for(let r=0;r<N;r++)for(let c=0;c<N;c++){
-  const i=r*N+c; if(isB(i))continue;
-  const sa=(c===0||isB(i-1))&&c<N-1&&!isB(i+1);
-  const sd=(r===0||isB(i-N))&&r<N-1&&!isB(i+N);
-  if(sa||sd){n++;num[i]=n;
-    if(sa){const cells=[];for(let x=c;x<N&&!isB(r*N+x);x++)cells.push(r*N+x);entries.push({key:n+"A",n,dir:"A",cells});}
-    if(sd){const cells=[];for(let y=r;y<N&&!isB(y*N+c);y++)cells.push(y*N+c);entries.push({key:n+"D",n,dir:"D",cells});}
+/* ============================ starfield ============================ */
+(function field() {
+  const host = document.getElementById("field");
+  const n = window.innerWidth < 500 ? 70 : 110;
+  let html = "";
+  for (let i = 0; i < n; i++) {
+    const s = (Math.random() * 1.9 + 0.6).toFixed(2);
+    const o = (Math.random() * 0.5 + 0.18).toFixed(2);
+    html += `<i style="left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*100).toFixed(2)}%;`
+          + `width:${s}px;height:${s}px;--o:${o};opacity:${o};`
+          + `--d:${(Math.random()*4+2.5).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s"></i>`;
   }
-}
-entries.forEach((e,ei)=>e.cells.forEach(i=>cellEntry[i][e.dir]=ei));
+  host.innerHTML = html;
+})();
 
-const spEntry=entries.find(e=>e.key===SPECIAL);
-// state
-let fill=Array(N*N).fill(""), bad=new Set();
-if(MASTER){fill=sol.map(s=>s||"");}
-else try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.fill&&s.fill.length===N*N)fill=s.fill;}catch(e){}
-const save=()=>{if(MASTER)return;try{localStorage.setItem(KEY,JSON.stringify({fill}));}catch(e){}};
-let cur=entries[0].cells[0], dir="A";
+/* ============================ elements ============================ */
+const body     = document.body;
+const cass     = document.getElementById("cass");
+const dbg      = document.getElementById("debug");
+const setState = s => body.dataset.state = s;
 
-// build
-document.getElementById("title").textContent=TITLE;
-document.getElementById("intro").textContent=INTRO;
-document.title=MASTER?TITLE+" (answer key)":TITLE;
-if(MASTER){document.body.classList.add("master");document.getElementById("intro").textContent="Answer key. Keep this one to yourself.";}
-const gridEl=document.getElementById("grid"), cellsEl=[];
-for(let i=0;i<N*N;i++){
-  const d=document.createElement("div");d.className="c"+(isB(i)?" b":"");
-  if(!isB(i)){d.setAttribute("role","gridcell");
-    if(num[i]){const s=document.createElement("span");s.className="n";s.textContent=num[i];d.appendChild(s);}
-    const l=document.createElement("span");l.className="l";d.appendChild(l);
-    d.addEventListener("click",()=>{if(cur===i)toggle();else{cur=i;if(cellEntry[i][dir]===null)toggle();}render();focusKb();});
+/* ============================ mobile gate ============================ */
+const coarse   = matchMedia("(pointer: coarse)").matches;
+const touch    = (navigator.maxTouchPoints || 0) > 0;
+const uaMobile = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
+// iPadOS reports a desktop UA, so the coarse-pointer + touch pair is what catches it.
+const isMobile = (coarse && touch) || uaMobile;
+
+/* ============================ sensors ============================ */
+let heading = null, beta = null, gamma = null, absolute = false, evName = "-";
+let gotReading = false, watching = false, lastAt = 0;
+
+const norm = a => ((a % 360) + 360) % 360;
+// shortest signed turn from `a` to `b`, in (-180, 180]
+const delta = (a, b) => ((b - a + 540) % 360) - 180;
+const lerpAngle = (a, b, t) => norm(a + delta(a, b) * t);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+function onOrient(e) {
+  let h = null;
+  if (typeof e.webkitCompassHeading === "number" && !Number.isNaN(e.webkitCompassHeading)) {
+    h = e.webkitCompassHeading;            // iOS: degrees clockwise from north
+    absolute = true;
+  } else if (e.absolute === true && typeof e.alpha === "number" && e.alpha !== null) {
+    h = norm(360 - e.alpha);               // Android absolute orientation
+    absolute = true;
   }
-  if(spEntry&&spEntry.cells.includes(i))d.classList.add("sp");
-  gridEl.appendChild(d);cellsEl.push(d);
-}
-const starSVG='<svg class="star" viewBox="0 0 16 16" aria-label="special answer"><path fill="currentColor" d="M8 .8l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.7l-4.4 2.5 1.1-4.9L.9 5.9l5-.5z"/></svg>';
-const filmSVG='<svg class="film" viewBox="0 0 16 16" aria-label="photo answer"><rect x="1" y="2" width="14" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><g fill="currentColor"><rect x="3" y="3.6" width="1.6" height="1.6"/><rect x="3" y="7.2" width="1.6" height="1.6"/><rect x="3" y="10.8" width="1.6" height="1.6"/><rect x="11.4" y="3.6" width="1.6" height="1.6"/><rect x="11.4" y="7.2" width="1.6" height="1.6"/><rect x="11.4" y="10.8" width="1.6" height="1.6"/></g></svg>';
-const liEls=[];
-entries.forEach((e,ei)=>{
-  const li=document.createElement("li");li.tabIndex=0;
-  const t=CLUES[e.key];if(!t)li.classList.add("todo");if(e.key===SPECIAL)li.classList.add("special");
-  li.innerHTML=`<span class="k">${e.n}${MARKED.includes(e.key)?filmSVG:""}${e.key===SPECIAL?starSVG:""}</span><span class="t"></span>`;
-  li.querySelector(".t").textContent=(t||"Clue to come")+(MASTER?"  "+e.cells.map(i=>sol[i]).join(""):"");
-  const go=()=>{dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];render();focusKb();};
-  li.addEventListener("click",go);li.addEventListener("keydown",ev=>{if(ev.key==="Enter")go();});
-  document.getElementById(e.dir==="A"?"across":"down").appendChild(li);liEls.push(li);
-});
+  if (h === null) return;
 
-function toggle(){const o=dir==="A"?"D":"A";if(cellEntry[cur][o]!==null)dir=o;}
-function curEntry(){let ei=cellEntry[cur][dir];if(ei===null){toggle();ei=cellEntry[cur][dir];}return ei;}
-function render(){
-  const ei=curEntry(),e=entries[ei];
-  cellsEl.forEach((d,i)=>{if(isB(i))return;
-    d.querySelector(".l").textContent=fill[i];
-    d.classList.toggle("w",e.cells.includes(i));d.classList.toggle("cur",i===cur);d.classList.toggle("bad",bad.has(i));});
-  liEls.forEach((li,j)=>{li.classList.toggle("on",j===ei);li.classList.toggle("done",entries[j].cells.every(i=>fill[i]));});
-  const bar=document.getElementById("bar");
-  bar.innerHTML=`<b>${e.n} ${e.dir==="A"?"Across":"Down"}</b><span></span>`;
-  bar.querySelector("span").textContent=CLUES[e.key]||"Clue to come";
-  const filled=sol.filter((s,i)=>s&&fill[i]).length,total=sol.filter(Boolean).length;
-  document.getElementById("status").textContent=filled===total?"All squares filled":`${filled} of ${total} squares filled`;
-  const won=sol.every((s,i)=>!s||fill[i]===s);
-  const w=document.getElementById("win");w.textContent=WIN_MESSAGE;w.classList.toggle("show",won);
+  evName = e.type;
+  if (typeof e.beta  === "number") beta  = e.beta;
+  if (typeof e.gamma === "number") gamma = e.gamma;
+
+  // light smoothing — raw compass output jitters by several degrees
+  heading = heading === null ? h : lerpAngle(heading, h, 0.25);
+  gotReading = true;
+  lastAt = performance.now();
 }
-function move(dr,dc){let r=Math.floor(cur/N),c=cur%N;do{r+=dr;c+=dc;}while(r>=0&&r<N&&c>=0&&c<N&&isB(r*N+c));if(r>=0&&r<N&&c>=0&&c<N)cur=r*N+c;}
-function nextEntry(step){let ei=curEntry()+step;ei=(ei+entries.length)%entries.length;const e=entries[ei];dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];}
-function type(ch){if(MASTER)return;
-  fill[cur]=ch;bad.delete(cur);
-  const e=entries[curEntry()],p=e.cells.indexOf(cur);
-  const nxt=e.cells.slice(p+1).find(i=>!fill[i]);
-  if(nxt!==undefined)cur=nxt;else if(p<e.cells.length-1)cur=e.cells[p+1];
-  save();render();
+
+function listen() {
+  if (watching) return;
+  watching = true;
+  window.addEventListener("deviceorientationabsolute", onOrient, true);
+  window.addEventListener("deviceorientation", onOrient, true);
+  setState("seek");
+  requestAnimationFrame(loop);
+  // If nothing ever arrives, the hardware or the permission isn't there.
+  setTimeout(() => { if (!gotReading) blocked("sensor"); }, 5000);
 }
-function back(){if(MASTER)return;
-  if(fill[cur]){fill[cur]="";}else{const e=entries[curEntry()],p=e.cells.indexOf(cur);if(p>0){cur=e.cells[p-1];fill[cur]="";}}
-  bad.delete(cur);save();render();
+
+/* The opening tap is what lets iOS hand over the compass. Every platform gets the
+   same screen so the experience doesn't fork; elsewhere the tap just starts it. */
+function arm() {
+  setState("tap");
+  document.addEventListener("click", async () => {
+    const DOE = window.DeviceOrientationEvent;
+    if (DOE && typeof DOE.requestPermission === "function") {
+      let res;
+      try { res = await DOE.requestPermission(); }
+      catch (err) { return blocked("permission"); }
+      if (res !== "granted") return blocked("permission");
+    }
+    listen();
+  }, { once: true });
 }
-const kb=document.getElementById("kb");
-function focusKb(){kb.focus({preventScroll:true});}
-kb.addEventListener("input",()=>{const v=(kb.value||"").toUpperCase().replace(/[^A-Z]/g,"");kb.value="";if(v)type(v[v.length-1]);});
-kb.addEventListener("keydown",ev=>{
-  const k=ev.key;
-  if(k==="Backspace"||k==="Delete"){ev.preventDefault();back();}
-  else if(k==="ArrowLeft"){ev.preventDefault();if(dir!=="A"){dir="A";if(cellEntry[cur].A===null)dir="D";}else move(0,-1);render();}
-  else if(k==="ArrowRight"){ev.preventDefault();if(dir!=="A"){dir="A";if(cellEntry[cur].A===null)dir="D";}else move(0,1);render();}
-  else if(k==="ArrowUp"){ev.preventDefault();if(dir!=="D"){dir="D";if(cellEntry[cur].D===null)dir="A";}else move(-1,0);render();}
-  else if(k==="ArrowDown"){ev.preventDefault();if(dir!=="D"){dir="D";if(cellEntry[cur].D===null)dir="A";}else move(1,0);render();}
-  else if(k==="Tab"||k==="Enter"){ev.preventDefault();nextEntry(ev.shiftKey?-1:1);render();}
-  else if(k===" "){ev.preventDefault();toggle();render();}
-});
-document.getElementById("clear").addEventListener("click",()=>{
-  if(!confirm("Clear every square? This can't be undone."))return;
-  fill=Array(N*N).fill("");bad=new Set();save();render();
-});
-render();
+
+function blocked(why) {
+  if (body.dataset.state === "done") return;
+  // There is no way past this screen. Pointing north is the only way in.
+  document.getElementById("blockedMsg").innerHTML = why === "permission"
+    ? "<b>I need the compass.</b> Allow motion &amp; orientation access, then reload."
+    : "<b>No compass reading.</b> This phone may not have one.";
+  setState("blocked");
+}
+
+/* ============================ the hold ============================ */
+let holdStart = 0, lit = 0;
+
+function loop(now) {
+  if (body.dataset.state === "done") return;
+
+  if (heading !== null) {
+    const off     = Math.abs(delta(0, heading));            // distance from north
+    const onNorth = off <= NORTH_TOL;
+    const tilt    = Math.max(Math.abs(beta ?? 99), Math.abs(gamma ?? 99));
+    const level   = tilt <= LEVEL_TOL;
+    // A stalled sensor must not let a stale "pointing north" finish the hold.
+    const fresh   = (now - lastAt) < 900;
+    const ok      = onNorth && level && fresh;
+
+    if (ok) { if (!holdStart) holdStart = now; }
+    else holdStart = 0;
+
+    const p = holdStart ? Math.min(1, (now - holdStart) / HOLD_MS) : 0;
+
+    /* The stars are the only feedback there is. They answer to how close she is,
+       dimmed while the phone is tilted, then fill the rest of the way on the hold. */
+    const near   = clamp((GLOW_FROM - off) / (GLOW_FROM - NORTH_TOL), 0, 1);
+    const target = holdStart ? 0.55 + p * 0.45 : near * (level ? 0.5 : 0.18);
+    lit += (target - lit) * 0.12;
+    cass.style.setProperty("--lit", lit.toFixed(3));
+
+    if (p >= 1) return succeed();
+  }
+
+  if (body.classList.contains("dbg")) {
+    dbg.textContent =
+      `event    ${evName}\nabsolute ${absolute}\nheading  ${heading === null ? "null" : heading.toFixed(1)}`
+      + `\nbeta     ${beta === null ? "null" : beta.toFixed(1)}\ngamma    ${gamma === null ? "null" : gamma.toFixed(1)}`
+      + `\nlit      ${lit.toFixed(2)}\nhold     ${holdStart ? (((now - holdStart) / 1000).toFixed(1) + "s") : "-"}`;
+  }
+  requestAnimationFrame(loop);
+}
+
+function succeed() {
+  setState("done");
+  body.classList.add("done");
+  cass.style.setProperty("--lit", "1");
+  if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
+}
+
+/* ============================ wiring ============================ */
+document.getElementById("next").addEventListener("click", () => location.assign(PUZZLE));
+
+if (qs.has("preview")) { setTimeout(succeed, 400); }       // check the payoff without a compass
+else if (!isMobile && !qs.has("force")) setState("desktop");
+else arm();
 </script>
 </body>
 </html>
