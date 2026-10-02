@@ -63,6 +63,27 @@ h1{
 #cass .st{fill:color-mix(in srgb,var(--star) calc(var(--lit) * 100%),var(--dim))}
 #cass .glow{fill:url(#halo);opacity:calc(var(--lit) * .62)}
 
+/* ---------- daylight ----------
+   With the lights on there is nothing to see, so the page says so and waits. Pure
+   CSS, so flipping the system setting changes it instantly with no reload. Only an
+   explicit light preference counts — "no preference" falls through to the sky. */
+@media (prefers-color-scheme:light){
+  :root{--sky:#E8ECF6;--sky2:#F7F9FD;--ink:#1C2647;--muted:#5B6688;--dim:#C6CDE0}
+  #field{display:none}
+  /* the stars are still up there, just washed out by the daylight */
+  #cass{opacity:.3}
+  #cass .glow{opacity:0}
+  #cass .st{fill:var(--dim)}
+  body:not([data-state="done"]) [data-step]{display:none!important}
+  body:not([data-state="done"]) [data-step="lights"]{display:flex!important}
+  body:not([data-state="done"]) h1{display:block!important}
+  body:not([data-state="done"]) #cass{display:block!important}
+  /* She has already earned the night sky, so don't take it back at the last step. */
+  body[data-state="done"]{--sky:#070B1A;--sky2:#0E1430;--ink:#E4E8F5;--muted:#8E99BC;--dim:#48537D}
+  body[data-state="done"] #cass{opacity:1}
+  body[data-state="done"] #cass .glow{opacity:.95}
+}
+
 /* ---------- the opening tap ---------- */
 /* iOS will not release compass data without a gesture, so the first screen asks
    for one. "Log in" and the constellation stay hidden until it comes. */
@@ -152,6 +173,10 @@ body.dbg #debug{display:block}
 
   <div data-step="tap">
     <p class="tapline">Tap to start</p>
+  </div>
+
+  <div data-step="lights">
+    <p class="sub">It&rsquo;s a bit light out to see the stars.</p>
   </div>
 
   <!-- the only screens that say anything at all -->
@@ -330,8 +355,17 @@ function succeed() {
 /* ============================ wiring ============================ */
 document.getElementById("next").addEventListener("click", () => location.assign(PUZZLE));
 
+/* Only an explicit light preference holds her at the door; "no preference" goes
+   straight through. Nothing is armed while the lights are on — no sensors, no
+   permission prompt — and turning them off starts the gate without a reload. */
+const lightQ = matchMedia("(prefers-color-scheme: light)");
+lightQ.addEventListener("change", e => {
+  if (!e.matches && body.dataset.state === "lights") arm();
+});
+
 if (qs.has("preview")) { setTimeout(succeed, 400); }       // check the payoff without a compass
 else if (!isMobile && !qs.has("force")) setState("desktop");
+else if (lightQ.matches) setState("lights");
 else arm();
 </script>
 </body>

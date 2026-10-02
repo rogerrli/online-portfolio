@@ -26,7 +26,10 @@ Modelled on the NYT app:
 - Tapping a square selects its clue in the current direction; tapping that square again
   flips direction; tapping the clue bar's text flips it too. Arrows at either end of the
   bar step through the entries, and span its full height — they are tap targets, so they
-  are sized like one (~87x53px).
+  are sized like one (~51x53px). They walk the clue *lists* (every Across, then every
+  Down), not `entries[]`, which is built in grid order and interleaves the two: stepping
+  through it sent you from 1 Across straight to 1 Down. The bar shows only the clue text;
+  the highlighted word in the grid is what tells you the direction.
 - **Switching clue always lands on that clue's first empty square**, whether you got there
   by arrow, by the clue list, or by flipping direction. `firstEmpty()` is deliberately not
   folded into `toggle()`: tapping a *different* square should leave you on the square you
@@ -53,6 +56,15 @@ as `/ataliena/index.html` hides the bug, because the relative form resolves corr
 there; test the bare URL.
 
 ## The gate
+
+### Daylight
+
+If the device explicitly reports light mode, the gate holds her at the door: the title, a
+washed-out constellation, and *"It's a bit light out to see the stars."* No instruction —
+the faded stars are the hint. Nothing is armed while it's up, so no sensors run and no
+permission is requested. It's plain CSS plus one `matchMedia` listener, so turning dark
+mode on swaps straight to the night sky with no reload, which is the reward for working it
+out. "No preference" is not light, and falls through to the sky as normal.
 
 There is no password and no text input. **The login is pointing the phone north.**
 

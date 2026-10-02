@@ -53,12 +53,11 @@ h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,
   flex:1;min-width:0;display:flex;gap:10px;align-items:center;
   padding:12px 4px;cursor:pointer;font-size:.95rem;
 }
-.bartext b{white-space:nowrap}
 .bartext span{min-width:0}
 .bar .nav{
   flex:none;display:flex;align-items:center;justify-content:center;
   border:0;border-radius:6px;background:transparent;color:var(--ink);
-  font-size:1.6rem;line-height:1;padding:0;min-width:3.4em;align-self:stretch;
+  font-size:1.6rem;line-height:1;padding:0;min-width:2em;align-self:stretch;
   cursor:pointer;
 }
 .bar .nav:active{background:rgba(0,0,0,.16)}
@@ -162,7 +161,7 @@ body.master .tools,body.master .win,body.master .danger{display:none}
       <div class="bar" id="bar" aria-live="polite">
         <button class="nav" id="prev" type="button" aria-label="Previous clue">&lsaquo;</button>
         <div class="bartext" id="bartext" role="button" tabindex="0" aria-label="Switch direction">
-          <b id="barnum"></b><span id="barclue"></span>
+          <span id="barclue"></span>
         </div>
         <button class="nav" id="next" type="button" aria-label="Next clue">&rsaquo;</button>
       </div>
@@ -355,7 +354,6 @@ function render(){
     if(a.dataset.v!==s){a.dataset.v=s;
       a.innerHTML=entries[j].cells.map(i=>fill[i]?fill[i]:'<span class="blank">·</span>').join("");}
   });
-  document.getElementById("barnum").textContent=`${e.n} ${e.dir==="A"?"Across":"Down"}`;
   document.getElementById("barclue").textContent=CLUES[e.key]||"Clue to come";
   const filled=sol.filter((s,i)=>s&&fill[i]).length,total=sol.filter(Boolean).length;
   document.getElementById("status").textContent=filled===total?"All squares filled":`${filled} of ${total} squares filled`;
@@ -363,7 +361,16 @@ function render(){
   const w=document.getElementById("win");w.textContent=WIN_MESSAGE;w.classList.toggle("show",won);
 }
 function move(dr,dc){let r=Math.floor(cur/N),c=cur%N;do{r+=dr;c+=dc;}while(r>=0&&r<N&&c>=0&&c<N&&isB(r*N+c));if(r>=0&&r<N&&c>=0&&c<N)cur=r*N+c;}
-function nextEntry(step){let ei=curEntry()+step;ei=(ei+entries.length)%entries.length;const e=entries[ei];dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];}
+/* entries[] is built in grid order, so it interleaves directions — 1A, 1D, 2D, 3D,
+   4A… — and stepping through it sent you from 1A to 1D. Walk the clue lists instead:
+   every Across in order, then every Down, which is what the columns below show. */
+const navOrder=entries.map((_,i)=>i).sort((a,b)=>
+  entries[a].dir!==entries[b].dir ? (entries[a].dir==="A"?-1:1) : entries[a].n-entries[b].n);
+function nextEntry(step){
+  const pos=navOrder.indexOf(curEntry());
+  const e=entries[navOrder[(pos+step+navOrder.length)%navOrder.length]];
+  dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];
+}
 function type(ch){if(MASTER)return;
   fill[cur]=ch;bad.delete(cur);
   const e=entries[curEntry()],p=e.cells.indexOf(cur);
