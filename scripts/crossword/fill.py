@@ -17,6 +17,7 @@ Usage:
 """
 import argparse
 import collections
+import math
 import random
 import sys
 import time
@@ -32,6 +33,7 @@ SEEDED = {"RIVERWALK": 60, "SAKURA": 60}
 # means "not found within these limits", never "no fill exists" — which is why
 # the driver restarts with a fresh pin arrangement rather than concluding.
 BRANCH = 150
+LCV_SAMPLE = 24        # candidates ranked by what they leave the crossings
 BLANK = "."
 
 
@@ -170,18 +172,62 @@ class Filler:
         self.nodes += 1
         tier = cands[:BRANCH]
         self.rng.shuffle(tier)
-        for w in tier:
+        for w in self.order(si, tier):
             old = self.place(si, w)
             if self.ok_after(si) and self.solve():
                 return True
             self.unplace(si, w, old)
         return False
 
+    def order(self, si, tier):
+        """Least-constraining value: try the word that leaves its crossings the most
+        room. Score ordering alone picks the best *word* and ignores what it does to
+        six neighbours, which is how the search ends up thrashing in open grids.
+
+        Only a sample is ranked, since scoring a candidate costs a placement plus a
+        pattern lookup per crossing. The sample is whatever the shuffle put in front,
+        so restarts rank different subsets.
+        """
+        if len(tier) <= 2:
+            return tier
+        head, tail = tier[:LCV_SAMPLE], tier[LCV_SAMPLE:]
+        scored = []
+        for w in head:
+            old = self.place(si, w)
+            room = 0
+            dead = False
+            for _, b, _ in self.cross[si]:
+                if b in self.assigned:
+                    continue
+                n = len(self.candidates(b))
+                if n == 0:
+                    dead = True
+                    break
+                room += math.log(n)
+            self.unplace(si, w, old)
+            if not dead:
+                scored.append((room, w))
+        scored.sort(key=lambda rw: -rw[0])
+        return [w for _, w in scored] + tail
+
     def solution(self):
         return "".join(ch for ch in self.grid if ch is not None)
 
 
-def pin(filler, rng, tries=400):
+def friction(filler, si):
+    """How hostile a slot is to an awkward word: how much long crossing it imposes.
+
+    The eight fixed answers are not ordinary fill. RIVERWALK and SAKURA are not even
+    in the word list, so every letter they write has to be absorbed by a crossing
+    word, and a K or a W landing mid-grid is where a fill dies. Dropped into random
+    slots they made three otherwise easy layouts unfillable — those same layouts
+    filled in one or two attempts with no pins at all. So the awkward answers go
+    where the crossings are shortest and most forgiving.
+    """
+    return sum(len(filler.slots[b]) - 2 for _, b, _ in filler.cross[si])
+
+
+def pin(filler, rng, tries=400, friendly=4):
     """Put the eight fixed answers into slots of matching length.
 
     Drawing eight slots at random and placing them blind does not work: where two
@@ -195,11 +241,16 @@ def pin(filler, rng, tries=400):
     by_len = collections.defaultdict(list)
     for si, cells in enumerate(filler.slots):
         by_len[len(cells)].append(si)
+    rank = {si: friction(filler, si) for si in range(len(filler.slots))}
     order = sorted(REQUIRED, key=len, reverse=True)
     for _ in range(tries):
         placed = []
         for w in order:
             opts = [si for si in by_len[len(w)] if si not in {p[0] for p in placed}]
+            # Friendliest few, then shuffled: biased to the gentlest slots while
+            # still varying between restarts.
+            opts.sort(key=lambda si: rank[si])
+            opts = opts[:friendly] if len(opts) > friendly else opts
             rng.shuffle(opts)
             for si in opts:
                 pat = filler.pattern(si)

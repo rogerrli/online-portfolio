@@ -111,6 +111,24 @@ def connected(layout, n=N):
     return len(seen) == len(white)
 
 
+def interlock(layout, n=N, minlen=6):
+    """Squares where both the Across and the Down entry are at least `minlen` long.
+
+    This is what predicts whether a grid can be filled, and nothing else measured
+    here came close. Alpha scores 25 and fills on the first attempt; generated
+    grids scoring 40 to 52 never filled, across every cap setting and both score
+    thresholds. Long entries are not the problem — long entries crossing other
+    long entries are, because each one has to agree with six or more neighbours
+    at once.
+    """
+    span = {}
+    for e in entries(layout, n):
+        for i in e["cells"]:
+            span.setdefault(i, {})[e["dir"]] = len(e["cells"])
+    return sum(1 for d in span.values()
+               if d.get("A", 0) >= minlen and d.get("D", 0) >= minlen)
+
+
 def load_wordlist(path, min_score=0):
     """Spread the Word(list) format: WORD;SCORE per line, uppercase A-Z only."""
     words = {}
