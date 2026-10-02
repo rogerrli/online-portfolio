@@ -19,6 +19,12 @@ can't be reissued, so it's stated explicitly.
 The puzzle is deliberately *not* ported to React, and the gate deliberately does not
 touch it. It's a finished, dependency-free file that works as-is.
 
+The gate navigates to the puzzle by **absolute** path (`/ataliena/puzzle.html`), and must
+keep doing so. The QR points at `/ataliena` with no trailing slash, so a relative
+`puzzle.html` resolves against `/` and lands on `/puzzle.html` — nowhere. Loading the gate
+as `/ataliena/index.html` hides the bug, because the relative form resolves correctly from
+there; test the bare URL.
+
 ## The gate
 
 There is no password and no text input. **The login is pointing the phone north.**

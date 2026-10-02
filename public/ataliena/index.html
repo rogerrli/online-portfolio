@@ -173,7 +173,9 @@ const NORTH_TOL = 10;    // degrees either side of north
 const LEVEL_TOL = 25;    // degrees of tilt still counted as "flat"
 const HOLD_MS   = 3000;  // how long both must be held
 const GLOW_FROM = 70;    // stars begin to answer from this far off north
-const PUZZLE    = "puzzle.html";
+/* Absolute, not relative. The QR points at /ataliena with no trailing slash, so a
+   relative "puzzle.html" resolves against / and lands on /puzzle.html — nowhere. */
+const PUZZLE    = "/ataliena/puzzle.html";
 const UNLOCK    = "gift-crossword-first-impressions-unlocked";
 
 const qs = new URLSearchParams(location.search);
