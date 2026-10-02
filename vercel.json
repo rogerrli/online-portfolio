@@ -3,6 +3,7 @@
   "rewrites": [
     { "source": "/ataliena", "destination": "/ataliena/index.html" },
     { "source": "/ataliena/", "destination": "/ataliena/index.html" },
-    { "source": "/ataliena/puzzle", "destination": "/ataliena/puzzle.html" }
+    { "source": "/ataliena/puzzle", "destination": "/ataliena/puzzle.html" },
+    { "source": "/ataliena/puzzle-alpha", "destination": "/ataliena/puzzle-alpha.html" }
   ]
 }
