@@ -166,7 +166,7 @@ body.master .tools,body.master .win,body.master .danger{display:none}
       <!-- Rides just above the keyboard on a phone; stays above the grid on a desktop. -->
       <div class="bar" id="bar" aria-live="polite">
         <button class="nav" id="prev" type="button" aria-label="Previous clue">&lsaquo;</button>
-        <div class="bartext" id="bartext" role="button" tabindex="0" aria-label="Switch direction">
+        <div class="bartext" id="bartext">
           <span id="barclue"></span>
         </div>
         <button class="nav" id="next" type="button" aria-label="Next clue">&rsaquo;</button>
@@ -443,10 +443,11 @@ kb.addEventListener("keydown",ev=>{
 // Clue bar: arrows step through the entries, the clue itself flips direction.
 document.getElementById("prev").addEventListener("click",()=>{nextEntry(-1);render();focusKb();});
 document.getElementById("next").addEventListener("click",()=>{nextEntry(1);render();focusKb();});
-document.getElementById("bartext").addEventListener("click",()=>{toggle();firstEmpty();render();focusKb();});
-document.getElementById("bartext").addEventListener("keydown",ev=>{
-  if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();toggle();firstEmpty();render();focusKb();}
-});
+/* Tapping the bar is how the keyboard comes back up, so it only focuses the input.
+   It used to flip direction too, which quietly moved you to the crossing clue just
+   for asking for the keyboard. Direction still flips by tapping the selected square
+   again, or with the spacebar. */
+document.getElementById("bartext").addEventListener("click",focusKb);
 
 /* The on-screen keyboard covers the bottom of the layout viewport but not the
    visual one, so the gap between them is the keyboard's height. Without this the
