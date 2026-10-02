@@ -24,9 +24,12 @@ file, edited in place.
 Modelled on the NYT app:
 
 - Tapping a square selects its clue in the current direction; tapping that square again
-  flips direction, as does the spacebar. Tapping the clue bar only focuses the keyboard —
-  it is how the keyboard comes back up, so flipping direction there moved you to the
-  crossing clue just for asking. Arrows at either end of the
+  flips direction, as does the spacebar. Tapping the clue bar does one of two things: with
+  the keyboard down it only summons it (flipping there moved you to the crossing clue just
+  for asking for the keyboard), and with the keyboard already up it flips direction. Focus
+  on the hidden `#kb` input is the signal, read on `mousedown` because by click time the
+  tap has already moved it; that same handler calls `preventDefault` so focus stays put and
+  the keyboard doesn't dismiss and re-summon. Arrows at either end of the
   bar step through the entries, and span its full height — they are tap targets, so they
   are sized like one (~51x53px). They walk the clue *lists* (every Across, then every
   Down), not `entries[]`, which is built in grid order and interleaves the two: stepping

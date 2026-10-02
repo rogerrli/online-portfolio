@@ -443,11 +443,21 @@ kb.addEventListener("keydown",ev=>{
 // Clue bar: arrows step through the entries, the clue itself flips direction.
 document.getElementById("prev").addEventListener("click",()=>{nextEntry(-1);render();focusKb();});
 document.getElementById("next").addEventListener("click",()=>{nextEntry(1);render();focusKb();});
-/* Tapping the bar is how the keyboard comes back up, so it only focuses the input.
-   It used to flip direction too, which quietly moved you to the crossing clue just
-   for asking for the keyboard. Direction still flips by tapping the selected square
-   again, or with the spacebar. */
-document.getElementById("bartext").addEventListener("click",focusKb);
+/* The bar does one of two things depending on whether the keyboard is already up.
+   With it down the tap only summons it — flipping there moved you to the crossing
+   clue just for asking for the keyboard. With it up the tap flips direction, which
+   is what you want once you are actually typing.
+
+   Focus on the hidden input is the signal, read on mousedown because by click time
+   the tap has already moved it. preventDefault keeps that focus where it is, so the
+   keyboard doesn't dismiss and re-summon — which would flicker and jump the bar. */
+let kbWasUp=false;
+const bartext=document.getElementById("bartext");
+bartext.addEventListener("mousedown",ev=>{kbWasUp=document.activeElement===kb;ev.preventDefault();});
+bartext.addEventListener("click",()=>{
+  if(kbWasUp){toggle();firstEmpty();render();}
+  focusKb();
+});
 
 /* The on-screen keyboard covers the bottom of the layout viewport but not the
    visual one, so the gap between them is the keyboard's height. Without this the
