@@ -19,6 +19,31 @@ can't be reissued, so it's stated explicitly.
 The puzzle is deliberately *not* ported to React — it stays a single dependency-free
 file, edited in place.
 
+## Alpha and beta
+
+`public/ataliena/puzzle-alpha.html` is a frozen copy of the puzzle as it stood once the
+clue-difficulty pass finished, served at `/ataliena/puzzle-alpha`. It exists so a harder
+rework can be attempted without risking the version that is known to work: if the rework
+never lands, the gate keeps pointing at `puzzle.html` and nothing is lost. Git tag
+`puzzle-alpha` marks the same state.
+
+Alpha is not maintained. Fixes to the engine go into `puzzle.html`; alpha is a fallback,
+not a second product.
+
+**A reworked grid must change `KEY`.** Restoring progress only checks the saved array's
+length:
+
+```js
+if(s&&s.fill&&s.fill.length===N*N)fill=s.fill;
+```
+
+A new `LAYOUT` on the same 15x15 board produces a saved array of exactly the same length,
+so old letters would be restored into cells that now mean something else — scattered
+letters in a grid she never typed them into, with no error and nothing to explain it.
+Any change to `LAYOUT` or `SOL_ENC` therefore needs a new `KEY` (`-v3`, and so on). Two
+puzzles served from the same origin need different keys for the same reason: alpha keeps
+`-v2`.
+
 ## Crossword interaction
 
 Modelled on the NYT app:
