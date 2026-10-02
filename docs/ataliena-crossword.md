@@ -26,7 +26,10 @@ Modelled on the NYT app:
 - Tapping a square selects its clue in the current direction; tapping that square again
   flips direction; tapping the clue bar's text flips it too. Arrows at either end of the
   bar step through the entries, and span its full height — they are tap targets, so they
-  are sized like one (~87x53px).
+  are sized like one (~51x53px). They walk the clue *lists* (every Across, then every
+  Down), not `entries[]`, which is built in grid order and interleaves the two: stepping
+  through it sent you from 1 Across straight to 1 Down. The bar shows only the clue text;
+  the highlighted word in the grid is what tells you the direction.
 - **Switching clue always lands on that clue's first empty square**, whether you got there
   by arrow, by the clue list, or by flipping direction. `firstEmpty()` is deliberately not
   folded into `toggle()`: tapping a *different* square should leave you on the square you
@@ -44,7 +47,20 @@ Modelled on the NYT app:
   `grid-template-rows` the rows were implicit and content-sized, so one letter took its row
   from 21px to 38px while the rest shrank; a bare `1fr` is not enough either, since it still
   floors at min-content.
+- The arrows skip entries that are already full, so running off the end of the unsolved
+  Acrosses lands on the first unsolved Down, and vice versa. Because `navOrder` wraps, the
+  "no unsolved clues the other way" case falls out for free. (In this grid every square is
+  checked both ways, so that case can't actually arise — a gap always unsolves both its
+  Across and its Down.)
 - Clearing the puzzle sits alone at the very bottom, error-themed, behind a confirm().
+
+## The clock
+
+Time spent lives under its own key, `…-v2-time`, deliberately separate from the grid:
+**clearing the puzzle starts the grid over but not the time already spent on it.** It only
+counts while the tab is actually in front (`visibilitychange`), and stops for good once
+every square is right, turning gold — so it reads as a solve time rather than a stopwatch
+left running. It is written to storage once a second, so a crash costs at most a second.
 
 The gate navigates to the puzzle by **absolute** path (`/ataliena/puzzle.html`), and must
 keep doing so. The QR points at `/ataliena` with no trailing slash, so a relative
@@ -53,6 +69,15 @@ as `/ataliena/index.html` hides the bug, because the relative form resolves corr
 there; test the bare URL.
 
 ## The gate
+
+### Daylight
+
+If the device explicitly reports light mode, the gate holds her at the door: the title, a
+washed-out constellation, and *"It's a bit light out to see the stars."* No instruction —
+the faded stars are the hint. Nothing is armed while it's up, so no sensors run and no
+permission is requested. It's plain CSS plus one `matchMedia` listener, so turning dark
+mode on swaps straight to the night sky with no reload, which is the reward for working it
+out. "No preference" is not light, and falls through to the sky as normal.
 
 There is no password and no text input. **The login is pointing the phone north.**
 
