@@ -176,16 +176,11 @@ const GLOW_FROM = 70;    // stars begin to answer from this far off north
 /* Absolute, not relative. The QR points at /ataliena with no trailing slash, so a
    relative "puzzle.html" resolves against / and lands on /puzzle.html — nowhere. */
 const PUZZLE    = "/ataliena/puzzle.html";
-const UNLOCK    = "gift-crossword-first-impressions-unlocked";
+/* The login is not remembered — every visit earns its way in again. The crossword's
+   own answers do persist; that is a separate key, written by the puzzle itself. */
 
 const qs = new URLSearchParams(location.search);
-if (qs.has("reset")) { try { localStorage.removeItem(UNLOCK); } catch (e) {} }
 if (qs.has("debug")) document.body.classList.add("dbg");
-
-/* Already solved it once? Don't make her do it again mid-crossword. */
-let unlocked = false;
-try { unlocked = localStorage.getItem(UNLOCK) === "1"; } catch (e) {}
-if (unlocked && !qs.has("replay")) location.replace(PUZZLE);
 
 /* ============================ starfield ============================ */
 (function field() {
@@ -325,7 +320,6 @@ function succeed() {
   setState("done");
   body.classList.add("done");
   cass.style.setProperty("--lit", "1");
-  try { localStorage.setItem(UNLOCK, "1"); } catch (e) {}
   if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
 }
 

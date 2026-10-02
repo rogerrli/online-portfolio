@@ -68,17 +68,19 @@ recovery is granting motion & orientation access and reloading.
 ## Progress, and why the origin is fixed
 
 The puzzle saves itself: on every keystroke it writes `{fill: [...]}` to `localStorage`
-under `gift-crossword-first-impressions-v2`, and rehydrates on load. The gate stores
-`gift-crossword-first-impressions-unlocked` and, once set, forwards straight to the
-puzzle — she solves the constellation once, not every time she picks the crossword back up.
+under `gift-crossword-first-impressions-v2`, and rehydrates on load.
 
-Both are per-origin, with two consequences:
+**The login is deliberately not remembered.** Every visit goes through the constellation
+again — the gate stores nothing and there is no "already unlocked" shortcut. Her crossword
+answers are untouched by this: that is a separate key, written by the puzzle itself, so
+she re-earns the way in but never loses a square.
+
+The grid is per-origin, with two consequences:
 
 - **The origin must not change once the QR is printed.** Moving the puzzle orphans every
-  saved grid and every unlock.
-- Neither follows her across devices, browsers, or a private window, and clearing site
-  data wipes both. Cross-device sync would need a backend; for one recipient it isn't
-  worth one.
+  saved grid.
+- It doesn't follow her across devices, browsers, or a private window, and clearing site
+  data wipes it. Cross-device sync would need a backend; for one recipient it isn't worth one.
 
 ## Test hooks
 
@@ -88,8 +90,6 @@ Query parameters on the gate, none of which appear in the QR:
 | --- | --- |
 | `?debug=1` | Live readout of event name, heading, beta, gamma, glow and hold time. **Use this to field-test on a real phone.** |
 | `?preview=1` | Plays the success animation without a compass. |
-| `?reset=1` | Clears the unlock so the gate can be run again. |
-| `?replay=1` | Shows the gate even when already unlocked. |
 | `?force=1` | Skips the mobile-only check (desktop has no compass, so it will just sit there). |
 
 ## Regenerating the QR code
