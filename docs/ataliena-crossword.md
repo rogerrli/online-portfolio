@@ -9,15 +9,35 @@ links to it, and both pages carry `<meta name="robots" content="noindex, nofollo
 | File | Role |
 | --- | --- |
 | `public/ataliena/index.html` | The Cassiopeia login gate. |
-| `public/ataliena/puzzle.html` | The crossword, untouched. |
+| `public/ataliena/puzzle.html` | The crossword. |
 
 `vercel.json` rewrites bare `/ataliena` to `index.html` and `/ataliena/puzzle` to
 `puzzle.html`. Resolving a bare path would otherwise depend on host-specific
 directory-index behaviour, and `/ataliena` is baked into a printed QR code that
 can't be reissued, so it's stated explicitly.
 
-The puzzle is deliberately *not* ported to React, and the gate deliberately does not
-touch it. It's a finished, dependency-free file that works as-is.
+The puzzle is deliberately *not* ported to React — it stays a single dependency-free
+file, edited in place.
+
+## Crossword interaction
+
+Modelled on the NYT app:
+
+- Tapping a square selects its clue in the current direction; tapping that square again
+  flips direction; tapping the clue bar's text flips it too. Arrows at either end of the
+  bar step through the entries.
+- **The clue bar is pinned above the keyboard on a phone.** The on-screen keyboard covers
+  the bottom of the *layout* viewport but not the *visual* one, so the gap between them is
+  the keyboard's height; a `visualViewport` listener writes that into `--kb` and the bar
+  lifts by it. Without this the bar sits underneath the keyboard. On a desktop there is no
+  keyboard to ride above, so it goes back to being a block above the grid.
+- Each clue in the list shows the answer so far, redrawn only when it actually changed —
+  `render()` runs on every keystroke and there are ~160 entries.
+- **Squares are a fixed size.** Both axes are `repeat(15, minmax(0,1fr))`. With no explicit
+  `grid-template-rows` the rows were implicit and content-sized, so one letter took its row
+  from 21px to 38px while the rest shrank; a bare `1fr` is not enough either, since it still
+  floors at min-content.
+- Clearing the puzzle sits alone at the very bottom, error-themed, behind a confirm().
 
 The gate navigates to the puzzle by **absolute** path (`/ataliena/puzzle.html`), and must
 keep doing so. The QR points at `/ataliena` with no trailing slash, so a relative
