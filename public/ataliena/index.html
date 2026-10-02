@@ -97,10 +97,6 @@ button{
 }
 button:active{transform:scale(.97)}
 button:focus-visible{outline:3px solid #fff;outline-offset:3px}
-.ghost{
-  background:transparent;color:var(--muted);border:1.5px solid #2A3357;
-  font-weight:400;font-size:.88rem;padding:9px 20px;
-}
 @media (prefers-reduced-motion:no-preference){
   #next{animation:rise .7s cubic-bezier(.2,.7,.3,1) both}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -165,7 +161,6 @@ body.dbg #debug{display:block}
 
   <div data-step="blocked">
     <p class="sub" id="blockedMsg"></p>
-    <button id="skip" class="ghost" type="button">Let me in anyway</button>
   </div>
 
 </main>
@@ -278,9 +273,10 @@ function arm() {
 
 function blocked(why) {
   if (body.dataset.state === "done") return;
+  // There is no way past this screen. Pointing north is the only way in.
   document.getElementById("blockedMsg").innerHTML = why === "permission"
-    ? "<b>I need the compass.</b> Your phone turned down the motion &amp; orientation request."
-    : "<b>No compass reading.</b> This phone may not have one, or the browser won&rsquo;t share it.";
+    ? "<b>I need the compass.</b> Allow motion &amp; orientation access, then reload."
+    : "<b>No compass reading.</b> This phone may not have one.";
   setState("blocked");
 }
 
@@ -333,12 +329,6 @@ function succeed() {
 
 /* ============================ wiring ============================ */
 document.getElementById("next").addEventListener("click", () => location.assign(PUZZLE));
-// Only ever offered once the sensors have actually failed her — never as a way
-// around the puzzle itself.
-document.getElementById("skip").addEventListener("click", () => {
-  try { localStorage.setItem(UNLOCK, "1"); } catch (e) {}
-  location.assign(PUZZLE);
-});
 
 if (qs.has("preview")) { setTimeout(succeed, 400); }       // check the payoff without a compass
 else if (!isMobile && !qs.has("force")) setState("desktop");

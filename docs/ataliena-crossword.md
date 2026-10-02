@@ -53,12 +53,11 @@ a wordless gate solvable rather than merely opaque.
 - Compensating for screen rotation is **not** implemented; the gate assumes she is
   holding the phone in portrait.
 
-### Getting locked out
+### There is no way past it
 
-Being unable to open a birthday present is the worst failure this page has. So the
-distinction is deliberate: failing to *point north* is the puzzle and offers no escape,
-but failing *hardware* — permission denied, or no compass at all — is not her fault and
-shows a way through.
+The gate is absolute: pointing north is the only way in. If the compass is denied or
+missing, the page says so and stops there — no bypass, no escape hatch. The only
+recovery is granting motion & orientation access and reloading.
 
 ## Progress, and why the origin is fixed
 
