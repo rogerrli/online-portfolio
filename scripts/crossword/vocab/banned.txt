@@ -35,3 +35,13 @@ ONEON
 ONELAP
 # Round 4 — name with no route in (Skai Jackson)
 SKAI
+# Round 5 — tone again. SEMITE is a loaded term to hand someone on their birthday;
+# RETCH is simply unpleasant.
+SEMITE
+RETCH
+# Round 5 — obscure names and vocabulary
+LEDERER
+SOAVE
+TYNE
+NIETO
+RIC
