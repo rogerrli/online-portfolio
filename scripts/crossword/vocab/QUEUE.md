@@ -75,3 +75,28 @@ Kept, and worth your eye — each is cluable but none is beyond question:
 | ELENA | Justice Kagan |
 | DERN | Laura, of *Jurassic Park* |
 | ARIEL, RALPH, SHANE, AARON | Ordinary first names, each with a famous bearer |
+
+## The locked grid (round 6) — what to look at first
+
+68 words, 6 threes, 50 blocks, nothing from `banned.txt`. These are the entries I would
+expect you to challenge, with the clue I wrote for each. Any you reject go in
+`banned.txt` and the search runs again — about 25 minutes a round, and the clues for
+every surviving answer carry over untouched.
+
+| Entry | Clue written | My confidence |
+| --- | --- | --- |
+| ALTHING | "Iceland's parliament, older than any other" | Lowest. True and interesting, but she will not know it |
+| ADUT | "Akech of the Vogue covers" | Low. A working model, but a deep cut |
+| SELES | "Monica with nine majors" | Low-ish. Famous in the 90s, dated now |
+| OLINE | "Blockers, in football shorthand" | Low-ish. Fine if she follows football |
+| FETTY | "Wap of 'Trap Queen'" | Medium. 2015 hit, her era |
+| ARIE | "India with a dot in her name" | Medium |
+| DANAI | "Gurira, who played Okoye" | Medium. Black Panther is in her favour |
+| RIA | "Valley the sea moved into" | Medium. A real geography term, rarely met |
+| MALONE | "Post, or the Mailman" | Fine. Two famous bearers |
+| GRATA, GRAS, SAO | clued without blanks | Fine, though all three are partials by nature |
+| FILA, DALI, SHIVA, AARON | ordinary | Fine |
+
+Nothing here is as bad as GATWA or TESSIE. If you want them gone anyway, say so and the
+loop runs again — but each ban also disqualifies the grid containing it, so expect a
+different grid rather than the same one minus a word.
