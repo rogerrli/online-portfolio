@@ -206,10 +206,31 @@ twitches" can be read as a number rather than argued about.
 
 ### How she is meant to work it out
 
-The stars are the only feedback, and they answer continuously: brightness ramps from 70°
-off target right up to the tolerance, so getting warmer is visible from most of a turn away.
-The sight at the centre is the only affordance on the page — it is a little wider than the
-belt is long, so it reads as somewhere to drop the belt into.
+**The sky is honest, and that is the puzzle.** Orion is drawn at its real relative
+magnitudes in the same plain starlight as everything else, so far from the target it reads
+as what it actually is — the brightest stars up there — and not as the one thing the page
+has picked out for her. Finding it means recognising the sky, which is the entire fiction of
+this page.
+
+An earlier version gave itself away twice over. Orion was gold against a white starfield,
+which marked the answer before she knew there was a question, and the brightness ramped
+from **70°** out, which turned the whole thing into a hot-and-cold gradient you could follow
+to the finish without ever noticing you were looking at a constellation. The sight sat at
+the centre of the screen from the first frame too, announcing that this was a game of aiming
+— the one thing she is supposed to work out for herself.
+
+Now nothing helps until she is within `HELP_FROM`, **30°**. Inside that the stars warm to
+gold, the halos bloom and the sight fades up — so warmth is no longer a search tool but
+confirmation she has found it. Outside it the page is a sky, a horizon and a title.
+
+The difficulty is therefore all in the first discovery, which is where it belongs: once she
+knows what the page is, it is turn east, tilt, hold. That matters because **the login is
+deliberately not remembered**, so she walks through it on every visit; a puzzle that was
+hard every time would be a tax, and a puzzle that explains itself in the first three seconds
+was never a puzzle.
+
+`?help=N` dials the distance for testing. `?help=70` is roughly the old, far more generous
+behaviour.
 
 **The hold indicator is the constellation lines drawing themselves in.** They pay out along
 the figure as a single thread, belt first, so holding steady visibly knits the hunter
@@ -298,6 +319,7 @@ Query parameters on the gate, none of which appear in the QR:
 | `?preview=1` | Plays the success animation without a compass. |
 | `?force=1` | Skips the mobile-only check (desktop has no compass, so it will just sit there). |
 | `?sight=N` | Overrides the sighting angle, 0–90. Use this to find the angle that holds steadiest in the hand; 90 is the original out-of-the-back behaviour. |
+| `?help=N` | How close before the page starts helping, in degrees. Lower is harder and more secretive; 70 is roughly the old behaviour, where the glow led her in from most of a turn away. |
 
 ## Regenerating the QR code
 

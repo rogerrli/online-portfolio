@@ -53,7 +53,10 @@ body.sky #sky{display:block}
 #frame{
   position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
   width:120px;height:120px;z-index:1;pointer-events:none;display:none;
-  opacity:calc(.26 + var(--lit) * .74);
+  /* Fades up with the warmth rather than sitting there from the first frame. An empty
+     frame in the middle of the screen announces that this is a game of aiming, which is
+     the one thing she is supposed to work out for herself. */
+  opacity:calc(var(--lit) * 1.9);
 }
 body.sky #frame{display:block}
 body[data-state="done"] #frame,
@@ -222,7 +225,15 @@ const AZ_TOL   = 10;    // degrees either side of the belt
 const ALT_TOL  = 10;    // degrees above or below it
 const HOLD_MS  = 5000;  // how long both must be held
 const HOLD_POW = 2.5;   // the hold fills slowly at first, then rushes at the end
-const GLOW_FROM= 70;    // stars begin to answer from this far off target
+/* How close she has to be before the page starts helping at all: inside this the stars
+   warm to gold, the halos bloom and the sight fades up. It used to be 70 degrees, which
+   made the whole sky a hot-and-cold gradient you could follow without ever noticing you
+   were looking at a constellation. At 30 the warmth stops being a search tool and becomes
+   confirmation that she has found it. ?help=N dials it; 70 is roughly the old behaviour. */
+const HELP_FROM= (() => {
+  const v = new URLSearchParams(location.search).get("help");
+  return v === null ? 30 : Math.max(AZ_TOL + 1, Math.min(180, +v || 0));
+})();
 const EASE_MS  = 70;    // how hard the sky is smoothed when the compass is trustworthy
 const SHAKY_MS = 520;   // ...and when it is not, which is the pose this gate asks for
 const UNWIND   = 2.5;   // the hold unwinds this much faster than it fills, so one twitchy
@@ -488,11 +499,17 @@ function onOrient(e) {
 }
 
 /* ============================ drawing ============================ */
-const NIGHT = { star: [242,193,78], dim: [72,83,125], hz: "rgba(142,153,188,.30)", bg: "255,255,255" };
-const DAY   = { star: [160,172,200], dim: [198,205,224], hz: "rgba(91,102,136,.18)", bg: "91,102,136" };
+/* `cold` is what Orion looks like before the page is helping: plain starlight, the same
+   white as the rest of the sky. Gold is a reward, not a label — marking the constellation
+   from the first frame told her which stars mattered before she had worked out that stars
+   were the point. */
+const NIGHT = { star: [242,193,78], cold: [226,232,245], dim: [72,83,125], hz: "rgba(142,153,188,.30)", bg: "255,255,255" };
+const DAY   = { star: [160,172,200], cold: [198,205,224], dim: [198,205,224], hz: "rgba(91,102,136,.18)", bg: "91,102,136" };
 const mix = (a, b, t) => `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
 // brighter stars are drawn bigger, the way a chart does it
 const radius = m => clamp(3.4 - 0.55 * m, 1.1, 3.4) * 1.5;
+/* Backdrop stars top out well below the belt, so the constellation still carries the eye
+   without being coloured in. */
 
 function horizon(p) {
   ctx.beginPath();
@@ -544,8 +561,12 @@ function figure(p, lit, prog) {
   ctx.globalAlpha = 1;
 }
 
+/* Orion is drawn at its real relative magnitudes, so far from the target it reads as what
+   it actually is — the brightest stars in the sky — rather than as the one thing the page
+   has picked out. Finding it is then a matter of recognising the sky, which is the whole
+   fiction of this page, instead of following a glow. */
 function orion(p, lit) {
-  const col = mix(p.dim, p.star, clamp(lit, 0, 1));
+  const col = mix(p.cold, p.star, clamp(lit, 0, 1));
   for (const k in ORION) {
     const s = ORION[k], q = project(s.v);
     if (!q) continue;
@@ -615,7 +636,7 @@ function loop(now) {
   const p = held / HOLD_MS;
   /* The stars are the only feedback there is. They answer to how close she is, all the
      way from most of a turn away, and fill the rest in over the hold. */
-  const near   = clamp((GLOW_FROM - off) / (GLOW_FROM - AZ_TOL), 0, 1);
+  const near   = clamp((HELP_FROM - off) / (HELP_FROM - AZ_TOL), 0, 1);
   const target = Math.max(near * 0.55, p > 0 ? 0.55 + p * 0.45 : 0);
   lit  += (target - lit) * (1 - Math.exp(-dt / 140));
   const want = Math.pow(p, HOLD_POW);
