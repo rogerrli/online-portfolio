@@ -1,14 +1,14 @@
 # The /ataliena crossword
 
 A crossword puzzle served at `https://liroger.com/ataliena`, handed out via a
-printed QR code, behind a compass "Log in". Unlisted: nothing on the portfolio
+printed QR code, behind a star-sighting "Log in". Unlisted: nothing on the portfolio
 links to it, and both pages carry `<meta name="robots" content="noindex, nofollow">`.
 
 ## The two pages
 
 | File | Role |
 | --- | --- |
-| `public/ataliena/index.html` | The Cassiopeia login gate. |
+| `public/ataliena/index.html` | The Orion login gate. |
 | `public/ataliena/puzzle.html` | The crossword. |
 
 `vercel.json` rewrites bare `/ataliena` to `index.html` and `/ataliena/puzzle` to
@@ -100,6 +100,13 @@ there; test the bare URL.
 
 ## The gate
 
+Where it sits in the hunt: the QR code leads here, the gate opens the crossword, and the
+box with the message in it comes **later**. So the gate runs before the box, not after, and
+it is deliberately *not* the box's own puzzle. The box's lid is Cassiopeia and Polaris; the
+gate is Orion and the east. Same verb — aim the phone at where a constellation really sits —
+different noun, so she arrives at the box already knowing that a lid full of dots is telling
+her which way to turn, without having been handed the answer.
+
 ### Daylight
 
 If the device explicitly reports light mode, the gate holds her at the door: the title, a
@@ -109,41 +116,104 @@ permission is requested. It's plain CSS plus one `matchMedia` listener, so turni
 mode on swaps straight to the night sky with no reload, which is the reward for working it
 out. "No preference" is not light, and falls through to the sky as normal.
 
-There is no password and no text input. **The login is pointing the phone north.**
+There is no password and no text input. **The login is facing where Orion's Belt rises.**
 
 1. **Tap to start.** Nothing but the words, on the starfield. This screen exists
    because iOS will not hand over compass data outside a user gesture —
    `DeviceOrientationEvent.requestPermission()` must be called from a real tap. Every
    platform shows it so the experience doesn't fork; on Android the tap just starts it.
-2. **Log in.** The title and a dim Cassiopeia. No instructions, by design.
-3. **The hold.** Heading within **±10°** of north, tilt within **±25°** of flat, both
-   sustained for **3 seconds**.
-4. **The payoff.** Stars go to full brightness, the constellation lines draw in, and a
-   **Next** button appears. Nothing auto-advances.
+2. **Log in.** The title, a sight at the centre of the screen, and a sky. No instructions,
+   by design.
+3. **The hold.** Heading within **±10°** and elevation within **±10°** of the belt,
+   sustained for **5 seconds**.
+4. **The payoff.** Stars go to full brightness, the whole figure is drawn, and a **Next**
+   button appears. Nothing auto-advances.
+
+### A window, not a dial
+
+The screen is a window onto the sky rather than a meter. Orion is pinned to its real
+position: turn and the stars pan the other way, tilt and they slide, roll the phone and they
+counter-rotate so the horizon stays level. Face the wrong way and the hunter is simply not
+on screen — a horizon line and about a thousand scattered stars keep the sky continuous
+while she looks for him.
+
+This is also why **the phone is held upright now, like a window, where the old gate wanted
+it flat like a compass.** That change is what forces the orientation maths below.
+
+### Where Orion is put, and why
+
+`CAT` holds the real catalogue — right ascension, declination, magnitude — and the page
+solves for the sidereal time at which Alnilam sits `BELT_ALT` above the horizon while
+rising, then places every star where it actually is at that moment. Doing the spherical
+maths rather than eyeballing a shape is what earns the picture: the hunter comes out lying
+on his side with the belt standing upright, Rigel just above the horizon and Saiph still
+under it, which is how Orion really rises at this latitude.
+
+It also lands Alnilam on azimuth **92.5° — due east**, which is the answer she is being
+asked for. `BELT_ALT` is 2°, high enough that all three belt stars are clear of the horizon;
+raising it further would drag the belt south of east, because a rising star climbs on a
+slant.
+
+Both compass sources read from **magnetic** north, so the whole sky is shifted by the 13°W
+declination at Boerum Hill once, at setup. There is then only one set of angles in the file.
 
 ### How she is meant to work it out
 
-The stars are the only feedback, and they answer continuously: brightness ramps from
-70° off north up to the tolerance, and is damped to a fraction of that while the phone
-is tilted. Getting warmer is visible without a word being written, which is what makes
-a wordless gate solvable rather than merely opaque.
+The stars are the only feedback, and they answer continuously: brightness ramps from 70°
+off target right up to the tolerance, so getting warmer is visible from most of a turn away.
+The sight at the centre is the only affordance on the page — it is a little wider than the
+belt is long, so it reads as somewhere to drop the belt into.
+
+**The hold indicator is the constellation lines drawing themselves in.** They pay out along
+the figure as a single thread, belt first, so holding steady visibly knits the hunter
+together and letting go unpicks him. The fill is `p ** 2.5` — slow at first, rushing at the
+end — so the last second feels like the thing closing rather than a bar ticking over. No
+arrows, no timed text hints, and no word anywhere on the page that isn't "Log in" or "Next".
+
+### Orientation maths
+
+The phone is held upright, which is **exactly** the pose where a heading read straight off
+`alpha` falls apart: at `beta` 90° the orientation angles are degenerate, and `alpha` and
+`gamma` trade against each other freely while the phone barely moves. Measured on that lock
+line, raw `alpha` can swing 16° with the phone essentially still.
+
+So the view is carried as a quaternion from first to last:
+
+- `alpha`/`beta`/`gamma` build a rotation; the camera-out direction is taken from it, and
+  heading and elevation are read back out of that vector at the very end. Through that same
+  16° swing of `alpha`, the computed heading does not move at all.
+- Stars are projected through the camera basis, so roll falls out for free: there is no
+  separate horizon-levelling step, and so nothing to get out of step.
+- `screen.orientation.angle` is folded into the same quaternion, so auto-rotate never jumps
+  the sky. Rolled 90° into landscape the view is identical to portrait, to the pixel.
+  Locking the orientation instead is not an option — it needs fullscreen on Android and
+  does not exist on iOS.
+- Smoothing is a **slerp on the quaternion**, not a filter on the angles. Smoothing angles
+  is what sends the sky the long way round when the heading crosses north.
+
+A canvas is a replaced element, so `inset: 0` alone leaves it at its intrinsic 300×150 and
+the sky draws into a box in the corner. Its width and height are explicit for that reason.
 
 ### Platform notes
 
-- iOS exposes `webkitCompassHeading` (degrees clockwise from north). Android has no
-  such property and needs the `deviceorientationabsolute` event, where the heading is
-  `360 - alpha`. Both are handled; readings are smoothed, since raw compass output
-  jitters by several degrees.
-- Requiring the phone to be level is not only flavour — heading derived from `alpha` is
-  unstable when the device is upright, so insisting on flat genuinely improves accuracy.
+- iOS exposes `webkitCompassHeading` (degrees clockwise from magnetic north); the page uses
+  `360 - webkitCompassHeading` as a north-referenced `alpha`. Android has no such property
+  and needs the `deviceorientationabsolute` event, whose `alpha` is already absolute.
+- **This is the one thing a field test has to settle.** Core Location defines its heading
+  from the device's top edge, which points at the zenith when the phone is upright — the
+  pose this gate asks for. The maths above is proven; whether iOS keeps reporting a sane
+  `webkitCompassHeading` in that pose is a hardware question, and `?debug=1` answers it in
+  about thirty seconds. If it drifts, the fix is to calibrate an offset against raw `alpha`
+  rather than trusting the compass heading directly.
+- A constant compass bias would not actually lock her out — she finds east by watching the
+  stars, not by being right about magnetic north. It would only make the gate less honest.
 - A reading older than 900ms doesn't count toward the hold, so a stalled sensor or a
-  backgrounded page can't let a stale "pointing north" quietly finish the login.
-- Compensating for screen rotation is **not** implemented; the gate assumes she is
-  holding the phone in portrait.
+  backgrounded page can't let a stale "facing east" quietly finish the login.
+- `prefers-reduced-motion` only stops the stars twinkling. The sky tracking is the puzzle.
 
 ### There is no way past it
 
-The gate is absolute: pointing north is the only way in. If the compass is denied or
+The gate is absolute: facing the belt is the only way in. If the compass is denied or
 missing, the page says so and stops there — no bypass, no escape hatch. The only
 recovery is granting motion & orientation access and reloading.
 
