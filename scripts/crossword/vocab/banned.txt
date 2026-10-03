@@ -1,0 +1,8 @@
+# Words that must never appear in the puzzle. One per line, uppercase.
+# Roger's calls, kept here so the same question is not asked twice and so a
+# rebuild cannot quietly reintroduce them. make_wordlist.py drops these outright;
+# unlike the category filters, banning a named handful costs no fillability.
+GATWA
+LARISSA
+UDALL
+TESSIE

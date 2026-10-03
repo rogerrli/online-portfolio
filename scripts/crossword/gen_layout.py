@@ -21,7 +21,7 @@ import argparse
 import collections
 import random
 
-from grid import N, entries, runs, connected, interlock
+from grid import N, entries, runs, connected, interlock, host_friction
 
 
 def runs_ok(layout):
@@ -36,7 +36,13 @@ MAX_THREES = 4
 
 MAX_FOURS = 14        # NYT Fridays run well above ten; ten starved the fill
 MAX_LONG = 1          # entries of 12+; stacked 15s are showcase grids, not Fridays
-MAX_INTERLOCK = 34    # see grid.interlock: above ~38 nothing fills
+MAX_INTERLOCK = 34    # see grid.interlock: kept, but falsified — default off in build.py
+# The gift answers need forgiving hosts, but do not over-fit: alpha hosts RIVERWALK
+# at friction 19, and 22 looked like a safe cap from that one example. It excluded
+# candidate 1 — the only grid that ever filled — which hosts it at 25. These are a
+# guard against the genuinely hostile, not a target.
+MAX_HOST_9 = 30
+MAX_HOST_10 = 42
 LONG_FROM = 12
 
 
@@ -56,7 +62,8 @@ def has_slots_for(lens):
 
 
 def accept(layout, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FOURS,
-           max_interlock=MAX_INTERLOCK):
+           max_interlock=MAX_INTERLOCK, max_host_9=MAX_HOST_9,
+           max_host_10=MAX_HOST_10):
     """Final acceptance. Separate from the walk because some of these only become
     true as blocks go in: an empty grid is thirty 15-letter entries, so a cap on
     long entries would reject the very first block and the walk would never
@@ -70,11 +77,15 @@ def accept(layout, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FO
         return False
     if interlock(layout) > max_interlock:
         return False
+    f9, f10 = host_friction(layout, 9), host_friction(layout, 10)
+    if f9 is None or f10 is None or f9 > max_host_9 or f10 > max_host_10:
+        return False
     return has_slots_for(lens)
 
 
 def grow(rng, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FOURS,
-         max_interlock=MAX_INTERLOCK):
+         max_interlock=MAX_INTERLOCK, max_host_9=MAX_HOST_9,
+         max_host_10=MAX_HOST_10):
     """Add 180-degree block pairs in random order, keeping only the constraints
     that a partly built grid can satisfy. Blocks are never placed singly, so
     symmetry holds by construction; the filler is where it may have to give.
@@ -99,7 +110,8 @@ def grow(rng, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FOURS,
         if words > max_words or lens.get(3, 0) > max_threes or lens.get(4, 0) > max_fours:
             layout[i] = layout[j] = "."
     s = "".join(layout)
-    return s if accept(s, min_words, max_words, max_threes, max_fours, max_interlock) else None
+    return s if accept(s, min_words, max_words, max_threes, max_fours, max_interlock,
+                       max_host_9, max_host_10) else None
 
 
 def show(layout):

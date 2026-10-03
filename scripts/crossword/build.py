@@ -23,18 +23,21 @@ import sys
 import time
 
 import gen_layout as G
-from fill import Filler, pin, SEEDED
+
+N_SQ = 225
+from fill import Filler, pin, SEEDED, banned_words
 from grid import entries, load_wordlist, symmetry
 
 
-def try_layout(layout, words, seconds, rng):
+def try_layout(layout, words, seconds, rng, clean=None):
     """Short, repeated attempts beat one long one: the search is randomised, so a
     fresh pin arrangement escapes a bad corner faster than backtracking out of it."""
     end = time.time() + seconds
     tries = 0
     while time.time() < end:
         tries += 1
-        f = Filler(layout, words, random.Random(rng.randrange(1 << 30)), min(end, time.time() + 6))
+        f = Filler(layout, words, random.Random(rng.randrange(1 << 30)),
+                   min(end, time.time() + 6), clean=clean)
         if not pin(f, f.rng):
             return None, tries
         try:
@@ -43,6 +46,40 @@ def try_layout(layout, words, seconds, rng):
         except TimeoutError:
             pass
     return None, tries
+
+
+def fill_quality(layout, sol, words, curated=None):
+    """A valid fill is not a good one. The first grid that verified came back with
+    TESSIE, UDALL, LARISSA, RENU, BENE, ANNO, ENS and EOCENE in it — every entry a
+    real word, and a joyless puzzle. Obscure proper nouns and crosswordese make a
+    grid hard in the cheap way: the solver is not being outwitted, just out-trivia'd.
+
+    So fills are ranked, not merely accepted: how many entries sit at the bottom of
+    the score range, then the mean.
+    """
+    from grid import entries as _ents, is_block as _isb
+    letters = []
+    k = 0
+    for i in range(N_SQ):
+        if _isb(layout, i):
+            letters.append(None)
+        else:
+            letters.append(sol[k])
+            k += 1
+    scores, names = [], 0
+    for e in _ents(layout):
+        w = "".join(letters[i] for i in e["cells"])
+        scores.append(words.get(w, 0))
+        # A name or brand: in the full list but not in the curated vocabulary.
+        if curated is not None and w not in curated:
+            names += 1
+    mean = sum(scores) / len(scores)
+    if curated is not None:
+        # Rank by names first. Banning them outright killed fillability — they hold
+        # the grid up — so they are counted and competed down instead.
+        return (-names, mean), names, mean
+    weak = sum(1 for s in scores if s <= 50)
+    return (-weak, mean), weak, mean
 
 
 def score_grid(layout):
@@ -69,8 +106,18 @@ def main():
     # Grids scoring below alpha's 25 still failed, and the same grids filled in one
     # attempt once the pinning was fixed. See grid.interlock.
     ap.add_argument("--max-interlock", type=int, default=99)
+    # Host slots for the two answers that are not real words. See grid.slot_friction.
+    ap.add_argument("--max-host-9", type=int, default=30)
+    ap.add_argument("--max-host-10", type=int, default=42)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out")
+    ap.add_argument("--log", help="append every fill found, as JSON lines")
+    ap.add_argument("--curated", help="vocabulary to judge fills against; anything "
+                                      "outside it counts as a name or brand")
+    # Off by default. Ordering clean words first sounds free and is not: the names
+    # hold these grids up, so the search exhausts clean subtrees and times out before
+    # reaching the entry a slot actually needs. 33 layouts, no fills, with it on.
+    ap.add_argument("--prefer-clean", action="store_true")
     args = ap.parse_args()
 
     # No entry longer than VIEWFINDER.
@@ -78,6 +125,12 @@ def main():
 
     words = load_wordlist(args.wordlist, min_score=args.min_score)
     words.update(SEEDED)
+    for w in banned_words():
+        words.pop(w, None)
+    curated = None
+    if args.curated:
+        curated = load_wordlist(args.curated)
+        curated.update(SEEDED)
     print(f"word list {len(words)} at score >= {args.min_score}", file=sys.stderr)
 
     rng = random.Random(args.seed)
@@ -87,13 +140,15 @@ def main():
     seen = set()
     while time.time() < deadline:
         layout = G.grow(rng, args.min_words, args.max_words, args.max_threes,
-                        args.max_fours, args.max_interlock)
+                        args.max_fours, args.max_interlock, args.max_host_9,
+                        args.max_host_10)
         if not layout or layout in seen:
             continue
         seen.add(layout)
         tested += 1
         budget = min(args.per_layout, max(1.0, deadline - time.time()))
-        sol, tries = try_layout(layout, words, budget, rng)
+        sol, tries = try_layout(layout, words, budget, rng,
+                                clean=curated if args.prefer_clean else None)
         rank, lens = score_grid(layout)
         status = "FILLED" if sol else "no"
         print(f"[{tested:3}] words={len(entries(layout))} 3s={lens.get(3,0)} "
@@ -102,9 +157,18 @@ def main():
         if not sol:
             continue
         filled += 1
-        if best is None or rank > best[0]:
-            best = (rank, layout, sol)
-            print(f"      new best: short-score {-rank[0]}", file=sys.stderr, flush=True)
+        qrank, weak, mean = fill_quality(layout, sol, words, curated)
+        print(f"      fill: {weak} names/brands, mean score {mean:.1f}",
+              file=sys.stderr, flush=True)
+        if args.log:
+            with open(args.log, "a") as fh:
+                fh.write(json.dumps({"layout": layout, "solution": sol, "names": weak,
+                                     "mean": round(mean, 2),
+                                     "words": len(entries(layout)),
+                                     "threes": lens.get(3, 0)}) + "\n")
+        if best is None or qrank > best[0]:
+            best = (qrank, layout, sol)
+            print(f"      new best fill", file=sys.stderr, flush=True)
 
     if not best:
         print(f"nothing filled out of {tested} layouts tested", file=sys.stderr)

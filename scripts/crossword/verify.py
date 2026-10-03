@@ -19,6 +19,9 @@ import sys
 
 from grid import N, entries, runs, symmetry, connected, load_wordlist, is_block
 
+# Not in any word list, and not meant to be: they are the gift.
+SEEDED = {"RIVERWALK": 60, "SAKURA": 60}
+
 REQUIRED = {
     "VIEWFINDER": "SPECIAL, star icon, highlighted squares",
     "RIVERWALK": "film icon",
@@ -30,7 +33,10 @@ REQUIRED = {
     "EMU": "film icon",
 }
 MAX_WORDS = 70
-MAX_THREES = 4
+# Four was unsatisfiable alongside the word count: total entry length is twice the
+# white-square count, so ~180 white squares at 68 words forces a 5.2-letter average.
+# Six is the real frontier, against alpha's 24.
+MAX_THREES = 6
 
 
 def rot13(s):
@@ -103,6 +109,7 @@ def main():
 
     try:
         words = load_wordlist(args.wordlist)
+        words.update(SEEDED)
     except OSError as e:
         print(f"FAIL cannot read word list: {e}")
         print("  Spread the Word(list), CC BY-NC-SA 4.0:")

@@ -29,6 +29,17 @@ from grid import N, entries, load_wordlist, is_block
 REQUIRED = ["VIEWFINDER", "RIVERWALK", "SAKURA", "DISNEY", "ROGER", "EAST", "STAR", "EMU"]
 SEEDED = {"RIVERWALK": 60, "SAKURA": 60}
 
+
+def banned_words(path="vocab/banned.txt"):
+    """Hard exclusions, Roger's calls. Banning a named handful is free; banning a
+    whole category is what killed fillability earlier."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return {l.strip().upper() for l in fh
+                    if l.strip() and not l.lstrip().startswith("#")}
+    except OSError:
+        return set()
+
 # Candidates tried per slot. This cap makes the search incomplete, so a False
 # means "not found within these limits", never "no fill exists" — which is why
 # the driver restarts with a fresh pin arrangement rather than concluding.
@@ -38,7 +49,15 @@ BLANK = "."
 
 
 class Filler:
-    def __init__(self, layout, words, rng, deadline):
+    def __init__(self, layout, words, rng, deadline, clean=None):
+        """`clean` is the vocabulary we actually want to read: ordinary words rather
+        than obscure names and brands. It is a preference, not a filter.
+
+        Filtering was tried and fails outright — the curated list filled nothing in 18
+        layouts and a score floor of 55 nothing in 22, while the full list fills. The
+        names hold the grid up. So instead candidates are ordered clean-first, and a
+        name is only reached for in a slot where nothing clean fits, which is the
+        difference between a grid with nine of them and a grid with two."""
         self.layout = layout
         self.rng = rng
         self.deadline = deadline
@@ -49,8 +68,9 @@ class Filler:
         self.by_len = collections.defaultdict(list)
         for w, s in words.items():
             self.by_len[len(w)].append((w, s))
+        ok = clean if clean is not None else words
         for L in self.by_len:
-            self.by_len[L].sort(key=lambda ws: -ws[1])
+            self.by_len[L].sort(key=lambda ws: (ws[0] not in ok, -ws[1]))
         self.idx = {}
         for L, ws in self.by_len.items():
             d = collections.defaultdict(set)

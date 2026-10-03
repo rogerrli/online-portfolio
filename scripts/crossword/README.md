@@ -61,3 +61,51 @@ cache instead: ~12,000.
 
 Also: `fill.py`'s `BRANCH` cap makes the search incomplete, so a failure means "not
 found within these limits", never "no fill exists".
+
+## What the search actually found, in order
+
+Every plausible-sounding constraint added here made things worse. Recorded so the
+same ground is not re-walked:
+
+| Tried | Result |
+| --- | --- |
+| Score floor 55 (93k words) | 0 fills in 22 layouts |
+| Curated list, names dropped (97k) | 0 fills in 18 layouts |
+| Local repair of weak entries (`polish.py`) | 0 of 9 replaced, at radius 1 and radius 2 |
+| Clean-first candidate ordering | 0 fills in 33 layouts |
+| Host friction capped at 22 | excluded candidate 1, the only grid that filled |
+| Full list, floor 50, 6 threes, ranked after | **fills** |
+
+The lesson is the same each time: **the names and brands are load-bearing.** TESSIE and
+UDALL are holding up the grid that the good fill sits in, so removing them as a class
+removes the fill. They have to be competed down by ranking many fills, not forbidden.
+
+Two numbers that are real constraints rather than preferences:
+
+- Total entry length is twice the white-square count, so ~180 white squares at 68
+  words forces a 5.2-letter average. **A high word count and few short entries are
+  mutually exclusive.** The first target here (70 words, 4 threes) was unsatisfiable.
+- Short entries are where the junk lives: the score-50 non-dictionary tier is mostly
+  three- and four-letter abbreviations. Going from 6 threes to 10 roughly doubled the
+  names in a fill (9 to 19). Fewer short entries is both the harder grid and the
+  cleaner one — they do not trade off.
+
+## Vetting vocabulary
+
+`vocab/banned.txt` and `vocab/approved.txt` hold Roger's calls on individual words, so
+the same question is not asked twice and a rebuild cannot reintroduce a rejected word.
+Banning a named handful costs no fillability; banning a category costs all of it.
+
+Workflow: take the lowest-name fill, review its names one at a time, add rejections to
+`banned.txt`, re-run. That loop converges. Chasing a name-free grid did not.
+
+## Emitting
+
+`emit.py` writes LAYOUT, the encoded solution and the `MARKED`/`SPECIAL` keys into the
+page. Those keys must not be typed by hand: **clue numbers move with the block
+pattern**, so alpha's 16A/37A/67A/46D/48D/52D/56D mean nothing in a new grid, and a
+stale number puts a film icon on the wrong clue and breaks the gift path.
+
+`puzzle-beta.html` carries its own storage key (`-v3`) and deliberately does not inherit
+alpha's clue list: 41 of beta's clue numbers collide with alpha's, so inheriting them
+would show alpha's clue against beta's answer — wrong, while still looking right.

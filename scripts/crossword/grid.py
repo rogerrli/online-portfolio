@@ -111,6 +111,37 @@ def connected(layout, n=N):
     return len(seen) == len(white)
 
 
+def spans(layout, n=N):
+    """Per white cell, the length of its Across and Down entry."""
+    sp = {}
+    for e in entries(layout, n):
+        for i in e["cells"]:
+            sp.setdefault(i, {})[e["dir"]] = len(e["cells"])
+    return sp
+
+
+def slot_friction(layout, cells, direction, sp=None):
+    """How much long crossing a slot imposes on whatever goes in it.
+
+    This is the number that decides whether the gift answers can be placed.
+    RIVERWALK and SAKURA are not in any word list, so every letter they write has
+    to be absorbed by a crossing word. Alpha hosts RIVERWALK at friction 19, which
+    is why its K and W work; dropped into friction-25 slots the same word made
+    otherwise easy grids unfillable.
+    """
+    sp = sp or spans(layout, n=N)
+    other = "D" if direction == "A" else "A"
+    return sum(sp[i].get(other, 0) - 2 for i in cells)
+
+
+def host_friction(layout, length, n=N):
+    """The gentlest slot of a given length, or None if there is none."""
+    sp = spans(layout, n)
+    vals = [slot_friction(layout, e["cells"], e["dir"], sp)
+            for e in entries(layout, n) if len(e["cells"]) == length]
+    return min(vals) if vals else None
+
+
 def interlock(layout, n=N, minlen=6):
     """Squares where both the Across and the Down entry are at least `minlen` long.
 
