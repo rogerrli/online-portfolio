@@ -6,10 +6,10 @@
  * Telescope Data Center. Public domain, and the canonical list of everything visible to
  * the naked eye.
  *
- * The gate freezes the sky at one instant — the moment Orion's belt clears the horizon
- * in the east, seen from Boerum Hill — so only the half of the catalogue that is above
- * the horizon then is worth carrying. The constants below must match the ones in the
- * page; change LATITUDE or BELT_ALT there and this needs running again.
+ * The gate freezes the sky at one instant — the moment Orion's belt clears the horizon in
+ * the east, seen from Boerum Hill. The whole celestial sphere is carried, below the horizon
+ * as well as above it, so the sky never runs out. The constants below must match the ones
+ * in the page; change LATITUDE or BELT_ALT there and this needs running again.
  *
  *   node scripts/generate-star-field.mjs
  *
@@ -20,7 +20,10 @@ const SRC       = "http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz";
 const LATITUDE  = 40.7;   // Boerum Hill, Brooklyn
 const BELT_ALT  = 2;      // where Alnilam is caught, degrees above the horizon
 const MAG_LIMIT = 5.0;    // naked-eye, generously: fainter than this is scenery nobody reads
-const FLOOR     = -0.5;   // below the horizon there is ground, not sky
+/* The whole sphere, not just the half that is up. Carrying only the risen half left the sky
+   dead below the horizon line, which shrank the search and read as broken when she tilted
+   down — and it threw away the far southern stars, the ones that never clear the horizon at
+   Brooklyn's latitude, which are exactly the unfamiliar sky worth sweeping through. */
 
 /* Orion is carried separately in the page, by name, because the figure's lines need to know
    which star is which. Matching on position rather than catalogue number keeps this honest:
@@ -76,19 +79,21 @@ for (let i = 0; i < 60; i++) {
   if (altaz(5.6033, -1.2, lst) < BELT_ALT) lo = lst; else hi = lst;
 }
 
-const up = stars.filter(s => altaz(s.ra, s.dec, lst) > FLOOR)
-                .sort((a, b) => a.mag - b.mag)
+const up = stars.sort((a, b) => a.mag - b.mag)
                 .map(s => `${s.ra.toFixed(4)},${s.dec.toFixed(2)},${s.mag.toFixed(2)}`);
 
+const risen = stars.filter(s => altaz(s.ra, s.dec, lst) > 0).length;
 process.stderr.write(
-  `${stars.length} stars to mag ${MAG_LIMIT}; ${up.length} above the horizon at LST ${lst.toFixed(4)}h\n`);
+  `${up.length} stars to mag ${MAG_LIMIT}; ${risen} of them above the horizon at LST ${lst.toFixed(4)}h\n`);
 
 const body = [];
 for (let i = 0; i < up.length; i += 6) body.push("  " + up.slice(i, i + 6).join(" "));
 process.stdout.write(
   `/* The sky over Boerum Hill at the moment the belt clears the horizon: every star in the\n` +
-  `   Yale Bright Star Catalog brighter than magnitude ${MAG_LIMIT.toFixed(1)} that is above the horizon then, as\n` +
-  `   "right ascension in hours, declination in degrees, visual magnitude". Orion itself is not\n` +
-  `   in here — it is carried by name in CAT, because the figure's lines need to know which star\n` +
-  `   is which. Regenerate with scripts/generate-star-field.mjs. */\n` +
+  `   Yale Bright Star Catalog brighter than magnitude ${MAG_LIMIT.toFixed(1)}, as "right ascension in hours,\n` +
+  `   declination in degrees, visual magnitude". The whole sphere, below the horizon as well as\n` +
+  `   above it, so the sky never runs out and the far southern stars that never rise here are\n` +
+  `   down there to sweep past. Orion itself is not in here — it is carried by name in CAT,\n` +
+  `   because the figure's lines need to know which star is which. Regenerate with\n` +
+  `   scripts/generate-star-field.mjs. */\n` +
   "const STARS = `\n" + body.join("\n") + "\n`.trim().split(/\\s+/).map(s => s.split(\",\").map(Number));\n");
