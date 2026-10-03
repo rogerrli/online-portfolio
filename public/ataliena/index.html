@@ -14,6 +14,7 @@
 :root{
   --sky:#070B1A; --sky2:#0E1430; --ink:#E4E8F5; --muted:#8E99BC;
   --star:#F2C14E; --dim:#48537D; --line:#F2C14E;
+  --lit:0;
   box-sizing:border-box;
 }
 *,*::before,*::after{box-sizing:inherit}
@@ -29,23 +30,57 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ---------- ambient starfield ---------- */
+/* ---------- ambient starfield ----------
+   Only for the screens that come before the sky is live. Once the canvas is up it
+   has background stars of its own, and they move with the sky; these do not. */
 #field{position:fixed;inset:0;pointer-events:none;z-index:0}
 #field i{position:absolute;display:block;border-radius:50%;background:#fff;opacity:.5}
+body.sky #field{display:none}
 @media (prefers-reduced-motion:no-preference){
   #field i{animation:tw var(--d,4s) ease-in-out var(--delay,0s) infinite}
   @keyframes tw{0%,100%{opacity:var(--o,.5)}50%{opacity:calc(var(--o,.5) * .25)}}
 }
 
+/* ---------- the sky ---------- */
+/* A canvas is a replaced element, so inset:0 alone leaves it at its intrinsic 300x150
+   and the sky ends up drawn into a box in the corner. The sizes are explicit. */
+#sky{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:0;pointer-events:none}
+body.sky #sky{display:block}
+
+/* ---------- the target frame ----------
+   The only affordance on the page: it says "put something here" without saying what.
+   Sized in JS to a fixed angular width, so it means the same thing on every screen. */
+#frame{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:120px;height:120px;z-index:1;pointer-events:none;display:none;
+  opacity:calc(.26 + var(--lit) * .74);
+}
+body.sky #frame{display:block}
+body[data-state="done"] #frame,
+body[data-state="lights"] #frame{display:none}
+#frame i{
+  position:absolute;width:17px;height:17px;
+  border:1.5px solid color-mix(in srgb,var(--star) calc(var(--lit) * 100%),var(--dim));
+}
+#frame i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}
+#frame i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+#frame i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}
+#frame i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+
 /* ---------- layout ---------- */
 .wrap{
-  position:relative;z-index:1;
+  position:relative;z-index:2;
   min-height:100svh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(20px,5vh,38px);
   padding:calc(24px + env(safe-area-inset-top,0px)) 22px calc(28px + env(safe-area-inset-bottom,0px));
   text-align:center;
+  pointer-events:none;
 }
+.wrap > * {pointer-events:auto}
+/* With the sky live the middle of the screen belongs to the stars, so the words
+   move out of its way rather than sitting on top of them. */
+body.sky .wrap{justify-content:space-between}
 h1{
   font-family:"Young Serif",Georgia,serif;font-weight:400;
   font-size:clamp(2.1rem,11vw,3rem);line-height:1;margin:0;letter-spacing:-.01em;
@@ -54,15 +89,6 @@ h1{
 .sub{color:var(--muted);margin:0;max-width:30ch;font-size:clamp(.95rem,4vw,1.05rem)}
 .sub b{color:var(--ink);font-weight:700}
 
-/* ---------- constellation ---------- */
-#cass{width:min(94vw,470px);height:auto;display:block;overflow:visible;--lit:0}
-#cass .lk{
-  fill:none;stroke:var(--line);stroke-width:.7;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:1;stroke-dashoffset:1;opacity:.9;
-}
-#cass .st{fill:color-mix(in srgb,var(--star) calc(var(--lit) * 100%),var(--dim))}
-#cass .glow{fill:url(#halo);opacity:calc(var(--lit) * .62)}
-
 /* ---------- daylight ----------
    With the lights on there is nothing to see, so the page says so and waits. Pure
    CSS, so flipping the system setting changes it instantly with no reload. Only an
@@ -70,26 +96,22 @@ h1{
 @media (prefers-color-scheme:light){
   :root{--sky:#E8ECF6;--sky2:#F7F9FD;--ink:#1C2647;--muted:#5B6688;--dim:#C6CDE0}
   #field{display:none}
-  /* the stars are still up there, just washed out by the daylight */
-  #cass{opacity:.3}
-  #cass .glow{opacity:0}
-  #cass .st{fill:var(--dim)}
   body:not([data-state="done"]) [data-step]{display:none!important}
   body:not([data-state="done"]) [data-step="lights"]{display:flex!important}
   body:not([data-state="done"]) h1{display:block!important}
-  body:not([data-state="done"]) #cass{display:block!important}
+  /* the stars are still up there, just washed out by the daylight */
+  body:not([data-state="done"]) #sky{display:block;opacity:.4}
+  body:not([data-state="done"]) #frame{display:none}
+  body:not([data-state="done"]) .wrap{justify-content:space-between}
   /* She has already earned the night sky, so don't take it back at the last step. */
   body[data-state="done"]{--sky:#070B1A;--sky2:#0E1430;--ink:#E4E8F5;--muted:#8E99BC;--dim:#48537D}
-  body[data-state="done"] #cass{opacity:1}
-  body[data-state="done"] #cass .glow{opacity:.95}
 }
 
 /* ---------- the opening tap ---------- */
 /* iOS will not release compass data without a gesture, so the first screen asks
-   for one. "Log in" and the constellation stay hidden until it comes. */
+   for one. "Log in" and the sky stay hidden until it comes. */
 body[data-state="tap"]{cursor:pointer}
-body[data-state="tap"] h1,
-body[data-state="tap"] #cass{display:none}
+body[data-state="tap"] h1{display:none}
 .tapline{
   font-family:"Young Serif",Georgia,serif;font-weight:400;
   font-size:clamp(1.45rem,7vw,2rem);color:var(--muted);margin:0;letter-spacing:.01em;
@@ -99,20 +121,11 @@ body[data-state="tap"] #cass{display:none}
   @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
 }
 
-body.done #cass .st{fill:#FFF3D2}
-body.done #cass .glow{opacity:.95}
-body.done #cass .lk{
-  stroke-dashoffset:0;
-  transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1);
-}
-@media (prefers-reduced-motion:reduce){
-  body.done #cass .lk{transition:none;stroke-dashoffset:0}
-}
 body[data-state="done"] h1{opacity:.3}
 
 /* ---------- controls ---------- */
 button{
-  font:inherit;font-weight:700;color:var(--sky);background:var(--star);
+  font:inherit;font-weight:700;color:#070B1A;background:var(--star);
   border:0;border-radius:999px;padding:13px 38px;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
@@ -124,14 +137,15 @@ button:focus-visible{outline:3px solid #fff;outline-offset:3px}
 
 /* ---------- state machine ---------- */
 [data-step]{display:none;flex-direction:column;align-items:center;gap:18px}
-/* The Next button holds its space from the moment the constellation appears, so
-   arriving fades it in without nudging anything else on the page. */
+/* The Next button holds its space from the moment the sky appears, so arriving
+   fades it in without nudging anything else on the page. */
 body[data-state="seek"] [data-step="done"]{display:flex}
 body[data-state="seek"] #next{opacity:0;pointer-events:none}
 body[data-state="done"] #next{opacity:1}
 body[data-state="tap"]     [data-step="tap"],
 body[data-state="desktop"] [data-step="desktop"],
 body[data-state="blocked"] [data-step="blocked"],
+body[data-state="lights"]  [data-step="lights"],
 body[data-state="done"]    [data-step="done"]{display:flex}
 
 .note{color:var(--muted);font-size:.82rem;max-width:34ch;margin:0}
@@ -148,28 +162,12 @@ body.dbg #debug{display:block}
 <body data-state="tap">
 
 <div id="field" aria-hidden="true"></div>
+<canvas id="sky" role="img" aria-label="The constellation Orion, rising"></canvas>
+<div id="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 <main class="wrap">
 
   <h1>Log in</h1>
-
-  <svg id="cass" viewBox="0 0 104 64" role="img" aria-label="The constellation Cassiopeia">
-    <defs>
-      <radialGradient id="halo">
-        <stop offset="0%" stop-color="#F2C14E" stop-opacity=".85"/>
-        <stop offset="45%" stop-color="#F2C14E" stop-opacity=".28"/>
-        <stop offset="100%" stop-color="#F2C14E" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <path class="lk" pathLength="1" d="M10 20 L30 46 L52 26 L74 48 L94 16"/>
-    <g>
-      <circle class="glow" cx="10" cy="20" r="9"/>  <circle class="st" cx="10" cy="20" r="2.6"/>
-      <circle class="glow" cx="30" cy="46" r="9.5"/><circle class="st" cx="30" cy="46" r="2.8"/>
-      <circle class="glow" cx="52" cy="26" r="10"/> <circle class="st" cx="52" cy="26" r="2.9"/>
-      <circle class="glow" cx="74" cy="48" r="8"/>  <circle class="st" cx="74" cy="48" r="2.3"/>
-      <circle class="glow" cx="94" cy="16" r="7.5"/><circle class="st" cx="94" cy="16" r="2"/>
-    </g>
-  </svg>
 
   <div data-step="tap">
     <p class="tapline">Tap to start</p>
@@ -198,20 +196,197 @@ body.dbg #debug{display:block}
 
 <script>
 /* ============================ settings ============================ */
-const NORTH_TOL = 10;    // degrees either side of north
-const LEVEL_TOL = 25;    // degrees of tilt still counted as "flat"
-const HOLD_MS   = 3000;  // how long both must be held
-const GLOW_FROM = 70;    // stars begin to answer from this far off north
+/* Both webkitCompassHeading and Android's absolute orientation read from *magnetic*
+   north, and Boerum Hill's declination is about 13 degrees west. The whole sky is shifted
+   into the sensors' frame once, here, so there is only ever one set of angles in play. */
+const DECLINATION = 13;
+const LATITUDE    = 40.7;   // Boerum Hill, Brooklyn
+/* Where the belt is caught: just clear of the horizon, so all three stars are up and only
+   the hunter's trailing foot is still under the ground. */
+const BELT_ALT    = 2;
+
+const AZ_TOL   = 10;    // degrees either side of the belt
+const ALT_TOL  = 10;    // degrees above or below it
+const HOLD_MS  = 5000;  // how long both must be held
+const HOLD_POW = 2.5;   // the hold fills slowly at first, then rushes at the end
+const GLOW_FROM= 70;    // stars begin to answer from this far off target
+const FRAME_DEG= 7;     // width of the target frame, in degrees of sky: a little wider
+                        // than the belt is long, so it reads as a sight to drop it into
+const DIAG_FOV = 65;    // field of view across the screen diagonal — fixed, so rotating
+                        // the phone changes what you see but never how big it is
 /* Absolute, not relative. The QR points at /ataliena with no trailing slash, so a
    relative "puzzle.html" resolves against / and lands on /puzzle.html — nowhere. */
-const PUZZLE    = "/ataliena/puzzle.html";
+const PUZZLE   = "/ataliena/puzzle.html";
 /* The login is not remembered — every visit earns its way in again. The crossword's
    own answers do persist; that is a separate key, written by the puzzle itself. */
 
 const qs = new URLSearchParams(location.search);
 if (qs.has("debug")) document.body.classList.add("dbg");
 
-/* ============================ starfield ============================ */
+/* Only an explicit light preference holds her at the door; "no preference" goes
+   straight through. Decorative motion is the only thing reduced-motion turns off —
+   the sky tracking is the puzzle, so it always runs. */
+const lightQ = matchMedia("(prefers-color-scheme: light)");
+const calmQ  = matchMedia("(prefers-reduced-motion: reduce)");
+
+const DEG = Math.PI / 180;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const norm  = a => ((a % 360) + 360) % 360;
+// shortest signed turn from `a` to `b`, in (-180, 180]
+const delta = (a, b) => ((b - a + 540) % 360) - 180;
+
+/* ============================ Orion ============================
+   The real catalogue — right ascension in hours, declination in degrees, visual
+   magnitude — so the figure can be checked against a star chart instead of against a
+   pile of screen coordinates. */
+const CAT = {
+  betelgeuse: [5.9200,  7.41, 0.45],
+  bellatrix:  [5.4183,  6.35, 1.64],
+  meissa:     [5.5850,  9.93, 3.39],
+  mintaka:    [5.5333, -0.30, 2.25],
+  alnilam:    [5.6033, -1.20, 1.69],
+  alnitak:    [5.6800, -1.94, 1.74],
+  rigel:      [5.2417, -8.20, 0.18],
+  saiph:      [5.7967, -9.67, 2.07],
+};
+
+/* The hold draws the figure in, and it starts at the belt — which is the whole point of
+   the puzzle — then knits outward through the shoulders and down to the feet. */
+const FIGURE = [
+  ["mintaka","alnilam"], ["alnilam","alnitak"],
+  ["alnitak","betelgeuse"], ["betelgeuse","meissa"], ["meissa","bellatrix"],
+  ["bellatrix","mintaka"],
+  ["mintaka","rigel"], ["alnitak","saiph"],
+];
+
+// unit vector for a point in the sky. World axes: x east, y up, z south.
+function dir(az, alt) {
+  const ca = Math.cos(alt * DEG);
+  return [ca * Math.sin(az * DEG), Math.sin(alt * DEG), -ca * Math.cos(az * DEG)];
+}
+
+const PHI = LATITUDE * DEG;
+function altaz(c, lst) {
+  const H = (lst - c[0]) * 15 * DEG, d = c[1] * DEG;
+  const sh = Math.sin(PHI) * Math.sin(d) + Math.cos(PHI) * Math.cos(d) * Math.cos(H);
+  const alt = Math.asin(clamp(sh, -1, 1));
+  const az  = Math.atan2(-Math.cos(d) * Math.sin(H), Math.sin(d) - Math.sin(PHI) * sh);
+  return [norm(az / DEG), alt / DEG];
+}
+
+/* Catch the sky at the instant the belt has just cleared the horizon in the east: solve
+   for the sidereal time at which Alnilam sits BELT_ALT up while rising, then put every
+   star where it really is at that moment. Doing it properly rather than by eye is what
+   lays the hunter on his side with the belt standing upright, and it lands Alnilam on
+   azimuth 92.5 — due east, which is the answer she is being asked for. */
+const ORION = {};
+let TARGET_AZ = 0, TARGET_ALT = 0, TARGET_V = null;
+(function placeOrion() {
+  let lo = -3, hi = 0.3, lst = 0;
+  for (let i = 0; i < 60; i++) {
+    lst = (lo + hi) / 2;
+    if (altaz(CAT.alnilam, lst)[1] < BELT_ALT) lo = lst; else hi = lst;
+  }
+  for (const k in CAT) {
+    const [az, alt] = altaz(CAT[k], lst);
+    ORION[k] = { az: az + DECLINATION, alt, mag: CAT[k][2], v: dir(az + DECLINATION, alt) };
+  }
+  TARGET_AZ = ORION.alnilam.az; TARGET_ALT = ORION.alnilam.alt; TARGET_V = ORION.alnilam.v;
+})();
+
+/* Scattered stars, enough to make the sky continuous when Orion is off-screen. Spread
+   over the whole sphere, of which the screen holds about a sixteenth, so the count is
+   much larger than what she can see at once. Seeded, so the same sky comes back on every
+   reload instead of reshuffling under her. */
+const BACKDROP = (function () {
+  let seed = 20261003;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const out = [];
+  for (let i = 0; i < 1100; i++) {
+    const alt = Math.asin(rnd() * 2 - 1) / DEG;
+    out.push({
+      v: dir(rnd() * 360, alt),
+      r: rnd() * 1.1 + 0.45,
+      o: rnd() * 0.42 + 0.12,
+      ph: rnd() * Math.PI * 2,
+      sp: rnd() * 1.4 + 0.7,
+    });
+  }
+  return out;
+})();
+
+/* ============================ quaternions ============================
+   The phone is held upright, which is exactly the pose where heading read straight off
+   alpha falls apart, so the view is carried as a quaternion from first to last and the
+   angles are only ever read back out of it at the end. */
+const HALF  = Math.sqrt(0.5);
+const Q_CAM = [-HALF, 0, 0, HALF];   // turn the camera around to look out of the back
+
+function qMul(a, b) {
+  const [ax,ay,az,aw] = a, [bx,by,bz,bw] = b;
+  return [
+    aw*bx + ax*bw + ay*bz - az*by,
+    aw*by - ax*bz + ay*bw + az*bx,
+    aw*bz + ax*by - ay*bx + az*bw,
+    aw*bw - ax*bx - ay*by - az*bz,
+  ];
+}
+function qRot(q, v) {
+  const [x,y,z,w] = q, [vx,vy,vz] = v;
+  const tx = 2*(y*vz - z*vy), ty = 2*(z*vx - x*vz), tz = 2*(x*vy - y*vx);
+  return [vx + w*tx + y*tz - z*ty, vy + w*ty + z*tx - x*tz, vz + w*tz + x*ty - y*tx];
+}
+// YXZ, the order the orientation event's angles are applied in
+function qFromEuler(x, y, z) {
+  const c1 = Math.cos(x/2), c2 = Math.cos(y/2), c3 = Math.cos(z/2);
+  const s1 = Math.sin(x/2), s2 = Math.sin(y/2), s3 = Math.sin(z/2);
+  return [
+    s1*c2*c3 + c1*s2*s3,
+    c1*s2*c3 - s1*c2*s3,
+    c1*c2*s3 - s1*s2*c3,
+    c1*c2*c3 + s1*s2*s3,
+  ];
+}
+/* Smoothing on the quaternion rather than on the angles. Raw compass output jitters by
+   several degrees, and smoothing the angles instead is what sends the sky the long way
+   round when the heading crosses north. */
+function qSlerp(a, b, t) {
+  let [bx,by,bz,bw] = b;
+  let d = a[0]*bx + a[1]*by + a[2]*bz + a[3]*bw;
+  if (d < 0) { bx=-bx; by=-by; bz=-bz; bw=-bw; d = -d; }
+  let s0 = 1 - t, s1 = t;
+  if (d < 0.9995) {
+    const th = Math.acos(d), sn = Math.sin(th);
+    s0 = Math.sin((1 - t) * th) / sn;
+    s1 = Math.sin(t * th) / sn;
+  }
+  const o = [s0*a[0] + s1*bx, s0*a[1] + s1*by, s0*a[2] + s1*bz, s0*a[3] + s1*bw];
+  const n = Math.hypot(o[0], o[1], o[2], o[3]) || 1;
+  return [o[0]/n, o[1]/n, o[2]/n, o[3]/n];
+}
+
+/* The screen rotates inside the phone, so every reading has to be undone by however far
+   the content has turned. Locking the orientation instead is not an option: it needs
+   fullscreen on Android and does not exist on iOS. */
+function screenAngle() {
+  const a = (screen.orientation && screen.orientation.angle);
+  return typeof a === "number" ? a : (window.orientation || 0);
+}
+function viewQuat(alpha, beta, gamma) {
+  const q = qFromEuler(beta * DEG, alpha * DEG, -gamma * DEG);
+  const h = -screenAngle() * DEG / 2;
+  return qMul(qMul(q, Q_CAM), [0, 0, Math.sin(h), Math.cos(h)]);
+}
+// looking due east at the belt, horizon level — the view the daylight screen shows
+const Q_REST = (function () {
+  const f = TARGET_V, up = [0,1,0];
+  const r = [f[1]*up[2] - f[2]*up[1], f[2]*up[0] - f[0]*up[2], f[0]*up[1] - f[1]*up[0]];
+  const rn = Math.hypot(...r); const R = r.map(v => v / rn);
+  const U = [R[1]*f[2] - R[2]*f[1], R[2]*f[0] - R[0]*f[2], R[0]*f[1] - R[1]*f[0]];
+  return { R, U, F: f };
+})();
+
+/* ============================ starfield (pre-sky screens) ============================ */
 (function field() {
   const host = document.getElementById("field");
   const n = window.innerWidth < 500 ? 70 : 110;
@@ -227,55 +402,217 @@ if (qs.has("debug")) document.body.classList.add("dbg");
 })();
 
 /* ============================ elements ============================ */
-const body     = document.body;
-const cass     = document.getElementById("cass");
-const dbg      = document.getElementById("debug");
-const setState = s => body.dataset.state = s;
+const body   = document.body;
+const cv     = document.getElementById("sky");
+const ctx    = cv.getContext("2d");
+const frame  = document.getElementById("frame");
+const dbg    = document.getElementById("debug");
 
-/* ============================ mobile gate ============================ */
-const coarse   = matchMedia("(pointer: coarse)").matches;
-const touch    = (navigator.maxTouchPoints || 0) > 0;
-const uaMobile = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
-// iPadOS reports a desktop UA, so the coarse-pointer + touch pair is what catches it.
-const isMobile = (coarse && touch) || uaMobile;
+function setState(s) {
+  body.dataset.state = s;
+  body.classList.toggle("sky", s === "seek" || s === "done" || s === "lights");
+}
 
-/* ============================ sensors ============================ */
-let heading = null, beta = null, gamma = null, absolute = false, evName = "-";
+/* ============================ canvas ============================ */
+let W = 0, H = 0, cx = 0, cy = 0, focal = 1;
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  W = cv.clientWidth || window.innerWidth;
+  H = cv.clientHeight || window.innerHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  cx = W / 2; cy = H / 2;
+  focal = Math.hypot(W, H) / (2 * Math.tan(DIAG_FOV / 2 * DEG));
+  const px = 2 * focal * Math.tan(FRAME_DEG / 2 * DEG);
+  frame.style.width = frame.style.height = px.toFixed(1) + "px";
+  if (!live()) paint(performance.now());
+}
+addEventListener("resize", resize);
+addEventListener("orientationchange", () => setTimeout(resize, 120));
+
+/* ============================ the view ============================ */
+let qRaw = null, qView = null, beta = null, gamma = null, evName = "-", absolute = false;
 let gotReading = false, watching = false, lastAt = 0;
+let R = Q_REST.R, U = Q_REST.U, F = Q_REST.F;
 
-const norm = a => ((a % 360) + 360) % 360;
-// shortest signed turn from `a` to `b`, in (-180, 180]
-const delta = (a, b) => ((b - a + 540) % 360) - 180;
-const lerpAngle = (a, b, t) => norm(a + delta(a, b) * t);
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+function basisFrom(q) {
+  R = qRot(q, [1,0,0]); U = qRot(q, [0,1,0]); F = qRot(q, [0,0,-1]);
+}
+function project(v) {
+  const z = v[0]*F[0] + v[1]*F[1] + v[2]*F[2];
+  if (z <= 0.04) return null;                       // behind her, or grazing the edge
+  const x = v[0]*R[0] + v[1]*R[1] + v[2]*R[2];
+  const y = v[0]*U[0] + v[1]*U[1] + v[2]*U[2];
+  return [cx + focal * x / z, cy - focal * y / z];
+}
 
 function onOrient(e) {
-  let h = null;
+  let alpha = null;
   if (typeof e.webkitCompassHeading === "number" && !Number.isNaN(e.webkitCompassHeading)) {
-    h = e.webkitCompassHeading;            // iOS: degrees clockwise from north
+    alpha = norm(360 - e.webkitCompassHeading);     // iOS: degrees clockwise from north
     absolute = true;
   } else if (e.absolute === true && typeof e.alpha === "number" && e.alpha !== null) {
-    h = norm(360 - e.alpha);               // Android absolute orientation
+    alpha = e.alpha;                                // Android absolute orientation
     absolute = true;
   }
-  if (h === null) return;
+  if (alpha === null || typeof e.beta !== "number" || typeof e.gamma !== "number") return;
 
-  evName = e.type;
-  if (typeof e.beta  === "number") beta  = e.beta;
-  if (typeof e.gamma === "number") gamma = e.gamma;
-
-  // light smoothing — raw compass output jitters by several degrees
-  heading = heading === null ? h : lerpAngle(heading, h, 0.25);
+  evName = e.type; beta = e.beta; gamma = e.gamma;
+  qRaw = viewQuat(alpha, beta, gamma);
+  if (!qView) qView = qRaw;
   gotReading = true;
   lastAt = performance.now();
 }
 
+/* ============================ drawing ============================ */
+const NIGHT = { star: [242,193,78], dim: [72,83,125], hz: "rgba(142,153,188,.30)", bg: "255,255,255" };
+const DAY   = { star: [160,172,200], dim: [198,205,224], hz: "rgba(91,102,136,.18)", bg: "91,102,136" };
+const mix = (a, b, t) => `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+// brighter stars are drawn bigger, the way a chart does it
+const radius = m => clamp(3.4 - 0.55 * m, 1.1, 3.4) * 1.5;
+
+function horizon(p) {
+  ctx.beginPath();
+  let pen = false;
+  for (let a = 0; a <= 360; a += 3) {
+    const q = project(dir(a, 0));
+    if (!q) { pen = false; continue; }
+    if (pen) ctx.lineTo(q[0], q[1]); else { ctx.moveTo(q[0], q[1]); pen = true; }
+  }
+  ctx.strokeStyle = p.hz; ctx.lineWidth = 1; ctx.stroke();
+}
+
+function backdrop(p, t) {
+  for (const s of BACKDROP) {
+    const q = project(s.v);
+    if (!q || q[0] < -8 || q[0] > W + 8 || q[1] < -8 || q[1] > H + 8) continue;
+    const o = calmQ.matches ? s.o : s.o * (0.72 + 0.28 * Math.sin(t / 1000 * s.sp + s.ph));
+    ctx.beginPath(); ctx.arc(q[0], q[1], s.r, 0, 6.2832);
+    ctx.fillStyle = `rgba(${p.bg},${o.toFixed(3)})`; ctx.fill();
+  }
+}
+
+/* The constellation lines are the hold indicator. They pay out along the figure as a
+   single thread, belt first, so holding steady visibly knits the hunter together and
+   letting go unpicks him. */
+function figure(p, lit, prog) {
+  if (prog <= 0.001) return;
+  const seg = [];
+  let total = 0;
+  for (const [a, b] of FIGURE) {
+    const pa = project(ORION[a].v), pb = project(ORION[b].v);
+    if (!pa || !pb) { seg.push(null); continue; }
+    const len = Math.hypot(pb[0]-pa[0], pb[1]-pa[1]);
+    seg.push({ pa, pb, len }); total += len;
+  }
+  if (!total) return;
+  let left = prog * total;
+  ctx.strokeStyle = mix(p.dim, p.star, clamp(lit, 0, 1));
+  ctx.lineWidth = 1.1; ctx.lineCap = "round"; ctx.globalAlpha = 0.85;
+  for (const s of seg) {
+    if (left <= 0) break;
+    if (!s) continue;
+    const f = Math.min(1, left / s.len); left -= s.len;
+    ctx.beginPath();
+    ctx.moveTo(s.pa[0], s.pa[1]);
+    ctx.lineTo(s.pa[0] + (s.pb[0]-s.pa[0]) * f, s.pa[1] + (s.pb[1]-s.pa[1]) * f);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function orion(p, lit) {
+  const col = mix(p.dim, p.star, clamp(lit, 0, 1));
+  for (const k in ORION) {
+    const s = ORION[k], q = project(s.v);
+    if (!q) continue;
+    const r = radius(s.mag);
+    if (lit > 0.02) {                                  // the halo is the warmth
+      const g = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], r * 4.6);
+      g.addColorStop(0,   `rgba(${p.star[0]},${p.star[1]},${p.star[2]},${(0.52*lit).toFixed(3)})`);
+      g.addColorStop(0.45,`rgba(${p.star[0]},${p.star[1]},${p.star[2]},${(0.18*lit).toFixed(3)})`);
+      g.addColorStop(1,   `rgba(${p.star[0]},${p.star[1]},${p.star[2]},0)`);
+      ctx.beginPath(); ctx.arc(q[0], q[1], r * 4.6, 0, 6.2832); ctx.fillStyle = g; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(q[0], q[1], r, 0, 6.2832);
+    ctx.fillStyle = lit > 0.985 ? "#FFF3D2" : col; ctx.fill();
+  }
+}
+
+function paint(t) {
+  const day = lightQ.matches && body.dataset.state !== "done";
+  const p = day ? DAY : NIGHT;
+  ctx.clearRect(0, 0, W, H);
+  if (day) { ({ R, U, F } = Q_REST); orion(p, 0.22); figure(p, 0.22, 1); return; }
+  horizon(p); backdrop(p, t); figure(p, lit, drawn); orion(p, lit);
+}
+
+/* ============================ the hold ============================ */
+let holdStart = 0, lit = 0, drawn = 0, lastFrame = 0;
+const live = () => body.dataset.state === "seek";
+
+function loop(now) {
+  if (body.dataset.state === "done") return;
+  const dt = lastFrame ? Math.min(100, now - lastFrame) : 16;
+  lastFrame = now;
+
+  let off = 180, dAz = 0, dAlt = 0;
+  if (qRaw) {
+    // frame-rate independent smoothing, so the sky glides the same on any phone
+    qView = qSlerp(qView, qRaw, 1 - Math.exp(-dt / 70));
+    basisFrom(qView);
+
+    const heading = norm(Math.atan2(F[0], -F[2]) / DEG);
+    const elev    = Math.asin(clamp(F[1], -1, 1)) / DEG;
+    dAz  = delta(TARGET_AZ, heading);
+    dAlt = elev - TARGET_ALT;
+    off  = Math.acos(clamp(F[0]*TARGET_V[0] + F[1]*TARGET_V[1] + F[2]*TARGET_V[2], -1, 1)) / DEG;
+
+    // A stalled sensor must not let a stale "facing east" quietly finish the hold.
+    const fresh = (now - lastAt) < 900;
+    const ok = Math.abs(dAz) <= AZ_TOL && Math.abs(dAlt) <= ALT_TOL && fresh;
+    if (ok) { if (!holdStart) holdStart = now; } else holdStart = 0;
+  }
+
+  const p = holdStart ? Math.min(1, (now - holdStart) / HOLD_MS) : 0;
+  /* The stars are the only feedback there is. They answer to how close she is, all the
+     way from most of a turn away, and fill the rest in over the hold. */
+  const near   = clamp((GLOW_FROM - off) / (GLOW_FROM - AZ_TOL), 0, 1);
+  const target = holdStart ? 0.55 + p * 0.45 : near * 0.55;
+  lit  += (target - lit) * (1 - Math.exp(-dt / 140));
+  const want = Math.pow(p, HOLD_POW);
+  drawn = want >= drawn ? want : drawn + (want - drawn) * (1 - Math.exp(-dt / 220));
+  document.documentElement.style.setProperty("--lit", lit.toFixed(3));
+
+  paint(now);
+  if (p >= 1) return succeed();
+
+  if (body.classList.contains("dbg")) {
+    dbg.textContent =
+      `event    ${evName}\nabsolute ${absolute}\nscreen   ${screenAngle()}`
+      + `\nd-az     ${dAz.toFixed(1)}\nd-alt    ${dAlt.toFixed(1)}\noff      ${off.toFixed(1)}`
+      + `\nbeta     ${beta === null ? "null" : beta.toFixed(1)}\ngamma    ${gamma === null ? "null" : gamma.toFixed(1)}`
+      + `\nlit      ${lit.toFixed(2)}\nhold     ${holdStart ? (((now - holdStart)/1000).toFixed(1) + "s") : "-"}`;
+  }
+  requestAnimationFrame(loop);
+}
+
+function succeed() {
+  setState("done");
+  lit = 1; drawn = 1;
+  document.documentElement.style.setProperty("--lit", "1");
+  paint(performance.now());
+  if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
+}
+
+/* ============================ sensors ============================ */
 function listen() {
   if (watching) return;
   watching = true;
   window.addEventListener("deviceorientationabsolute", onOrient, true);
   window.addEventListener("deviceorientation", onOrient, true);
   setState("seek");
+  resize();
   requestAnimationFrame(loop);
   // If nothing ever arrives, the hardware or the permission isn't there.
   setTimeout(() => { if (!gotReading) blocked("sensor"); }, 5000);
@@ -299,74 +636,40 @@ function arm() {
 
 function blocked(why) {
   if (body.dataset.state === "done") return;
-  // There is no way past this screen. Pointing north is the only way in.
+  // There is no way past this screen. Facing the belt is the only way in.
   document.getElementById("blockedMsg").innerHTML = why === "permission"
     ? "<b>I need the compass.</b> Allow motion &amp; orientation access, then reload."
     : "<b>No compass reading.</b> This phone may not have one.";
   setState("blocked");
 }
 
-/* ============================ the hold ============================ */
-let holdStart = 0, lit = 0;
-
-function loop(now) {
-  if (body.dataset.state === "done") return;
-
-  if (heading !== null) {
-    const off     = Math.abs(delta(0, heading));            // distance from north
-    const onNorth = off <= NORTH_TOL;
-    const tilt    = Math.max(Math.abs(beta ?? 99), Math.abs(gamma ?? 99));
-    const level   = tilt <= LEVEL_TOL;
-    // A stalled sensor must not let a stale "pointing north" finish the hold.
-    const fresh   = (now - lastAt) < 900;
-    const ok      = onNorth && level && fresh;
-
-    if (ok) { if (!holdStart) holdStart = now; }
-    else holdStart = 0;
-
-    const p = holdStart ? Math.min(1, (now - holdStart) / HOLD_MS) : 0;
-
-    /* The stars are the only feedback there is. They answer to how close she is,
-       dimmed while the phone is tilted, then fill the rest of the way on the hold. */
-    const near   = clamp((GLOW_FROM - off) / (GLOW_FROM - NORTH_TOL), 0, 1);
-    const target = holdStart ? 0.55 + p * 0.45 : near * (level ? 0.5 : 0.18);
-    lit += (target - lit) * 0.12;
-    cass.style.setProperty("--lit", lit.toFixed(3));
-
-    if (p >= 1) return succeed();
-  }
-
-  if (body.classList.contains("dbg")) {
-    dbg.textContent =
-      `event    ${evName}\nabsolute ${absolute}\nheading  ${heading === null ? "null" : heading.toFixed(1)}`
-      + `\nbeta     ${beta === null ? "null" : beta.toFixed(1)}\ngamma    ${gamma === null ? "null" : gamma.toFixed(1)}`
-      + `\nlit      ${lit.toFixed(2)}\nhold     ${holdStart ? (((now - holdStart) / 1000).toFixed(1) + "s") : "-"}`;
-  }
-  requestAnimationFrame(loop);
-}
-
-function succeed() {
-  setState("done");
-  body.classList.add("done");
-  cass.style.setProperty("--lit", "1");
-  if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
-}
-
 /* ============================ wiring ============================ */
 document.getElementById("next").addEventListener("click", () => location.assign(PUZZLE));
 
-/* Only an explicit light preference holds her at the door; "no preference" goes
-   straight through. Nothing is armed while the lights are on — no sensors, no
-   permission prompt — and turning them off starts the gate without a reload. */
-const lightQ = matchMedia("(prefers-color-scheme: light)");
+/* Nothing is armed while the lights are on — no sensors, no permission prompt — and
+   turning them off starts the gate without a reload. The canvas may never have been
+   sized if the lights came on mid-screen, so go through resize rather than paint. */
 lightQ.addEventListener("change", e => {
   if (!e.matches && body.dataset.state === "lights") arm();
+  else if (!live()) resize();
 });
 
-if (qs.has("preview")) { setTimeout(succeed, 400); }       // check the payoff without a compass
-else if (!isMobile && !qs.has("force")) setState("desktop");
-else if (lightQ.matches) setState("lights");
-else arm();
+const coarse   = matchMedia("(pointer: coarse)").matches;
+const touch    = (navigator.maxTouchPoints || 0) > 0;
+const uaMobile = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
+// iPadOS reports a desktop UA, so the coarse-pointer + touch pair is what catches it.
+const isMobile = (coarse && touch) || uaMobile;
+
+if (qs.has("preview")) {                                   // check the payoff without a compass
+  setState("seek"); resize();
+  setTimeout(() => { lit = 1; drawn = 1; succeed(); }, 400);
+} else if (!isMobile && !qs.has("force")) {
+  setState("desktop");
+} else if (lightQ.matches) {
+  setState("lights"); resize();
+} else {
+  arm();
+}
 </script>
 </body>
 </html>
