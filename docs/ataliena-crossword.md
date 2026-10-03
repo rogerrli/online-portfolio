@@ -122,8 +122,8 @@ There is no password and no text input. **The login is facing where Orion's Belt
    because iOS will not hand over compass data outside a user gesture —
    `DeviceOrientationEvent.requestPermission()` must be called from a real tap. Every
    platform shows it so the experience doesn't fork; on Android the tap just starts it.
-2. **Log in.** The title, a sight at the centre of the screen, and a sky. No instructions,
-   by design.
+2. **Log in.** The title, a small ring at the centre of the screen, and a sky. No
+   instructions, by design.
 3. **The hold.** Heading within **±10°** and elevation within **±10°** of the belt, for
    **5 seconds** — accumulated, not consecutive. See *Holding still on a shaky reading*.
 4. **The payoff.** Stars go to full brightness, the whole figure is drawn, and a **Next**
@@ -247,13 +247,24 @@ this page.
 An earlier version gave itself away twice over. Orion was gold against a white starfield,
 which marked the answer before she knew there was a question, and the brightness ramped
 from **70°** out, which turned the whole thing into a hot-and-cold gradient you could follow
-to the finish without ever noticing you were looking at a constellation. The sight sat at
-the centre of the screen from the first frame too, announcing that this was a game of aiming
-— the one thing she is supposed to work out for herself.
+to the finish without ever noticing you were looking at a constellation.
 
 Now nothing helps until she is within `HELP_FROM`, **30°**. Inside that the stars warm to
-gold, the halos bloom and the sight fades up — so warmth is no longer a search tool but
-confirmation she has found it. Outside it the page is a sky, a horizon and a title.
+gold and the halos bloom — so warmth is no longer a search tool but confirmation she has
+found it. Outside it the page is a sky, a horizon, a title and the sight.
+
+### The sight says nothing
+
+A ring at the middle of the screen, `FRAME_DEG` **4°** across — a little more than the belt
+is long — at a constant opacity and a constant colour.
+
+It is deliberately **not** feedback. For a while it faded up with the warmth instead of
+sitting there from the first frame, on the reasoning that an empty frame in the middle of
+the screen announces this is a game of aiming. That traded one giveaway for a worse one: a
+mark that *materialises as she closes in* doesn't say "aim at something", it says "you're
+nearly there", which is the single most valuable thing the page has to keep to itself. A
+mark that is simply always there says far less. It is furniture, not a signal, and nothing
+about how close she is reaches it.
 
 The difficulty is therefore all in the first discovery, which is where it belongs: once she
 knows what the page is, it is turn east, tilt, hold. That matters because **the login is

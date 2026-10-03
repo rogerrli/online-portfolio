@@ -14,7 +14,6 @@
 :root{
   --sky:#070B1A; --sky2:#0E1430; --ink:#E4E8F5; --muted:#8E99BC;
   --star:#F2C14E; --dim:#48537D; --line:#F2C14E;
-  --lit:0;
   box-sizing:border-box;
 }
 *,*::before,*::after{box-sizing:inherit}
@@ -47,28 +46,24 @@ body.sky #field{display:none}
 #sky{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:0;pointer-events:none}
 body.sky #sky{display:block}
 
-/* ---------- the target frame ----------
-   The only affordance on the page: it says "put something here" without saying what.
-   Sized in JS to a fixed angular width, so it means the same thing on every screen. */
+/* ---------- the sight ----------
+   A ring at the middle of the screen, sized in JS to a fixed angular width so it means the
+   same thing on every screen. It is furniture, not feedback: constant opacity, constant
+   colour, and nothing about how close she is reaches it. (The `--lit` custom property that
+   used to drive it is gone with it — the canvas keeps its own `lit`.)
+
+   It used to fade up with the warmth, which was meant to keep the page quiet early on. That
+   traded one giveaway for a worse one — a mark that materialises as she closes in doesn't
+   say "aim at something", it says "you're nearly there", which is the most valuable thing
+   the page has to keep to itself. Always being there says far less. */
 #frame{
   position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:120px;height:120px;z-index:1;pointer-events:none;display:none;
-  /* Fades up with the warmth rather than sitting there from the first frame. An empty
-     frame in the middle of the screen announces that this is a game of aiming, which is
-     the one thing she is supposed to work out for herself. */
-  opacity:calc(var(--lit) * 1.9);
+  width:60px;height:60px;z-index:1;pointer-events:none;display:none;
+  border:1px solid rgba(226,232,245,.26);border-radius:50%;
 }
 body.sky #frame{display:block}
 body[data-state="done"] #frame,
 body[data-state="lights"] #frame{display:none}
-#frame i{
-  position:absolute;width:17px;height:17px;
-  border:1.5px solid color-mix(in srgb,var(--star) calc(var(--lit) * 100%),var(--dim));
-}
-#frame i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}
-#frame i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
-#frame i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}
-#frame i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
 
 /* ---------- layout ---------- */
 .wrap{
@@ -182,7 +177,7 @@ body.dbg #debug{display:block}
 
 <div id="field" aria-hidden="true"></div>
 <canvas id="sky" role="img" aria-label="The constellation Orion, rising"></canvas>
-<div id="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div id="frame" aria-hidden="true"></div>
 
 <main class="wrap">
 
@@ -259,8 +254,8 @@ const EASE_MS  = 70;    // how hard the sky is smoothed when the compass is trus
 const SHAKY_MS = 520;   // ...and when it is not, which is the pose this gate asks for
 const UNWIND   = 2.5;   // the hold unwinds this much faster than it fills, so one twitchy
                         // frame costs a moment rather than the whole attempt
-const FRAME_DEG= 7;     // width of the target frame, in degrees of sky: a little wider
-                        // than the belt is long, so it reads as a sight to drop it into
+const FRAME_DEG= 4;     // width of the sight, in degrees of sky: a little more than the
+                        // belt is long, so it reads as somewhere to drop the belt into
 const DIAG_FOV = 65;    // field of view across the screen diagonal — fixed, so rotating
                         // the phone changes what you see but never how big it is
 /* Absolute, not relative. The QR points at /ataliena with no trailing slash, so a
@@ -805,7 +800,6 @@ function loop(now) {
   lit  += (target - lit) * (1 - Math.exp(-dt / 140));
   const want = Math.pow(p, HOLD_POW);
   drawn = want >= drawn ? want : drawn + (want - drawn) * (1 - Math.exp(-dt / 220));
-  document.documentElement.style.setProperty("--lit", lit.toFixed(3));
 
   paint(now);
   if (p >= 1) return succeed();
@@ -824,7 +818,6 @@ function loop(now) {
 function succeed() {
   setState("done");
   lit = 1; drawn = 1; held = HOLD_MS;
-  document.documentElement.style.setProperty("--lit", "1");
   paint(performance.now());
   if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
 }
