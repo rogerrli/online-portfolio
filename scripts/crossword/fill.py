@@ -30,6 +30,27 @@ REQUIRED = ["VIEWFINDER", "RIVERWALK", "SAKURA", "DISNEY", "ROGER", "EAST", "STA
 SEEDED = {"RIVERWALK": 60, "SAKURA": 60}
 
 
+def read_vocab(path):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return {l.strip().upper() for l in fh
+                    if l.strip() and not l.lstrip().startswith("#")}
+    except OSError:
+        return set()
+
+
+def favored_words(path="vocab/favored.txt", extra_path="vocab/extra.txt"):
+    """Marvel, Baldur's Gate, space, dinosaurs, birds, The Expanse — her territory."""
+    return read_vocab(path) | read_vocab(extra_path)
+
+
+def extra_words(path="vocab/extra.txt", score=52):
+    """Words added to the vocabulary whatever the score floor says, or whatever the
+    list omits. Optional, unlike the seeded gift answers: the filler takes them where
+    they fit and ignores them otherwise, so they cost nothing."""
+    return {w: score for w in read_vocab(path) if w.isalpha() and 3 <= len(w) <= 10}
+
+
 def banned_words(path="vocab/banned.txt"):
     """Hard exclusions, Roger's calls. Banning a named handful is free; banning a
     whole category is what killed fillability earlier."""
@@ -49,15 +70,25 @@ BLANK = "."
 
 
 class Filler:
-    def __init__(self, layout, words, rng, deadline, clean=None):
+    def __init__(self, layout, words, rng, deadline, clean=None, favored=None,
+                 favor=12, name_penalty=3):
         """`clean` is the vocabulary we actually want to read: ordinary words rather
         than obscure names and brands. It is a preference, not a filter.
 
         Filtering was tried and fails outright — the curated list filled nothing in 18
         layouts and a score floor of 55 nothing in 22, while the full list fills. The
-        names hold the grid up. So instead candidates are ordered clean-first, and a
-        name is only reached for in a slot where nothing clean fits, which is the
-        difference between a grid with nine of them and a grid with two."""
+        names hold the grid up.
+
+        The first attempt at this was all-or-nothing — every clean word ahead of every
+        name — and it filled nothing in 33 layouts, because a slot that needs a name
+        never gets offered one in time. So the preference is a weight, not an order:
+        a favoured word gains `favor`, a name loses `name_penalty`, and the two bands
+        interleave. At 12 and 3 against scores of 50 and 55, a strong name still
+        outranks weak ordinary fill, which is the point — the search is steered, not
+        starved.
+
+        `favored` is her own territory, and those stop counting as names at all: a
+        proper noun she knows cold is not the problem RUKEYSER is."""
         self.layout = layout
         self.rng = rng
         self.deadline = deadline
@@ -69,8 +100,11 @@ class Filler:
         for w, s in words.items():
             self.by_len[len(w)].append((w, s))
         ok = clean if clean is not None else words
+        fav = favored or set()
+        def weight(w, sc):
+            return sc + (favor if w in fav else 0) - (0 if (w in ok or w in fav) else name_penalty)
         for L in self.by_len:
-            self.by_len[L].sort(key=lambda ws: (ws[0] not in ok, -ws[1]))
+            self.by_len[L].sort(key=lambda ws: -weight(ws[0], ws[1]))
         self.idx = {}
         for L, ws in self.by_len.items():
             d = collections.defaultdict(set)

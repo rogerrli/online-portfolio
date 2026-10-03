@@ -25,11 +25,11 @@ import time
 import gen_layout as G
 
 N_SQ = 225
-from fill import Filler, pin, SEEDED, banned_words
+from fill import Filler, pin, SEEDED, banned_words, favored_words, extra_words
 from grid import entries, load_wordlist, symmetry
 
 
-def try_layout(layout, words, seconds, rng, clean=None):
+def try_layout(layout, words, seconds, rng, clean=None, favored=None):
     """Short, repeated attempts beat one long one: the search is randomised, so a
     fresh pin arrangement escapes a bad corner faster than backtracking out of it."""
     end = time.time() + seconds
@@ -37,7 +37,7 @@ def try_layout(layout, words, seconds, rng, clean=None):
     while time.time() < end:
         tries += 1
         f = Filler(layout, words, random.Random(rng.randrange(1 << 30)),
-                   min(end, time.time() + 6), clean=clean)
+                   min(end, time.time() + 6), clean=clean, favored=favored)
         if not pin(f, f.rng):
             return None, tries
         try:
@@ -66,18 +66,21 @@ def fill_quality(layout, sol, words, curated=None):
         else:
             letters.append(sol[k])
             k += 1
-    scores, names = [], 0
+    scores, names, fav = [], 0, 0
+    favset = favored_words()
     for e in _ents(layout):
         w = "".join(letters[i] for i in e["cells"])
         scores.append(words.get(w, 0))
-        # A name or brand: in the full list but not in the curated vocabulary.
-        if curated is not None and w not in curated:
+        if w in favset:
+            fav += 1
+        elif curated is not None and w not in curated:
+            # A name or brand: in the full list, not in the curated vocabulary, and
+            # not from her territory.
             names += 1
     mean = sum(scores) / len(scores)
     if curated is not None:
-        # Rank by names first. Banning them outright killed fillability — they hold
-        # the grid up — so they are counted and competed down instead.
-        return (-names, mean), names, mean
+        # Fewest strangers first, then most of her own world, then mean score.
+        return (-names, fav, mean), names, mean
     weak = sum(1 for s in scores if s <= 50)
     return (-weak, mean), weak, mean
 
@@ -126,8 +129,11 @@ def main():
 
     words = load_wordlist(args.wordlist, min_score=args.min_score)
     words.update(SEEDED)
+    words.update(extra_words())
     for w in banned_words():
         words.pop(w, None)
+    favored = favored_words()
+    print(f"favoured vocabulary: {len(favored)} words", file=sys.stderr)
     curated = None
     if args.curated:
         curated = load_wordlist(args.curated)
@@ -148,8 +154,8 @@ def main():
         seen.add(layout)
         tested += 1
         budget = min(args.per_layout, max(1.0, deadline - time.time()))
-        sol, tries = try_layout(layout, words, budget, rng,
-                                clean=curated if args.prefer_clean else None)
+        sol, tries = try_layout(layout, words, budget, rng, clean=curated,
+                                favored=favored)
         rank, lens = score_grid(layout)
         status = "FILLED" if sol else "no"
         print(f"[{tested:3}] words={len(entries(layout))} 3s={lens.get(3,0)} "
@@ -159,7 +165,7 @@ def main():
             continue
         filled += 1
         qrank, weak, mean = fill_quality(layout, sol, words, curated)
-        print(f"      fill: {weak} names/brands, mean score {mean:.1f}",
+        print(f"      fill: {weak} strangers, mean score {mean:.1f}",
               file=sys.stderr, flush=True)
         if args.log:
             with open(args.log, "a") as fh:

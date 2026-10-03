@@ -1,0 +1,69 @@
+# Vocabulary added to the filler regardless of the score floor, and favoured.
+#
+# Two kinds of word end up here: ones the list scores below the floor (TAV is 35,
+# which is Hebrew-letter territory, not Baldur's Gate), and ones no crossword list
+# carries at all because they are three years old.
+#
+# These are OPTIONAL, unlike the seeded gift answers. The filler uses them where they
+# fit and ignores them otherwise, so an absent-from-the-list word costs nothing here —
+# RIVERWALK is expensive because it is forced, not because it is unusual.
+#
+# Nothing longer than ten letters: that is the longest slot these grids have.
+
+# Baldur's Gate 3
+TAV
+ASTARION
+KARLACH
+LAEZEL
+WYLL
+HALSIN
+MINSC
+JAHEIRA
+MINTHARA
+VOLO
+MIZORA
+OWLBEAR
+TIEFLING
+GITHYANKI
+DROW
+FAERUN
+SELUNE
+BHAAL
+AVERNUS
+ILLITHID
+MINDFLAYER
+
+# The Expanse
+BOBBIE
+DUARTE
+AVASARALA
+FILIP
+MCRN
+INAROS
+NAGATA
+BURTON
+KAMAL
+DRAPER
+
+# Marvel
+OKOYE
+MJOLNIR
+SOKOVIA
+KREE
+SKRULL
+NAMOR
+IRONHEART
+RIRI
+MOBIUS
+SYLVIE
+
+# Dinosaurs
+SPINOSAURUS
+ANKYLOSAUR
+STEGOSAUR
+HADROSAUR
+THEROPOD
+SAUROPOD
+TITANOSAUR
+PALAEO
+DEINONYCHUS
