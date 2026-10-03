@@ -109,6 +109,7 @@ def main():
     # Host slots for the two answers that are not real words. See grid.slot_friction.
     ap.add_argument("--max-host-9", type=int, default=30)
     ap.add_argument("--max-host-10", type=int, default=42)
+    ap.add_argument("--max-blocks", type=int, default=G.MAX_BLOCKS)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out")
     ap.add_argument("--log", help="append every fill found, as JSON lines")
@@ -141,7 +142,7 @@ def main():
     while time.time() < deadline:
         layout = G.grow(rng, args.min_words, args.max_words, args.max_threes,
                         args.max_fours, args.max_interlock, args.max_host_9,
-                        args.max_host_10)
+                        args.max_host_10, args.max_blocks)
         if not layout or layout in seen:
             continue
         seen.add(layout)
@@ -163,6 +164,7 @@ def main():
         if args.log:
             with open(args.log, "a") as fh:
                 fh.write(json.dumps({"layout": layout, "solution": sol, "names": weak,
+                                     "blocks": layout.count("#"),
                                      "mean": round(mean, 2),
                                      "words": len(entries(layout)),
                                      "threes": lens.get(3, 0)}) + "\n")
@@ -177,7 +179,8 @@ def main():
     out = {"layout": layout, "solution": sol,
            "words": len(entries(layout)),
            "lens": {str(k): v for k, v in sorted(score_grid(layout)[1].items())},
-           "symmetry": round(100 * symmetry(layout)[0] / 225, 1)}
+           "symmetry": round(100 * symmetry(layout)[0] / 225, 1),
+           "blocks": layout.count("#")}
     print(json.dumps(out, indent=2))
     if args.out:
         with open(args.out, "w") as fh:

@@ -195,8 +195,8 @@ const TITLE = "First Impressions";
 const INTRO = "Happy Birthday Natalie :)\nSome of these answers are worth a closer look so you can find the next step";
 const WIN_MESSAGE = "Every square is right. First impressions matter, so grab your VIEWFINDER and take a closer look";
 // Answers marked with the film icon (the seven photos). VIEWFINDER (20A) is left unmarked on purpose.
-const SPECIAL = "20A"; // the very special answer (VIEWFINDER)
-const MARKED = ["16A", "37A", "67A", "46D", "48D", "52D", "56D"];
+const SPECIAL = "50A"; // the very special answer (VIEWFINDER)
+const MARKED = ["33A", "1D", "32A", "11A", "60A", "23A", "57D"];
 // Clues keyed by number + direction. Anything missing shows as "Clue to come".
 const CLUES = {
   /* Beta's clues are written against beta's answers and nothing else.
@@ -210,8 +210,8 @@ const CLUES = {
 /* ================================================= */
 
 const N=15;
-const LAYOUT="...#....##........#.....#........#.....#...............#.........##....#..........##.........##...#.....####.........####.....#...##.........##..........#....##.........#...##..........#.....#........#.....#........##....#...";
-const SOL_ENC="RkNTRU5GVVRZVlFSQkhWTlBVUlFFQlRSRVlHRVNOVkVSRU5BVEJJVlJKU1ZBUVJFU0JFUVJHTlZZRkNOQU9SUkFCQU1SRUJHTlZZUlFHQUdWUUJHVkFSRkVWSVJFSk5ZWEVWQUZSTlVWQ0dORlJQTkFHQllRWk5WUU5HUkdSUlpWUVlSUVhWR0ZRTkxGR05UUkhBVkdSRllOVkFHTlFFQlpOQUdOT1lSUlpITllSRUdFUllMRlJD";
+const LAYOUT="#.....##....###......##.....##......##...........#...............#....##......#....##.....##......#......###.........###......#......##.....##....#......##....#...............#...........##......##.....##......###....##.....#";
+const SOL_ENC="RlpORUdURU5GWU5IRVZSRUJUUkVCWFFSTkVOSk5FUkJTTkhFTlpORkdSRVNWWVJRRUJGRkZHTkVBVkdGTkJDRUJPRkdWQUdaTllCQVJRVkZBUkxFVklSRUpOWVhGQ0VWR1JBQllCRkZVUlJRRk5FVlJORlhWRUZaTkVGUU5BTlZJVlJKU1ZBUVJFTlFIR05ZR1VWQVROUkVOR1JGUllSRkZaQkVSRlJORkdDSEFHRg==";
 /* -v3, and it must stay distinct from alpha's -v2. Restoring progress only checks
    that the saved array is N*N long, so a different LAYOUT on the same 15x15 board
    would silently restore alpha's letters into cells that now mean something else.

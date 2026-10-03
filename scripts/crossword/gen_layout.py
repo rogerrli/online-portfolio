@@ -43,6 +43,10 @@ MAX_INTERLOCK = 34    # see grid.interlock: kept, but falsified — default off 
 # guard against the genuinely hostile, not a target.
 MAX_HOST_9 = 30
 MAX_HOST_10 = 42
+# Blocks are capped for looks, not solvability. The walk packs blocks until the short
+# entries run out, and one round came back with 65 of 225 — a third of the grid black,
+# against alpha's 42 and a convention of 32 to 40. It verified and looked wrong.
+MAX_BLOCKS = 52
 LONG_FROM = 12
 
 
@@ -63,13 +67,15 @@ def has_slots_for(lens):
 
 def accept(layout, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FOURS,
            max_interlock=MAX_INTERLOCK, max_host_9=MAX_HOST_9,
-           max_host_10=MAX_HOST_10):
+           max_host_10=MAX_HOST_10, max_blocks=MAX_BLOCKS):
     """Final acceptance. Separate from the walk because some of these only become
     true as blocks go in: an empty grid is thirty 15-letter entries, so a cap on
     long entries would reject the very first block and the walk would never
     start."""
     words, lens = profile(layout)
     if not (min_words <= words <= max_words):
+        return False
+    if layout.count("#") > max_blocks:
         return False
     if lens.get(3, 0) > max_threes or lens.get(4, 0) > max_fours:
         return False
@@ -85,7 +91,7 @@ def accept(layout, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FO
 
 def grow(rng, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FOURS,
          max_interlock=MAX_INTERLOCK, max_host_9=MAX_HOST_9,
-         max_host_10=MAX_HOST_10):
+         max_host_10=MAX_HOST_10, max_blocks=MAX_BLOCKS):
     """Add 180-degree block pairs in random order, keeping only the constraints
     that a partly built grid can satisfy. Blocks are never placed singly, so
     symmetry holds by construction; the filler is where it may have to give.
@@ -111,7 +117,7 @@ def grow(rng, min_words, max_words, max_threes=MAX_THREES, max_fours=MAX_FOURS,
             layout[i] = layout[j] = "."
     s = "".join(layout)
     return s if accept(s, min_words, max_words, max_threes, max_fours, max_interlock,
-                       max_host_9, max_host_10) else None
+                       max_host_9, max_host_10, max_blocks) else None
 
 
 def show(layout):
