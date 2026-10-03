@@ -21,3 +21,6 @@ SETAT
 ATROOT
 DEMIE
 EBOND
+# Round 3 — no route in for her
+DALIS
+TOTIE

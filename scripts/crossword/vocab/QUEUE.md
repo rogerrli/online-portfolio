@@ -16,4 +16,31 @@ minutes per round.
 
 ## Awaiting Roger's call
 
-(filled in as rounds complete)
+From the round-2 grid (66 words, 6 threes, 10 names). Left in the **neither** tier —
+available but penalised — because each has a defensible clue and the call is taste:
+
+| Word | Why it might be fine | Why it might not |
+| --- | --- | --- |
+| KLIMT | Painted *The Kiss*; one of the better-known painters | Still a surname-only entry |
+| ERSO | Jyn Erso, *Rogue One*. Alpha already leans on Star Wars twice (FORD, Mando) | Needs that specific film |
+| ODETTE | *Swan Lake*'s heroine | Ballet knowledge, or just a name |
+| NBATV | A real channel, cluable as "Hoops channel" | Initialism soup |
+| DELT | Gym slang, "Muscle worked by a press, informally" | The singular is awkward; nobody says one delt |
+| OKS | "Signs off on" | Crosswordese plural of a non-noun |
+
+Banned without asking, because I could not write a clue she could get:
+
+| Word | Why |
+| --- | --- |
+| DALIS | Plural of a painter's surname. Pluralising a proper noun to make it fit is the giveaway |
+| TOTIE | Totie Fields, a comedian who died in 1978 |
+| KRALL | Diana Krall, jazz pianist |
+| INABA | Carrie Ann Inaba, *Dancing with the Stars* judge |
+| ELVA | An obscure given name and a defunct car marque |
+| TEM, RTE | Not words. RTE is "route" abbreviated |
+| SETAT, ATROOT | Arbitrary phrases ("set at", "at root") |
+| DEMIE, EBOND | Weak fill; EBOND is not a thing anyone says |
+
+Approved as ordinary knowledge: OBAMA, ELTON, NALGENE, ASOS, NGOS, ELMO, SEP.
+
+Available if need be, by Roger's call: TEAACT, AIRES.

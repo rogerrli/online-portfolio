@@ -7,3 +7,6 @@ ELTON
 NALGENE
 ASOS
 NGOS
+# Round 3 — ordinary knowledge
+ELMO
+SEP
