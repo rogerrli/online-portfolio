@@ -134,8 +134,11 @@ There is no password and no text input. **The login is facing where Orion's Belt
 The screen is a window onto the sky rather than a meter. Orion is pinned to its real
 position: turn and the stars pan the other way, tilt and they slide, roll the phone and they
 counter-rotate so the horizon stays level. Face the wrong way and the hunter is simply not
-on screen — a horizon line and about a thousand scattered stars keep the sky continuous
-while she looks for him.
+on screen.
+
+And the sky he is hiding in is the **real** one — see *The star field* — so sweeping past is
+sweeping past Taurus and the Pleiades, Auriga, Pegasus. Below the horizon line there is
+nothing at all, because below the horizon there is ground.
 
 The phone is held at a **comfortable angle**, not bolt upright. Which way the view points
 out of the phone is a dial, `SIGHT_DEG`: 90° is straight out of the back, 0° is along the
@@ -203,6 +206,35 @@ smaller annoyance than jitter when what she has been asked to do is hold still.
 
 `?debug=1` reports `wobble`, the spread of the heading over the last ~90 frames, so "it
 twitches" can be read as a number rather than argued about.
+
+### The star field
+
+`STARS` is the **Yale Bright Star Catalog**, 5th revised edition (BSC5), from Harvard's
+Telescope Data Center — public domain, and the canonical list of what the naked eye can see.
+Everything in it brighter than magnitude 5.0 that is above the horizon at the frozen instant
+is carried, placed through the same `LST` and the same magnetic shift as Orion. What she
+sweeps is therefore the sky that was genuinely over Boerum Hill when the belt cleared the
+horizon, not a scatter of dots with a constellation pasted on: Taurus and the Pleiades up
+and north of the hunter, Auriga above them, Vega and Deneb and Altair round to the west.
+
+**Every star is drawn by one law of magnitude** — `sizeOf`, `alphaOf`, and the same twinkle —
+Orion's eight included. That is the whole point: a constellation quietly drawn a little
+larger or brighter than its neighbours is a constellation that has been pointed at. Until
+she is close, `orion()` draws nothing whatsoever; the hunter is just more sky, and the only
+thing that distinguishes him is that he is a shape worth recognising.
+
+Only the half of the catalogue above the horizon is embedded, which is why the data has to
+be rebuilt if `LATITUDE` or `BELT_ALT` ever move. See *Regenerating the star field*.
+
+### Put on your seatbelt
+
+One clue, once per visit. After the opening tap the screen holds **"Put on your seatbelt."**
+alone for `BUCKLE_MS`, then it dissolves as the sky comes up.
+
+It names the belt without naming Orion and without pointing anywhere, so it stays a riddle
+rather than an instruction — which is what lets the gate itself stay wordless. The sensors
+start at the beginning of the beat rather than the end, so the sky is already tracking by the
+time she sees it and never arrives frozen and then lurching.
 
 ### How she is meant to work it out
 
@@ -320,6 +352,22 @@ Query parameters on the gate, none of which appear in the QR:
 | `?force=1` | Skips the mobile-only check (desktop has no compass, so it will just sit there). |
 | `?sight=N` | Overrides the sighting angle, 0–90. Use this to find the angle that holds steadiest in the hand; 90 is the original out-of-the-back behaviour. |
 | `?help=N` | How close before the page starts helping, in degrees. Lower is harder and more secretive; 70 is roughly the old behaviour, where the glow led her in from most of a turn away. |
+
+## Regenerating the star field
+
+`scripts/generate-star-field.mjs` downloads BSC5, keeps everything brighter than magnitude
+5.0 that is above the horizon at the frozen instant, drops Orion's own eight (they are
+carried by name in `CAT`, because the figure's lines need to know which star is which), and
+prints the replacement for the `const STARS = ...` block:
+
+```bash
+node scripts/generate-star-field.mjs > /tmp/stars.js
+```
+
+Paste the output over the existing block. The script's `LATITUDE` and `BELT_ALT` must match
+the page's, and a BSC5 row with blank coordinates parses as `0`, not `NaN` — the script
+rejects blank fields before converting, and skipping that check lands a knot of fictitious
+bright stars at right ascension zero.
 
 ## Regenerating the QR code
 
