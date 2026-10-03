@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>First Impressions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- EDIT ME: title, intro, clues live in the <script> below ---------- */
+:root{
+  --paper:#E8ECF6; --ink:#1C2647; --muted:#5B6688; --line:#1C2647;
+  --cell:#FFFFFF; --word:#CBD5F0; --cur:#F2C14E; --wrong:#D2453C; --star:#C9971F;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141A31; --ink:#E4E8F5; --muted:#9AA4C4; --line:#060914;
+    --cell:#232B4A; --word:#34416E; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141A31; --ink:#E4E8F5; --muted:#9AA4C4; --line:#060914;
+  --cell:#232B4A; --word:#34416E; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--paper);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 48px}
+header{margin-bottom:22px}
+.titlerow{display:flex;align-items:center;gap:16px}
+h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,5vw,3.1rem);line-height:1;margin:0;letter-spacing:-.01em}
+.intro{color:var(--muted);margin:.7rem 0 0;white-space:pre-line}
+.intro::first-line{color:var(--ink);font-weight:700}
+.cass{width:92px;height:52px;flex:none;color:var(--star)}
+.layout{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:32px;align-items:start}
+.board{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
+/* A plain block above the grid by default; on a phone it pins to the bottom and
+   is lifted above the keyboard by --kb (kept current by the visualViewport
+   listener), the way the NYT app does it. */
+/* stretch, not center: the arrows are tap targets, so they take the bar's full
+   height rather than being only as tall as their own glyph. */
+.bar{
+  display:flex;align-items:stretch;gap:0;
+  min-height:3.4em;margin-bottom:10px;
+  background:var(--word);border-radius:6px;
+}
+.bartext{
+  flex:1;min-width:0;display:flex;gap:10px;align-items:center;
+  padding:12px 4px;cursor:pointer;font-size:.95rem;
+}
+.bartext span{min-width:0}
+.bar .nav{
+  flex:none;display:flex;align-items:center;justify-content:center;
+  border:0;border-radius:6px;background:transparent;color:var(--ink);
+  font-size:1.6rem;line-height:1;padding:0;min-width:2em;align-self:stretch;
+  cursor:pointer;
+}
+.bar .nav:active{background:rgba(0,0,0,.16)}
+/* Only a real pointer gets hover. A phone leaves :hover stuck on whatever it
+   last tapped, which read as the button staying selected. */
+@media (hover:hover){
+  .bar .nav:hover{background:rgba(0,0,0,.08)}
+}
+/* Rows and columns are both pinned to equal fractions. Without an explicit
+   grid-template-rows the rows are implicit and sized by their content, so typing a
+   letter made that row taller than the empty ones. minmax(0,…) stops a tall glyph
+   from pushing past its share, since a bare 1fr still floors at min-content. */
+.grid{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));border:2px solid var(--line);background:var(--line);gap:1px;width:100%;aspect-ratio:1;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.c{position:relative;background:var(--cell);display:flex;align-items:center;justify-content:center;font-weight:400;line-height:1;overflow:hidden;font-size:clamp(.8rem,2.6vw,1.4rem);text-transform:uppercase;cursor:pointer}
+.c.b{background:var(--line);cursor:default}
+.c.w{background:var(--word)}
+.c.cur{background:var(--cur);color:#1C2647}
+.c.bad .l{color:var(--wrong);text-decoration:line-through;text-decoration-thickness:2px}
+.c .n{position:absolute;top:1px;left:2px;font-size:clamp(.42rem,1.1vw,.62rem);font-weight:400;line-height:1}
+.tools{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media (hover:hover){button:hover{background:var(--word)}}
+button:focus-visible,.cl li:focus-visible{outline:3px solid var(--cur);outline-offset:2px}
+.status{color:var(--muted);align-self:center;font-size:.9rem}
+.clock{
+  margin-left:auto;align-self:center;color:var(--muted);font-size:.9rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums;
+}
+.clock.stopped{color:var(--star);font-weight:700}
+/* Destructive, so it sits alone at the very bottom and looks the part. */
+.danger{margin-top:40px;padding-top:22px;border-top:1px solid var(--word);display:flex;justify-content:center}
+.danger button{color:var(--wrong);border-color:var(--wrong)}
+@media (hover:hover){.danger button:hover{background:var(--wrong);color:var(--paper)}}
+.clues{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.cl h2{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.4rem;margin:0 0 8px;padding-bottom:6px;border-bottom:1.5px solid var(--ink)}
+.cl ol{list-style:none;margin:0;padding:0}
+.cl li{display:grid;grid-template-columns:2.4em 1fr;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:.95rem}
+/* The answer so far, under each clue — tap the clue and type straight into it. */
+.cl li .ans{
+  grid-column:2;margin-top:3px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;
+  letter-spacing:.22em;color:var(--ink);white-space:nowrap;overflow-x:auto;
+}
+.cl li .ans .blank{color:var(--muted);opacity:.55}
+.cl li.on .ans{font-weight:700}
+.cl li .k{font-weight:700;display:flex;align-items:flex-start;gap:3px}
+.cl li.on{background:var(--word)}
+.cl li.done .t{opacity:.5}
+.film{width:.95em;height:.95em;flex:none;margin-top:.22em;color:var(--star)}
+.c.sp::after{content:"";position:absolute;inset:2px;border:2px solid var(--star);pointer-events:none}
+.cl li.special{border:1.5px solid var(--star);margin:4px 0}
+.cl li.special .t{font-weight:700}
+.star{width:1em;height:1em;flex:none;margin-top:.18em;color:var(--star)}
+.cl li.todo .t{font-style:italic;color:var(--muted)}
+.win{display:none;margin-top:14px;padding:12px 14px;border:1.5px solid var(--star);border-radius:6px}
+.win.show{display:block}
+body.master .tools,body.master .win,body.master .danger{display:none}
+@media print{body.master .c .l{visibility:visible}}
+#kb{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;font-size:16px}
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr}
+  .board{position:static}
+  .clues{grid-template-columns:1fr}
+  /* Pinned above the keyboard. --kb is the keyboard's height, or 0 when closed. */
+  .bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    margin:0;border-radius:0;border-top:1.5px solid var(--line);
+    transform:translateY(calc(var(--kb,0px) * -1));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .bar .nav{border-radius:0}
+  body{padding-bottom:6rem}   /* so the fixed bar never covers the last clue */
+}
+@media (prefers-reduced-motion:no-preference){.c{transition:background .08s}}
+@media print{
+  :root{--paper:#fff;--ink:#000;--muted:#000;--line:#000;--cell:#fff;--word:#fff;--cur:#fff;--star:#000}
+  @page{margin:.5in}
+  body{background:#fff}
+  .wrap{padding:0;max-width:none}
+  .bar,.tools,.win,.danger,#kb{display:none!important}
+  .layout{grid-template-columns:4.6in 1fr;gap:.3in}
+  .board{position:static}
+  .grid{width:4.6in}
+  .c .l{visibility:hidden}
+  .clues{gap:.2in;font-size:9pt}
+  .cl li{padding:1px 0;break-inside:avoid}
+  header{margin-bottom:.2in}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="titlerow">
+    <svg class="cass" viewBox="0 0 92 52" aria-hidden="true">
+      <polyline points="6,14 26,40 46,22 66,44 86,10" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
+      <g fill="currentColor"><circle cx="6" cy="14" r="3.2"/><circle cx="26" cy="40" r="2.6"/><circle cx="46" cy="22" r="3.6"/><circle cx="66" cy="44" r="2.8"/><circle cx="86" cy="10" r="3"/></g>
+    </svg>
+      <h1 id="title"></h1>
+    </div>
+    <p class="intro" id="intro"></p>
+  </header>
+  <div class="layout">
+    <div class="board">
+      <!-- Rides just above the keyboard on a phone; stays above the grid on a desktop. -->
+      <div class="bar" id="bar" aria-live="polite">
+        <button class="nav" id="prev" type="button" aria-label="Previous clue">&lsaquo;</button>
+        <div class="bartext" id="bartext">
+          <span id="barclue"></span>
+        </div>
+        <button class="nav" id="next" type="button" aria-label="Next clue">&rsaquo;</button>
+      </div>
+      <div class="grid" id="grid" role="grid" aria-label="Crossword grid"></div>
+      <div class="tools">
+        <span class="status" id="status"></span>
+        <span class="clock" id="clock" aria-label="Time spent"></span>
+      </div>
+      <div class="win" id="win"></div>
+    </div>
+    <div class="clues">
+      <section class="cl"><h2>Across</h2><ol id="across"></ol></section>
+      <section class="cl"><h2>Down</h2><ol id="down"></ol></section>
+    </div>
+  </div>
+
+  <div class="danger">
+    <button id="clear" type="button">Clear puzzle</button>
+  </div>
+</div>
+<input id="kb" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-label="Type a letter">
+<script>
+/* =================== EDIT HERE =================== */
+const TITLE = "First Impressions";
+const INTRO = "Happy Birthday Natalie :)\nSome of these answers are worth a closer look so you can find the next step";
+const WIN_MESSAGE = "Every square is right. First impressions matter, so grab your VIEWFINDER and take a closer look";
+// Answers marked with the film icon (the seven photos). VIEWFINDER (20A) is left unmarked on purpose.
+const SPECIAL = "40A"; // the very special answer (VIEWFINDER)
+const MARKED = ["26D", "48A", "1D", "13D", "24A", "6A", "4D"];
+// Clues keyed by number + direction. Anything missing shows as "Clue to come".
+const CLUES = {
+  /* Generated by clues.py from a file keyed by answer, not by number.
+     Do not hand-edit: clue numbers move with the block pattern, and a
+     stale number shows a real-looking clue on the wrong entry. */
+  "1A": "What Arrakis has instead of scenery",
+  "6A": "____ party",
+  "10A": "What a kid who looks just like you gets called",
+  "11A": "Eighteen-___ (big rig)",
+  "14A": "BTS's started in Tampa",
+  "15A": "Do what Stan Lee always did",
+  "16A": "Person with taste and no manners",
+  "17A": "Where the War of 1812 ended on paper",
+  "19A": "ARI____",
+  "20A": "The appointment you take in pyjamas",
+  "22A": "What you put in to stay in",
+  "23A": "Barrett who started Pink Floyd",
+  "24A": "It doesn't run across the Brooklyn Bridge",
+  "25A": "Surname of a very incredible family",
+  "26A": "Posts at length, in all caps",
+  "27A": "Full of holes, flatteringly",
+  "28A": "Half of a very small phrase",
+  "29A": "Russian ruler, or a drug official",
+  "31A": "LeBron's first team, familiarly",
+  "33A": "What a window gets and a poet was",
+  "34A": "A few, vaguely",
+  "35A": "Where the protomolecule should have stayed",
+  "36A": "Agency watching the water",
+  "39A": "A tad, to a crossword",
+  "40A": "In order to see the missing clue",
+  "43A": "Lead-in to 'what you did there'",
+  "44A": "Singer who names albums after her age",
+  "45A": "Little of 'The Wire', or a Sharif",
+  "46A": "Moscow cathedral with the twisted domes",
+  "48A": "______ season",
+  "50A": "Greek, to a Greek",
+  "51A": "How a veiled insult is veiled",
+  "52A": "Fake out on the ice",
+  "53A": "Under a tree, or not to be trusted",
+  "1D": "We saw a falcon in the rain here",
+  "2D": "Beyond counting, or never mentioned",
+  "3D": "Mother turned to stone by grief",
+  "4D": "You'll be saying 'ay, caramba' when you see this facing forward",
+  "5D": "Barnes's rank before the arm",
+  "6D": "Moment, briefly",
+  "7D": "Demolish, as an argument or a couch",
+  "8D": "Book that predicts the weather and the tides",
+  "9D": "What a capsule does on the way home",
+  "10D": "Non-negotiables",
+  "11D": "Habit, or won't without the apostrophe",
+  "12D": "Has, in a sonnet",
+  "13D": "Who you need to get sticky",
+  "15D": "Shoulders, at the gym",
+  "18D": "Done before thinking",
+  "21D": "Preliminary races",
+  "26D": "Locale for a stroll that happened on some \"under\" land?",
+  "27D": "Yogurt drink that puts out a curry",
+  "29D": "Drag the deep for whatever surfaces",
+  "30D": "Films that come with a box of tissues",
+  "31D": "Stopped pedalling",
+  "32D": "Easy to be around",
+  "33D": "Gets out while it can",
+  "34D": "Kebab lead-in",
+  "36D": "Treacherous Pevensie, or Lear's bastard son",
+  "37D": "Like gates or whites",
+  "38D": "What radio telescopes come in",
+  "40D": "Fruitless, or too fond of a mirror",
+  "41D": "Doing nothing, or a Python",
+  "42D": "Phone that outlived its own era",
+  "47D": "Get it",
+  "49D": "Sound of sinking into a hot bath",
+};
+/* ================================================= */
+
+const N=15;
+const LAYOUT="#.....####....#......##.............#............#.....#..............#.......#....###....###.....##....####....#....####....##.....###....###....#.......#..............#.....#............#.............##......#....####.....#";
+const SOL_ENC="UUhBUkZGR05FWlZBVlpSSlVSUllSRUhGR0JIRVFCTlBOWlJCRkFCT1RVUkFHRU5BVEdSWVJVUk5ZR1VOQUdSRkxRUk5GR0NORUVFTkFHRllOUExWR0dMR0ZORVBOSUZTRUJGR0ZCWlJZTk9GUkNOVU5WRUlWUkpTVkFRUkVWRk5KTlFSWVJCWk5FRkdPTkZWWUZGTlhIRU5VUllZUkFSR1VWQVlMUVJYUkZVTlFM";
+/* -v3, and it must stay distinct from alpha's -v2. Restoring progress only checks
+   that the saved array is N*N long, so a different LAYOUT on the same 15x15 board
+   would silently restore alpha's letters into cells that now mean something else.
+   Both puzzles are served from one origin, so one key would corrupt the other. */
+const KEY="gift-crossword-first-impressions-v3";
+const MASTER=false; // true = answer key
+
+const rot=s=>s.replace(/[A-Z]/g,c=>String.fromCharCode((c.charCodeAt(0)-52)%26+65));
+const solLetters=rot(atob(SOL_ENC));
+const sol=[];{let k=0;for(let i=0;i<N*N;i++)sol.push(LAYOUT[i]==="#"?null:solLetters[k++]);}
+const isB=i=>LAYOUT[i]==="#";
+
+// numbering and entries
+const num=Array(N*N).fill(0), entries=[], cellEntry=Array.from({length:N*N},()=>({A:null,D:null}));
+let n=0;
+for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+  const i=r*N+c; if(isB(i))continue;
+  const sa=(c===0||isB(i-1))&&c<N-1&&!isB(i+1);
+  const sd=(r===0||isB(i-N))&&r<N-1&&!isB(i+N);
+  if(sa||sd){n++;num[i]=n;
+    if(sa){const cells=[];for(let x=c;x<N&&!isB(r*N+x);x++)cells.push(r*N+x);entries.push({key:n+"A",n,dir:"A",cells});}
+    if(sd){const cells=[];for(let y=r;y<N&&!isB(y*N+c);y++)cells.push(y*N+c);entries.push({key:n+"D",n,dir:"D",cells});}
+  }
+}
+entries.forEach((e,ei)=>e.cells.forEach(i=>cellEntry[i][e.dir]=ei));
+
+const spEntry=entries.find(e=>e.key===SPECIAL);
+// state
+let fill=Array(N*N).fill(""), bad=new Set();
+if(MASTER){fill=sol.map(s=>s||"");}
+else try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.fill&&s.fill.length===N*N)fill=s.fill;}catch(e){}
+const save=()=>{if(MASTER)return;try{localStorage.setItem(KEY,JSON.stringify({fill}));}catch(e){}};
+
+/* ---- the clock ----
+   Its own key, deliberately: clearing the grid starts the puzzle over but not the
+   time already spent on it. Only counts while the tab is actually in front, and
+   stops for good once every square is right. */
+const CLOCK_KEY=KEY+"-time";
+let spent=0,runningSince=null;
+try{spent=Number(localStorage.getItem(CLOCK_KEY))||0;}catch(e){}
+const solved=()=>sol.every((s,i)=>!s||fill[i]===s);
+const spentNow=()=>spent+(runningSince===null?0:performance.now()-runningSince);
+function clockSave(){if(MASTER)return;try{localStorage.setItem(CLOCK_KEY,String(Math.round(spentNow())));}catch(e){}}
+function clockStop(){if(runningSince!==null){spent+=performance.now()-runningSince;runningSince=null;clockSave();}}
+function clockStart(){if(runningSince===null&&!MASTER&&!solved())runningSince=performance.now();}
+function fmt(ms){
+  const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;
+  return (h?h+":"+String(m).padStart(2,"0"):String(m))+":"+String(s).padStart(2,"0");
+}
+function drawClock(){
+  const done=solved();
+  if(done)clockStop();
+  const el=document.getElementById("clock");
+  el.textContent=fmt(spentNow());
+  el.classList.toggle("stopped",done);
+}
+setInterval(()=>{drawClock();if(runningSince!==null)clockSave();},1000);
+document.addEventListener("visibilitychange",()=>{document.hidden?clockStop():clockStart();});
+window.addEventListener("pagehide",clockStop);
+let cur=entries[0].cells[0], dir="A";
+
+// build
+document.getElementById("title").textContent=TITLE;
+document.getElementById("intro").textContent=INTRO;
+document.title=MASTER?TITLE+" (answer key)":TITLE;
+if(MASTER){document.body.classList.add("master");document.getElementById("intro").textContent="Answer key. Keep this one to yourself.";}
+const gridEl=document.getElementById("grid"), cellsEl=[];
+for(let i=0;i<N*N;i++){
+  const d=document.createElement("div");d.className="c"+(isB(i)?" b":"");
+  if(!isB(i)){d.setAttribute("role","gridcell");
+    if(num[i]){const s=document.createElement("span");s.className="n";s.textContent=num[i];d.appendChild(s);}
+    const l=document.createElement("span");l.className="l";d.appendChild(l);
+    d.addEventListener("click",()=>{if(cur===i){toggle();firstEmpty();}else{cur=i;if(cellEntry[i][dir]===null)toggle();}render();focusKb();});
+  }
+  if(spEntry&&spEntry.cells.includes(i))d.classList.add("sp");
+  gridEl.appendChild(d);cellsEl.push(d);
+}
+const starSVG='<svg class="star" viewBox="0 0 16 16" aria-label="special answer"><path fill="currentColor" d="M8 .8l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.7l-4.4 2.5 1.1-4.9L.9 5.9l5-.5z"/></svg>';
+const filmSVG='<svg class="film" viewBox="0 0 16 16" aria-label="photo answer"><rect x="1" y="2" width="14" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><g fill="currentColor"><rect x="3" y="3.6" width="1.6" height="1.6"/><rect x="3" y="7.2" width="1.6" height="1.6"/><rect x="3" y="10.8" width="1.6" height="1.6"/><rect x="11.4" y="3.6" width="1.6" height="1.6"/><rect x="11.4" y="7.2" width="1.6" height="1.6"/><rect x="11.4" y="10.8" width="1.6" height="1.6"/></g></svg>';
+const liEls=[];
+entries.forEach((e,ei)=>{
+  const li=document.createElement("li");li.tabIndex=0;
+  const t=CLUES[e.key];if(!t)li.classList.add("todo");if(e.key===SPECIAL)li.classList.add("special");
+  li.innerHTML=`<span class="k">${e.n}${MARKED.includes(e.key)?filmSVG:""}${e.key===SPECIAL?starSVG:""}</span><span class="t"></span><span class="ans"></span>`;
+  li.querySelector(".t").textContent=(t||"Clue to come")+(MASTER?"  "+e.cells.map(i=>sol[i]).join(""):"");
+  const go=()=>{dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];render();focusKb();};
+  li.addEventListener("click",go);li.addEventListener("keydown",ev=>{if(ev.key==="Enter")go();});
+  document.getElementById(e.dir==="A"?"across":"down").appendChild(li);liEls.push(li);
+});
+
+function toggle(){const o=dir==="A"?"D":"A";if(cellEntry[cur][o]!==null)dir=o;}
+/* Landing on the first gap of whatever clue you just switched to. Deliberately not
+   folded into toggle(): tapping a *different* square should leave you on the square
+   you tapped, and curEntry() flips direction only to find a valid entry. */
+function firstEmpty(){const e=entries[curEntry()];cur=e.cells.find(i=>!fill[i])??e.cells[0];}
+function curEntry(){let ei=cellEntry[cur][dir];if(ei===null){toggle();ei=cellEntry[cur][dir];}return ei;}
+function render(){
+  const ei=curEntry(),e=entries[ei];
+  cellsEl.forEach((d,i)=>{if(isB(i))return;
+    d.querySelector(".l").textContent=fill[i];
+    d.classList.toggle("w",e.cells.includes(i));d.classList.toggle("cur",i===cur);d.classList.toggle("bad",bad.has(i));});
+  liEls.forEach((li,j)=>{
+    li.classList.toggle("on",j===ei);li.classList.toggle("done",entries[j].cells.every(i=>fill[i]));
+    // The answer so far, redrawn only when it actually changed — render() runs on
+    // every keystroke and there are ~160 entries.
+    const s=entries[j].cells.map(i=>fill[i]||"").join("\u0000");
+    const a=li.querySelector(".ans");
+    if(a.dataset.v!==s){a.dataset.v=s;
+      a.innerHTML=entries[j].cells.map(i=>fill[i]?fill[i]:'<span class="blank">·</span>').join("");}
+  });
+  document.getElementById("barclue").textContent=CLUES[e.key]||"Clue to come";
+  const filled=sol.filter((s,i)=>s&&fill[i]).length,total=sol.filter(Boolean).length;
+  document.getElementById("status").textContent=filled===total?"All squares filled":`${filled} of ${total} squares filled`;
+  const won=sol.every((s,i)=>!s||fill[i]===s);
+  drawClock();
+  const w=document.getElementById("win");w.textContent=WIN_MESSAGE;w.classList.toggle("show",won);
+}
+function move(dr,dc){let r=Math.floor(cur/N),c=cur%N;do{r+=dr;c+=dc;}while(r>=0&&r<N&&c>=0&&c<N&&isB(r*N+c));if(r>=0&&r<N&&c>=0&&c<N)cur=r*N+c;}
+/* entries[] is built in grid order, so it interleaves directions — 1A, 1D, 2D, 3D,
+   4A… — and stepping through it sent you from 1A to 1D. Walk the clue lists instead:
+   every Across in order, then every Down, which is what the columns below show. */
+const navOrder=entries.map((_,i)=>i).sort((a,b)=>
+  entries[a].dir!==entries[b].dir ? (entries[a].dir==="A"?-1:1) : entries[a].n-entries[b].n);
+const isFilled=e=>e.cells.every(i=>fill[i]);
+/* Step to the next entry with a gap in it, skipping anything already filled. Because
+   navOrder runs every Across then every Down and wraps, running off the end of the
+   unsolved Acrosses lands on the first unsolved Down by itself — and if there are
+   none, it comes back round to the first unsolved Across. */
+function nextEntry(step){
+  const n=navOrder.length,start=navOrder.indexOf(curEntry());
+  for(let k=1;k<=n;k++){
+    const e=entries[navOrder[(((start+step*k)%n)+n)%n]];
+    if(!isFilled(e)){dir=e.dir;cur=e.cells.find(i=>!fill[i])??e.cells[0];return;}
+  }
+  // Every entry is full; just move one along so the arrows still do something.
+  const e=entries[navOrder[(((start+step)%n)+n)%n]];
+  dir=e.dir;cur=e.cells[0];
+}
+function type(ch){if(MASTER)return;
+  fill[cur]=ch;bad.delete(cur);
+  const e=entries[curEntry()],p=e.cells.indexOf(cur);
+  const nxt=e.cells.slice(p+1).find(i=>!fill[i]);
+  if(nxt!==undefined)cur=nxt;else if(p<e.cells.length-1)cur=e.cells[p+1];
+  save();render();
+}
+function back(){if(MASTER)return;
+  if(fill[cur]){fill[cur]="";}else{const e=entries[curEntry()],p=e.cells.indexOf(cur);if(p>0){cur=e.cells[p-1];fill[cur]="";}}
+  bad.delete(cur);save();render();
+}
+const kb=document.getElementById("kb");
+function focusKb(){kb.focus({preventScroll:true});}
+kb.addEventListener("input",()=>{const v=(kb.value||"").toUpperCase().replace(/[^A-Z]/g,"");kb.value="";if(v)type(v[v.length-1]);});
+kb.addEventListener("keydown",ev=>{
+  const k=ev.key;
+  if(k==="Backspace"||k==="Delete"){ev.preventDefault();back();}
+  else if(k==="ArrowLeft"){ev.preventDefault();if(dir!=="A"){dir="A";if(cellEntry[cur].A===null)dir="D";}else move(0,-1);render();}
+  else if(k==="ArrowRight"){ev.preventDefault();if(dir!=="A"){dir="A";if(cellEntry[cur].A===null)dir="D";}else move(0,1);render();}
+  else if(k==="ArrowUp"){ev.preventDefault();if(dir!=="D"){dir="D";if(cellEntry[cur].D===null)dir="A";}else move(-1,0);render();}
+  else if(k==="ArrowDown"){ev.preventDefault();if(dir!=="D"){dir="D";if(cellEntry[cur].D===null)dir="A";}else move(1,0);render();}
+  else if(k==="Tab"||k==="Enter"){ev.preventDefault();nextEntry(ev.shiftKey?-1:1);render();}
+  else if(k===" "){ev.preventDefault();toggle();firstEmpty();render();}
+});
+// Clue bar: arrows step through the entries, the clue itself flips direction.
+document.getElementById("prev").addEventListener("click",()=>{nextEntry(-1);render();focusKb();});
+document.getElementById("next").addEventListener("click",()=>{nextEntry(1);render();focusKb();});
+/* The bar does one of two things depending on whether the keyboard is already up.
+   With it down the tap only summons it — flipping there moved you to the crossing
+   clue just for asking for the keyboard. With it up the tap flips direction, which
+   is what you want once you are actually typing.
+
+   Focus on the hidden input is the signal, read on mousedown because by click time
+   the tap has already moved it. preventDefault keeps that focus where it is, so the
+   keyboard doesn't dismiss and re-summon — which would flicker and jump the bar. */
+let kbWasUp=false;
+const bartext=document.getElementById("bartext");
+bartext.addEventListener("mousedown",ev=>{kbWasUp=document.activeElement===kb;ev.preventDefault();});
+bartext.addEventListener("click",()=>{
+  if(kbWasUp){toggle();firstEmpty();render();}
+  focusKb();
+});
+
+/* The on-screen keyboard covers the bottom of the layout viewport but not the
+   visual one, so the gap between them is the keyboard's height. Without this the
+   bar would sit underneath the keyboard rather than above it. */
+(function trackKeyboard(){
+  const vv=window.visualViewport;if(!vv)return;
+  const place=()=>{
+    const gap=Math.max(0,window.innerHeight-(vv.height+vv.offsetTop));
+    document.documentElement.style.setProperty("--kb",gap+"px");
+  };
+  vv.addEventListener("resize",place);vv.addEventListener("scroll",place);place();
+})();
+
+document.getElementById("clear").addEventListener("click",()=>{
+  if(!confirm("Clear every square? This can't be undone."))return;
+  // The clock is untouched on purpose — the grid starts over, the time spent doesn't.
+  // It does need restarting, though, in case a solved puzzle had stopped it.
+  fill=Array(N*N).fill("");bad=new Set();save();clockStart();render();
+});
+clockStart();
+render();
+</script>
+</body>
+</html>

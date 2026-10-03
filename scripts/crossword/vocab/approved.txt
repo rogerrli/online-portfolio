@@ -1,0 +1,12 @@
+# Names and brands Roger has cleared. Treated as ordinary vocabulary: the filler
+# prefers these as readily as dictionary words, and they stop counting against a
+# fill's quality score. One per line, uppercase.
+# Round 2 — cleared: ordinary knowledge or squarely in her world
+OBAMA
+ELTON
+NALGENE
+ASOS
+NGOS
+# Round 3 — ordinary knowledge
+ELMO
+SEP
