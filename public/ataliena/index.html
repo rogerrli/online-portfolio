@@ -205,11 +205,28 @@ const LATITUDE    = 40.7;   // Boerum Hill, Brooklyn
    the hunter's trailing foot is still under the ground. */
 const BELT_ALT    = 2;
 
+/* Which way the phone is sighted along. 90 is straight out of the back of the phone,
+   which puts the horizon on screen only when the phone is held bolt upright — and upright
+   is exactly where the compass fails, because Core Location reads its heading off the
+   device's top edge and that edge is then pointing at the zenith with no horizontal left
+   to project onto. Tilting the sight toward the top edge brings the horizon on screen at
+   a comfortable wrist angle instead, well clear of that dead zone. The puzzle is unchanged
+   by this: she still faces where the belt rises, and the belt still lands in the sight.
+   ?sight=N overrides it, so the sweet spot can be found on a real phone without a deploy. */
+const SIGHT_DEG= (() => {
+  const v = new URLSearchParams(location.search).get("sight");
+  return v === null ? 45 : Math.max(0, Math.min(90, +v || 0));
+})();
+
 const AZ_TOL   = 10;    // degrees either side of the belt
 const ALT_TOL  = 10;    // degrees above or below it
 const HOLD_MS  = 5000;  // how long both must be held
 const HOLD_POW = 2.5;   // the hold fills slowly at first, then rushes at the end
 const GLOW_FROM= 70;    // stars begin to answer from this far off target
+const EASE_MS  = 70;    // how hard the sky is smoothed when the compass is trustworthy
+const SHAKY_MS = 520;   // ...and when it is not, which is the pose this gate asks for
+const UNWIND   = 2.5;   // the hold unwinds this much faster than it fills, so one twitchy
+                        // frame costs a moment rather than the whole attempt
 const FRAME_DEG= 7;     // width of the target frame, in degrees of sky: a little wider
                         // than the belt is long, so it reads as a sight to drop it into
 const DIAG_FOV = 65;    // field of view across the screen diagonal — fixed, so rotating
@@ -319,8 +336,8 @@ const BACKDROP = (function () {
    The phone is held upright, which is exactly the pose where heading read straight off
    alpha falls apart, so the view is carried as a quaternion from first to last and the
    angles are only ever read back out of it at the end. */
-const HALF  = Math.sqrt(0.5);
-const Q_CAM = [-HALF, 0, 0, HALF];   // turn the camera around to look out of the back
+// turn the view to look along the sighting axis: 90 is out of the back, 0 is along the top edge
+const Q_CAM = [-Math.sin(SIGHT_DEG * DEG / 2), 0, 0, Math.cos(SIGHT_DEG * DEG / 2)];
 
 function qMul(a, b) {
   const [ax,ay,az,aw] = a, [bx,by,bz,bw] = b;
@@ -372,10 +389,16 @@ function screenAngle() {
   const a = (screen.orientation && screen.orientation.angle);
   return typeof a === "number" ? a : (window.orientation || 0);
 }
+/* The screen rotation has to swing the *lean*, so it is applied before the tilt and about
+   the device's own z axis — which is y in the frame the Euler angles land in. While the
+   sight pointed straight out of the back the two were the same rotation and the order
+   didn't matter; with the sight leaning toward whichever edge is up, getting this wrong
+   aims 50 degrees off and 30 below as soon as the phone is turned to landscape. At a
+   90-degree sight this reduces to exactly the roll-about-the-view-axis it used to be. */
 function viewQuat(alpha, beta, gamma) {
   const q = qFromEuler(beta * DEG, alpha * DEG, -gamma * DEG);
   const h = -screenAngle() * DEG / 2;
-  return qMul(qMul(q, Q_CAM), [0, 0, Math.sin(h), Math.cos(h)]);
+  return qMul(qMul(q, [0, Math.sin(h), 0, Math.cos(h)]), Q_CAM);
 }
 // looking due east at the belt, horizon level — the view the daylight screen shows
 const Q_REST = (function () {
@@ -548,7 +571,9 @@ function paint(t) {
 }
 
 /* ============================ the hold ============================ */
-let holdStart = 0, lit = 0, drawn = 0, lastFrame = 0;
+let held = 0, lit = 0, drawn = 0, lastFrame = 0;
+/* Rolling spread of the heading, so "it twitches" can be read as a number under ?debug=1. */
+const shake = []; let spread = 0;
 const live = () => body.dataset.state === "seek";
 
 function loop(now) {
@@ -556,10 +581,16 @@ function loop(now) {
   const dt = lastFrame ? Math.min(100, now - lastFrame) : 16;
   lastFrame = now;
 
-  let off = 180, dAz = 0, dAlt = 0;
+  let off = 180, dAz = 0, dAlt = 0, trust = 1;
   if (qRaw) {
+    /* How much the heading is worth believing: the compass is read off the device's top
+       edge, so it is at its best with that edge horizontal and worthless with it vertical.
+       Smooth hardest exactly where the reading is worst — lag is a far smaller annoyance
+       than jitter when what she has been asked to do is hold still. */
+    trust = beta === null ? 1 : Math.abs(Math.cos(beta * DEG));
+    const ease = SHAKY_MS + (EASE_MS - SHAKY_MS) * trust;
     // frame-rate independent smoothing, so the sky glides the same on any phone
-    qView = qSlerp(qView, qRaw, 1 - Math.exp(-dt / 70));
+    qView = qSlerp(qView, qRaw, 1 - Math.exp(-dt / ease));
     basisFrom(qView);
 
     const heading = norm(Math.atan2(F[0], -F[2]) / DEG);
@@ -568,17 +599,24 @@ function loop(now) {
     dAlt = elev - TARGET_ALT;
     off  = Math.acos(clamp(F[0]*TARGET_V[0] + F[1]*TARGET_V[1] + F[2]*TARGET_V[2], -1, 1)) / DEG;
 
+    shake.push(heading);
+    if (shake.length > 90) shake.shift();
+    spread = shake.reduce((m, h) => Math.max(m, Math.abs(delta(heading, h))), 0);
+
     // A stalled sensor must not let a stale "facing east" quietly finish the hold.
     const fresh = (now - lastAt) < 900;
     const ok = Math.abs(dAz) <= AZ_TOL && Math.abs(dAlt) <= ALT_TOL && fresh;
-    if (ok) { if (!holdStart) holdStart = now; } else holdStart = 0;
+    /* The hold accumulates rather than restarting. Zeroing it on a single frame outside
+       the tolerance threw away four seconds of patience for one flick of a noisy compass;
+       unwinding faster than it fills still loses it properly when she turns away. */
+    held = ok ? Math.min(HOLD_MS, held + dt) : Math.max(0, held - dt * UNWIND);
   }
 
-  const p = holdStart ? Math.min(1, (now - holdStart) / HOLD_MS) : 0;
+  const p = held / HOLD_MS;
   /* The stars are the only feedback there is. They answer to how close she is, all the
      way from most of a turn away, and fill the rest in over the hold. */
   const near   = clamp((GLOW_FROM - off) / (GLOW_FROM - AZ_TOL), 0, 1);
-  const target = holdStart ? 0.55 + p * 0.45 : near * 0.55;
+  const target = Math.max(near * 0.55, p > 0 ? 0.55 + p * 0.45 : 0);
   lit  += (target - lit) * (1 - Math.exp(-dt / 140));
   const want = Math.pow(p, HOLD_POW);
   drawn = want >= drawn ? want : drawn + (want - drawn) * (1 - Math.exp(-dt / 220));
@@ -592,14 +630,15 @@ function loop(now) {
       `event    ${evName}\nabsolute ${absolute}\nscreen   ${screenAngle()}`
       + `\nd-az     ${dAz.toFixed(1)}\nd-alt    ${dAlt.toFixed(1)}\noff      ${off.toFixed(1)}`
       + `\nbeta     ${beta === null ? "null" : beta.toFixed(1)}\ngamma    ${gamma === null ? "null" : gamma.toFixed(1)}`
-      + `\nlit      ${lit.toFixed(2)}\nhold     ${holdStart ? (((now - holdStart)/1000).toFixed(1) + "s") : "-"}`;
+      + `\nsight    ${SIGHT_DEG}\ntrust    ${trust.toFixed(2)}\nwobble   ${spread.toFixed(1)}`
+      + `\nlit      ${lit.toFixed(2)}\nhold     ${(held/1000).toFixed(1)}s`;
   }
   requestAnimationFrame(loop);
 }
 
 function succeed() {
   setState("done");
-  lit = 1; drawn = 1;
+  lit = 1; drawn = 1; held = HOLD_MS;
   document.documentElement.style.setProperty("--lit", "1");
   paint(performance.now());
   if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
