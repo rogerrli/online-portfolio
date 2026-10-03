@@ -6,3 +6,18 @@ GATWA
 LARISSA
 UDALL
 TESSIE
+# Round 2 — names she would have no way into
+KRALL
+INABA
+ELVA
+TEM
+RTE
+# TEAACT and AIRES are deliberately NOT banned and NOT approved: Roger will take them
+# if need be. Left out of both lists, they stay available to the filler while still
+# counting against a fill's quality score, so a grid only uses them when it must.
+# Round 2 — not names, but arbitrary phrases and weak fill, banned on the same
+# principle. My call rather than Roger's; one line each to revert.
+SETAT
+ATROOT
+DEMIE
+EBOND

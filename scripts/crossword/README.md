@@ -96,8 +96,19 @@ Two numbers that are real constraints rather than preferences:
 the same question is not asked twice and a rebuild cannot reintroduce a rejected word.
 Banning a named handful costs no fillability; banning a category costs all of it.
 
-Workflow: take the lowest-name fill, review its names one at a time, add rejections to
-`banned.txt`, re-run. That loop converges. Chasing a name-free grid did not.
+Three tiers, not two:
+
+- **banned** — dropped from the filler's vocabulary outright. Words Roger would never
+  accept. Cheap for a named handful, ruinous for a category.
+- **in neither list** — usable, but counted against a fill's quality score, so the
+  search reaches for it only where a slot leaves no alternative. This is where "fine
+  if need be" lives, and where the whole unvetted score-50 tier sits by default.
+- **approved** — treated as ordinary vocabulary, no penalty, preferred as readily as
+  dictionary words.
+
+Workflow: take the lowest-name fill, review its names one at a time, sort them into
+those three, re-run. Each round's calls are permanent, so the floor drops every time.
+Chasing a name-free grid did not converge; this does.
 
 ## Emitting
 
