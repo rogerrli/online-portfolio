@@ -100,3 +100,14 @@ every surviving answer carry over untouched.
 Nothing here is as bad as GATWA or TESSIE. If you want them gone anyway, say so and the
 loop runs again — but each ban also disqualifies the grid containing it, so expect a
 different grid rather than the same one minus a word.
+
+## The rule for bans, after Roger's correction
+
+A word is banned only on **fairness** — she would have no route into it. A tonal
+objection is not enough: it says "I would rather she did not see this", which is a
+preference, where fairness says "she cannot solve this", which is a property of the
+puzzle. ISIS, SEMITE and RETCH were banned on tone and that was reversed; they sit in
+the conditional tier now, usable only where the grid has no alternative.
+
+Anything that does surface from that tier gets flagged in the final report rather than
+quietly shipped. A word reads differently in a finished grid than in a list.

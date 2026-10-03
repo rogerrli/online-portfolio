@@ -24,9 +24,11 @@ EBOND
 # Round 3 — no route in for her
 DALIS
 TOTIE
-# Round 4 — tone, not fairness. Standard crossword fill as the Egyptian goddess, and
-# still not going in a birthday present.
-ISIS
+# ISIS, SEMITE and RETCH were banned here on tone and Roger reversed it: a tonal
+# objection is not strong enough evidence to forbid a word the grid genuinely needs.
+# They now sit in neither list, like TEAACT and AIRES — available to the filler,
+# still counted against a fill's quality, so they only appear where nothing else
+# fits, and the final grid gets a look before it ships.
 # Round 4 — arbitrary phrases and non-words
 ARS
 ONER
@@ -35,13 +37,14 @@ ONEON
 ONELAP
 # Round 4 — name with no route in (Skai Jackson)
 SKAI
-# Round 5 — tone again. SEMITE is a loaded term to hand someone on their birthday;
-# RETCH is simply unpleasant.
-SEMITE
-RETCH
 # Round 5 — obscure names and vocabulary
 LEDERER
 SOAVE
 TYNE
 NIETO
 RIC
+# Round 7 — Roger's call on the locked grid's weakest
+ALTHING
+ADUT
+SELES
+OLINE
