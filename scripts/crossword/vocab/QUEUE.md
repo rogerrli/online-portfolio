@@ -44,3 +44,34 @@ Banned without asking, because I could not write a clue she could get:
 Approved as ordinary knowledge: OBAMA, ELTON, NALGENE, ASOS, NGOS, ELMO, SEP.
 
 Available if need be, by Roger's call: TEAACT, AIRES.
+
+## Round 3's grid (66 words, 5 threes) — the one being clued
+
+Good company, and a voice that suits her: LABPARTNER, BORICACID, BEAFRIEND, IWASLIKE,
+LODESTAR, INSTAS, BEREAL, and FETT and PEETA sitting next to alpha's Mando streak.
+
+Banned from it without asking:
+
+| Word | Why |
+| --- | --- |
+| ISIS | Tone, not fairness. Ordinary crossword fill as the Egyptian goddess; still not going in a birthday present |
+| ARS, ONER, ADAI | Non-words or near enough |
+| ONEON, ONELAP | Arbitrary phrases |
+| SKAI | Skai Jackson. No route in |
+
+Kept, and worth your eye — each is cluable but none is beyond question:
+
+| Word | How I would clue it |
+| --- | --- |
+| FETT | "Bounty hunter of Mandalore" — pairs with alpha's Q9-0 clue |
+| PEETA | *Hunger Games* baker |
+| NACL | "Table salt, to a chemist" — and alpha already clues salt at 1D |
+| TAMAL | "Singular of tamales" |
+| GENTE | "People, in Spanish" |
+| OWIES | "Boo-boos" |
+| AWMAN | "'Shucks!'" |
+| MVPS | "Finals honorees" |
+| ROSANNA | Toto's song, or the name |
+| ELENA | Justice Kagan |
+| DERN | Laura, of *Jurassic Park* |
+| ARIEL, RALPH, SHANE, AARON | Ordinary first names, each with a famous bearer |
