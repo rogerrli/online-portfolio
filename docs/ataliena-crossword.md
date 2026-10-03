@@ -124,8 +124,8 @@ There is no password and no text input. **The login is facing where Orion's Belt
    platform shows it so the experience doesn't fork; on Android the tap just starts it.
 2. **Log in.** The title, a sight at the centre of the screen, and a sky. No instructions,
    by design.
-3. **The hold.** Heading within **±10°** and elevation within **±10°** of the belt,
-   sustained for **5 seconds**.
+3. **The hold.** Heading within **±10°** and elevation within **±10°** of the belt, for
+   **5 seconds** — accumulated, not consecutive. See *Holding still on a shaky reading*.
 4. **The payoff.** Stars go to full brightness, the whole figure is drawn, and a **Next**
    button appears. Nothing auto-advances.
 
@@ -137,8 +137,10 @@ counter-rotate so the horizon stays level. Face the wrong way and the hunter is 
 on screen — a horizon line and about a thousand scattered stars keep the sky continuous
 while she looks for him.
 
-This is also why **the phone is held upright now, like a window, where the old gate wanted
-it flat like a compass.** That change is what forces the orientation maths below.
+The phone is held at a **comfortable angle**, not bolt upright. Which way the view points
+out of the phone is a dial, `SIGHT_DEG`: 90° is straight out of the back, 0° is along the
+top edge. See *The sighting axis* — getting this wrong is what made the first version
+unusable in the hand.
 
 ### Where Orion is put, and why
 
@@ -157,6 +159,51 @@ slant.
 Both compass sources read from **magnetic** north, so the whole sky is shifted by the 13°W
 declination at Boerum Hill once, at setup. There is then only one set of angles in the file.
 
+### The sighting axis
+
+The first build sighted straight out of the back of the phone, which is the obvious reading
+of "a window onto the sky". On a real phone it was unusable: the heading twitched and could
+not be held.
+
+The cause is not the puzzle but the hardware. Core Location derives its heading from the
+**device's top edge**, projected onto the horizontal plane. Sighting out of the back puts
+the horizon on screen only when the phone is upright — and upright is exactly when that top
+edge points at the zenith, leaving no horizontal projection for the heading to be computed
+from. The gate was asking her to stand in the one place the compass cannot see.
+
+Leaning the sight toward the top edge fixes it. At `SIGHT_DEG` **45°** the horizon arrives
+on screen with the phone held at an ordinary reading angle, the top edge has plenty of
+horizontal to point along, and the dead zone is nowhere near. `trust` in the debug readout
+is `|cos(beta)|`, the length of that horizontal projection: 1.00 flat, **0.71 at the 45°
+sight**, 0.00 at the upright pose the gate used to demand.
+
+Nothing about the puzzle changes. She still faces where the belt rises, the belt still lands
+in the sight, the sky is still a window she pans by turning. Only the wrist angle moves.
+
+`?sight=N` overrides the dial, so the sweet spot can be found on her actual phone without a
+deploy. Worth knowing while testing: **landscape is the steadiest pose of all**, because
+rolling the phone on its side lays the top edge flat and `trust` goes to 1.00.
+
+### Holding still on a shaky reading
+
+Two things stop a noisy heading from making the gate unwinnable.
+
+**The hold accumulates rather than restarting.** It used to zero the instant a single frame
+fell outside the tolerance, which is brutal against a twitchy compass: simulated at 60fps,
+with only **2%** of frames flicking out of tolerance the old rule finished a 5-second hold
+on just a quarter of attempts, median 52 seconds — and at 5% it never finished at all. The
+accumulator unwinds at `UNWIND` (2.5×) the rate it fills, so a blip costs a moment and
+turning away still properly loses it: 6.1s at 5% noise, 7.6s at 10%, and it only becomes
+unwinnable past about 28%.
+
+**The smoothing follows how much the heading deserves belief.** The slerp time constant
+scales with `trust`, from `EASE_MS` (70ms) with the top edge flat to `SHAKY_MS` (520ms) with
+it vertical, so readings are damped hardest exactly where they are worst. Lag is a far
+smaller annoyance than jitter when what she has been asked to do is hold still.
+
+`?debug=1` reports `wobble`, the spread of the heading over the last ~90 frames, so "it
+twitches" can be read as a number rather than argued about.
+
 ### How she is meant to work it out
 
 The stars are the only feedback, and they answer continuously: brightness ramps from 70°
@@ -172,12 +219,15 @@ arrows, no timed text hints, and no word anywhere on the page that isn't "Log in
 
 ### Orientation maths
 
-The phone is held upright, which is **exactly** the pose where a heading read straight off
-`alpha` falls apart: at `beta` 90° the orientation angles are degenerate, and `alpha` and
-`gamma` trade against each other freely while the phone barely moves. Measured on that lock
-line, raw `alpha` can swing 16° with the phone essentially still.
+The view is carried as a quaternion from first to last. The original reason still stands:
+at `beta` 90° the orientation angles are degenerate and `alpha` and `gamma` trade against
+each other freely while the phone barely moves — measured on that lock line, raw `alpha` can
+swing 16° with the phone essentially still.
 
-So the view is carried as a quaternion from first to last:
+That is **Euler** gimbal lock, and it is a different problem from the compass one above.
+Carrying a quaternion fixes the first and cannot touch the second: no amount of care with
+the maths rescues a north reference that is itself noise. Moving the sighting axis is what
+fixes that one.
 
 - `alpha`/`beta`/`gamma` build a rotation; the camera-out direction is taken from it, and
   heading and elevation are read back out of that vector at the very end. Through that same
@@ -188,6 +238,12 @@ So the view is carried as a quaternion from first to last:
   the sky. Rolled 90° into landscape the view is identical to portrait, to the pixel.
   Locking the orientation instead is not an option — it needs fullscreen on Android and
   does not exist on iOS.
+- **The screen rotation is applied before the sight is tilted, about the device's own z
+  axis** (which is `y` in the frame the Euler angles land in). While the sight pointed
+  straight out of the back the two were the same rotation and the order did not matter; a
+  leaning sight has to lean toward whichever edge is currently up, and getting this wrong
+  aims 50° off and 30° low the moment the phone is turned to landscape. At `SIGHT_DEG` 90
+  the form reduces exactly to the roll-about-the-view-axis it used to be.
 - Smoothing is a **slerp on the quaternion**, not a filter on the angles. Smoothing angles
   is what sends the sky the long way round when the heading crosses north.
 
@@ -199,12 +255,10 @@ the sky draws into a box in the corner. Its width and height are explicit for th
 - iOS exposes `webkitCompassHeading` (degrees clockwise from magnetic north); the page uses
   `360 - webkitCompassHeading` as a north-referenced `alpha`. Android has no such property
   and needs the `deviceorientationabsolute` event, whose `alpha` is already absolute.
-- **This is the one thing a field test has to settle.** Core Location defines its heading
-  from the device's top edge, which points at the zenith when the phone is upright — the
-  pose this gate asks for. The maths above is proven; whether iOS keeps reporting a sane
-  `webkitCompassHeading` in that pose is a hardware question, and `?debug=1` answers it in
-  about thirty seconds. If it drifts, the fix is to calibrate an offset against raw `alpha`
-  rather than trusting the compass heading directly.
+- **Field test, first build: the heading twitched and could not be held.** That is what the
+  sighting axis is for; see above. If 45° still is not enough on her phone, the next lever
+  is to calibrate a north offset against the raw gyro-led `alpha` and coast on it while
+  `trust` is low, rather than believing `webkitCompassHeading` moment to moment.
 - A constant compass bias would not actually lock her out — she finds east by watching the
   stars, not by being right about magnetic north. It would only make the gate less honest.
 - A reading older than 900ms doesn't count toward the hold, so a stalled sensor or a
@@ -243,6 +297,7 @@ Query parameters on the gate, none of which appear in the QR:
 | `?debug=1` | Live readout of event name, heading, beta, gamma, glow and hold time. **Use this to field-test on a real phone.** |
 | `?preview=1` | Plays the success animation without a compass. |
 | `?force=1` | Skips the mobile-only check (desktop has no compass, so it will just sit there). |
+| `?sight=N` | Overrides the sighting angle, 0–90. Use this to find the angle that holds steadiest in the hand; 90 is the original out-of-the-back behaviour. |
 
 ## Regenerating the QR code
 
