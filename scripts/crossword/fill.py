@@ -71,7 +71,7 @@ BLANK = "."
 
 class Filler:
     def __init__(self, layout, words, rng, deadline, clean=None, favored=None,
-                 favor=12, name_penalty=3):
+                 favor=4, name_penalty=3):
         """`clean` is the vocabulary we actually want to read: ordinary words rather
         than obscure names and brands. It is a preference, not a filter.
 
@@ -88,7 +88,14 @@ class Filler:
         starved.
 
         `favored` is her own territory, and those stop counting as names at all: a
-        proper noun she knows cold is not the problem RUKEYSER is."""
+        proper noun she knows cold is not the problem RUKEYSER is.
+
+        `favor` is deliberately small. At 12 it reordered the search hard enough to
+        cost most of the hit rate — 1 fill in 358 layouts against 3 to 7 — and bought
+        exactly one favoured entry in 66, because 293 favoured words against 121,000
+        is a quarter of one per cent: most slots have no favoured candidate that fits
+        their crossings at all. Her world goes into this puzzle through the clues,
+        which costs nothing. This weight only breaks ties in her direction."""
         self.layout = layout
         self.rng = rng
         self.deadline = deadline
