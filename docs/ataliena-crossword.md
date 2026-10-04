@@ -124,8 +124,9 @@ There is no password and no text input. **The login is facing where Orion's Belt
    platform shows it so the experience doesn't fork; on Android the tap just starts it.
 2. **Log in.** The title, a small ring at the centre of the screen, and a sky. No
    instructions, by design.
-3. **The hold.** Heading within **±10°** and elevation within **±10°** of the belt, for
-   **5 seconds** — accumulated, not consecutive. See *Holding still on a shaky reading*.
+3. **The hold.** The ring over some part of Orion — a star, or the figure between two of
+   them — for **5 seconds**, accumulated rather than consecutive. See *The sight is the
+   tolerance* and *Holding still on a shaky reading*.
 4. **The payoff.** Stars go to full brightness, the whole figure is drawn, and a **Next**
    button appears. Nothing auto-advances.
 
@@ -211,8 +212,9 @@ twitches" can be read as a number rather than argued about.
 
 `STARS` is the **Yale Bright Star Catalog**, 5th revised edition (BSC5), from Harvard's
 Telescope Data Center — public domain, and the canonical list of what the naked eye can see.
-Everything in it brighter than magnitude 5.0 that is above the horizon at the frozen instant
-is carried, placed through the same `LST` and the same magnetic shift as Orion. What she
+Everything in it brighter than magnitude 5.0 is carried — the whole celestial sphere, below
+the horizon as well as above it — placed through the same `LST` and the same magnetic shift
+as Orion. What she
 sweeps is therefore the sky that was genuinely over Boerum Hill when the belt cleared the
 horizon, not a scatter of dots with a constellation pasted on: Taurus and the Pleiades up
 and north of the hunter, Auriga above them, Vega and Deneb and Altair round to the west.
@@ -223,8 +225,10 @@ larger or brighter than its neighbours is a constellation that has been pointed 
 she is close, `orion()` draws nothing whatsoever; the hunter is just more sky, and the only
 thing that distinguishes him is that he is a shape worth recognising.
 
-Only the half of the catalogue above the horizon is embedded, which is why the data has to
-be rebuilt if `LATITUDE` or `BELT_ALT` ever move. See *Regenerating the star field*.
+Carrying only the risen half, as an earlier version did, left the sky dead below the horizon
+line: tilt down and there was nothing, which shrank the search and read as broken. It also
+threw away the far southern stars — the ones that never clear the horizon at this latitude —
+which are exactly the unfamiliar sky worth sweeping through. 1621 stars, about 32 KB.
 
 ### Put on your seatbelt
 
@@ -247,13 +251,16 @@ this page.
 An earlier version gave itself away twice over. Orion was gold against a white starfield,
 which marked the answer before she knew there was a question, and the brightness ramped
 from **70°** out, which turned the whole thing into a hot-and-cold gradient you could follow
-to the finish without ever noticing you were looking at a constellation.
+to the finish without ever noticing you were looking at a constellation. Pulling that ramp
+in to 30° made it slower to notice but no less of a tell: proximity warmth is a gradient you
+can walk up, and the distance it starts at only changes how long that takes.
 
-Now nothing helps until she is within `HELP_FROM`, **30°**. Inside that the stars warm to
-gold and the halos bloom — so warmth is no longer a search tool but confirmation she has
-found it. Outside it the page is a sky, a horizon, a title and the sight.
+**So nothing brightens until she has held it for `GLOW_AFTER`, one second.** Warmth is no
+longer a search signal at all — it is the page noticing she has *stopped*, which is the one
+thing it is fair to tell her. Until then the page is a sky, a horizon, a title and the
+sight, and moving around in it is answered by nothing but the sky moving.
 
-### The sight says nothing
+### The sight is the tolerance
 
 A ring at the middle of the screen, `FRAME_DEG` **4°** across — a little more than the belt
 is long — at a constant opacity and a constant colour.
@@ -266,14 +273,26 @@ nearly there", which is the single most valuable thing the page has to keep to i
 mark that is simply always there says far less. It is furniture, not a signal, and nothing
 about how close she is reaches it.
 
+**And it is now the actual target.** The unlock used to be a ±10° box on heading and
+elevation around the belt's centre — twenty degrees across, five times the ring — so it
+fired with the constellation nowhere near the sight and the ring was decoration rather than
+the thing being asked for. `toFigure()` now measures the angular distance from the middle of
+the screen to **the figure itself**: the eight stars and the arcs drawn between them, the
+nearest point on each arc found by projecting the view onto the plane of its two ends and
+falling back to whichever end is closer when that projection lands outside the span. A star
+in the ring counts, and so does the space between two stars, because the arc runs through
+it.
+
+`GRAB_DEG` is the ring's own radius, **2°**, and no more — there is no padding around it.
+That is about 159 square degrees of sky spread along the hunter, against roughly 400 for the
+old box, so it is meaningfully tighter as well as honest. `?grab=N` widens it for field
+testing, which matters because the compass is not quiet and 2° is a small thing to hold.
+
 The difficulty is therefore all in the first discovery, which is where it belongs: once she
 knows what the page is, it is turn east, tilt, hold. That matters because **the login is
 deliberately not remembered**, so she walks through it on every visit; a puzzle that was
 hard every time would be a tax, and a puzzle that explains itself in the first three seconds
 was never a puzzle.
-
-`?help=N` dials the distance for testing. `?help=70` is roughly the old, far more generous
-behaviour.
 
 **The hold indicator is the constellation lines drawing themselves in.** They pay out along
 the figure as a single thread, belt first, so holding steady visibly knits the hunter
@@ -362,21 +381,22 @@ Query parameters on the gate, none of which appear in the QR:
 | `?preview=1` | Plays the success animation without a compass. |
 | `?force=1` | Skips the mobile-only check (desktop has no compass, so it will just sit there). |
 | `?sight=N` | Overrides the sighting angle, 0–90. Use this to find the angle that holds steadiest in the hand; 90 is the original out-of-the-back behaviour. |
-| `?help=N` | How close before the page starts helping, in degrees. Lower is harder and more secretive; 70 is roughly the old behaviour, where the glow led her in from most of a turn away. |
+| `?grab=N` | How near the middle of the screen has to be to the figure, in degrees. The default is the sight's own radius, 2. Raise it if the compass is too restless to hold something that small. |
 
 ## Regenerating the star field
 
 `scripts/generate-star-field.mjs` downloads BSC5, keeps everything brighter than magnitude
-5.0 that is above the horizon at the frozen instant, drops Orion's own eight (they are
-carried by name in `CAT`, because the figure's lines need to know which star is which), and
-prints the replacement for the `const STARS = ...` block:
+5.0, drops Orion's own eight (they are carried by name in `CAT`, because the figure's lines
+need to know which star is which), and prints the replacement for the `const STARS = ...`
+block:
 
 ```bash
 node scripts/generate-star-field.mjs > /tmp/stars.js
 ```
 
-Paste the output over the existing block. The script's `LATITUDE` and `BELT_ALT` must match
-the page's, and a BSC5 row with blank coordinates parses as `0`, not `NaN` — the script
+Paste the output over the existing block. The script's `LATITUDE` and `BELT_ALT` are only
+used to report how many stars happen to be up at that moment — the data itself is the whole
+sphere and does not depend on them. A BSC5 row with blank coordinates parses as `0`, not `NaN` — the script
 rejects blank fields before converting, and skipping that check lands a knot of fictitious
 bright stars at right ascension zero.
 
