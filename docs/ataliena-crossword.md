@@ -8,7 +8,7 @@ links to it, and both pages carry `<meta name="robots" content="noindex, nofollo
 
 | File | Role |
 | --- | --- |
-| `public/ataliena/index.html` | The Orion login gate. |
+| `public/ataliena/index.html` | The Libra login gate. |
 | `public/ataliena/puzzle.html` | The crossword. |
 
 `vercel.json` rewrites bare `/ataliena` to `index.html` and `/ataliena/puzzle` to
@@ -108,7 +108,7 @@ there; test the bare URL.
 Where it sits in the hunt: the QR code leads here, the gate opens the crossword, and the
 box with the message in it comes **later**. So the gate runs before the box, not after, and
 it is deliberately *not* the box's own puzzle. The box's lid is Cassiopeia and Polaris; the
-gate is Orion and the east. Same verb — aim the phone at where a constellation really sits —
+gate is Libra, her own sign. Same verb — aim the phone at where a constellation really sits —
 different noun, so she arrives at the box already knowing that a lid full of dots is telling
 her which way to turn, without having been handed the answer.
 
@@ -121,7 +121,7 @@ permission is requested. It's plain CSS plus one `matchMedia` listener, so turni
 mode on swaps straight to the night sky with no reload, which is the reward for working it
 out. "No preference" is not light, and falls through to the sky as normal.
 
-There is no password and no text input. **The login is facing where Orion's Belt rises.**
+There is no password and no text input. **The login is facing where Libra rises.**
 
 1. **Tap to start.** Nothing but the words, on the starfield. This screen exists
    because iOS will not hand over compass data outside a user gesture —
@@ -129,7 +129,7 @@ There is no password and no text input. **The login is facing where Orion's Belt
    platform shows it so the experience doesn't fork; on Android the tap just starts it.
 2. **Log in.** The title, a small ring at the centre of the screen, and a sky. No
    instructions, by design.
-3. **The hold.** The ring over some part of Orion — a star, or the figure between two of
+3. **The hold.** The ring over some part of Libra — a star, or the figure between two of
    them — for **5 seconds**, accumulated rather than consecutive. See *The sight is the
    tolerance* and *Holding still on a shaky reading*.
 4. **The payoff.** Stars go to full brightness, the whole figure is drawn, and a **Next**
@@ -137,13 +137,13 @@ There is no password and no text input. **The login is facing where Orion's Belt
 
 ### A window, not a dial
 
-The screen is a window onto the sky rather than a meter. Orion is pinned to its real
+The screen is a window onto the sky rather than a meter. Libra is pinned to its real
 position: turn and the stars pan the other way, tilt and they slide, roll the phone and they
-counter-rotate so the horizon stays level. Face the wrong way and the hunter is simply not
+counter-rotate so the horizon stays level. Face the wrong way and the scales are simply not
 on screen.
 
 And the sky he is hiding in is the **real** one — see *The star field* — so sweeping past is
-sweeping past Taurus and the Pleiades, Auriga, Pegasus. Below the horizon line there is
+sweeping past Virgo and Spica, Scorpius coming up behind. Below the horizon line there is
 nothing at all, because below the horizon there is ground.
 
 The phone is held at a **comfortable angle**, not bolt upright. Which way the view points
@@ -151,19 +151,35 @@ out of the phone is a dial, `SIGHT_DEG`: 90° is straight out of the back, 0° i
 top edge. See *The sighting axis* — getting this wrong is what made the first version
 unusable in the hand.
 
-### Where Orion is put, and why
+### Why Libra, and where it is put
+
+The gate asked for Orion for a long time, because Orion is easy to recognise. It asks for
+**Libra** now, because that is her sign — 5 October — and the point of a birthday present is
+that it is hers.
+
+That is knowingly much harder, and the numbers are worth writing down:
+
+| | brightest star | stars in the sky brighter than that |
+| --- | --- | --- |
+| Orion | mag 0.12 (Rigel) | 6 |
+| Libra | mag 2.61 (Zubeneschamali) | **101** |
+
+Orion had seven stars brighter than magnitude 2.3. Libra has two brighter than 2.8, and it is
+the least conspicuous constellation on the zodiac — a faint quadrilateral with no bright
+anchor — sitting in a sky of 1621 others. Nothing marks it, nothing warms until she is
+already holding still on it, and there is no text. That is the intent, chosen with the
+numbers above in view.
 
 `CAT` holds the real catalogue — right ascension, declination, magnitude — and the page
-solves for the sidereal time at which Alnilam sits `BELT_ALT` above the horizon while
-rising, then places every star where it actually is at that moment. Doing the spherical
-maths rather than eyeballing a shape is what earns the picture: the hunter comes out lying
-on his side with the belt standing upright, Rigel just above the horizon and Saiph still
-under it, which is how Orion really rises at this latitude.
+solves for the sidereal time at which **Brachium**, the last of the four to rise, sits
+`CLEAR_ALT` (3°) above the horizon, then places every star where it actually is at that
+moment. The whole of the scales is then up and no higher than it has to be: the figure lands
+between 3° and 12.5° altitude on true azimuths 109–120°, east-south-east, where her sign
+rises.
 
-It also lands Alnilam on azimuth **92.5° — due east**, which is the answer she is being
-asked for. `BELT_ALT` is 2°, high enough that all three belt stars are clear of the horizon;
-raising it further would drag the belt south of east, because a rising star climbs on a
-slant.
+Keeping it low is not only the picture. The sight leans 45°, so every degree of altitude is a
+degree more wrist: the figure's centre sits at 8.3°, which puts the phone at **53° from
+flat**. Catching Libra higher in the sky would have been prettier and much worse to hold.
 
 Both compass sources read from **magnetic** north, so the whole sky is shifted by the 13°W
 declination at Boerum Hill once, at setup. There is then only one set of angles in the file.
@@ -186,8 +202,8 @@ horizontal to point along, and the dead zone is nowhere near. `trust` in the deb
 is `|cos(beta)|`, the length of that horizontal projection: 1.00 flat, **0.71 at the 45°
 sight**, 0.00 at the upright pose the gate used to demand.
 
-Nothing about the puzzle changes. She still faces where the belt rises, the belt still lands
-in the sight, the sky is still a window she pans by turning. Only the wrist angle moves.
+Nothing about the puzzle changes. She still faces where her sign rises, it still lands in the
+sight, the sky is still a window she pans by turning. Only the wrist angle moves.
 
 `?sight=N` overrides the dial, so the sweet spot can be found on her actual phone without a
 deploy. Worth knowing while testing: **landscape is the steadiest pose of all**, because
@@ -219,41 +235,42 @@ twitches" can be read as a number rather than argued about.
 Telescope Data Center — public domain, and the canonical list of what the naked eye can see.
 Everything in it brighter than magnitude 5.0 is carried — the whole celestial sphere, below
 the horizon as well as above it — placed through the same `LST` and the same magnetic shift
-as Orion. What she
-sweeps is therefore the sky that was genuinely over Boerum Hill when the belt cleared the
-horizon, not a scatter of dots with a constellation pasted on: Taurus and the Pleiades up
-and north of the hunter, Auriga above them, Vega and Deneb and Altair round to the west.
+as the sign. What she
+sweeps is therefore the sky that was genuinely over Boerum Hill when the scales cleared the
+horizon, not a scatter of dots with a constellation pasted on: Virgo and Spica round to the
+west of them, Scorpius and Antares coming up behind.
 
 **Every star is drawn by one law of magnitude** — `sizeOf`, `alphaOf`, and the same twinkle —
-Orion's eight included. That is the whole point: a constellation quietly drawn a little
+Libra's four included. That is the whole point: a constellation quietly drawn a little
 larger or brighter than its neighbours is a constellation that has been pointed at. Until
-she is close, `orion()` draws nothing whatsoever; the hunter is just more sky, and the only
-thing that distinguishes him is that he is a shape worth recognising.
+she has held it, `sign()` draws nothing whatsoever; the scales are just more sky, and the
+only thing that distinguishes them is that they are a shape worth recognising.
 
 Carrying only the risen half, as an earlier version did, left the sky dead below the horizon
 line: tilt down and there was nothing, which shrank the search and read as broken. It also
 threw away the far southern stars — the ones that never clear the horizon at this latitude —
 which are exactly the unfamiliar sky worth sweeping through. 1621 stars, about 32 KB.
 
-### Put on your seatbelt
+### No clue on the page
 
-One clue, once per visit. After the opening tap the screen holds **"Put on your seatbelt."**
-alone for `BUCKLE_MS`, then it dissolves as the sky comes up.
+There was one, for a while: after the opening tap the screen held **"Put on your seatbelt."**
+for a beat before the sky came up. It named Orion's belt without naming Orion, which made it
+a riddle rather than an instruction.
 
-It names the belt without naming Orion and without pointing anywhere, so it stays a riddle
-rather than an instruction — which is what lets the gate itself stay wordless. The sensors
-start at the beginning of the beat rather than the end, so the sky is already tracking by the
-time she sees it and never arrives frozen and then lurching.
+It is gone. It is wrong for Libra, and more to the point the page should not be clueing
+itself at all — the opening tap goes straight to the sky. The daylight screen keeps its line,
+because that one explains why there is nothing to see with the lights on, which is a
+different gate and not a hint about this one.
 
 ### How she is meant to work it out
 
-**The sky is honest, and that is the puzzle.** Orion is drawn at its real relative
+**The sky is honest, and that is the puzzle.** Libra is drawn at its real relative
 magnitudes in the same plain starlight as everything else, so far from the target it reads
 as what it actually is — the brightest stars up there — and not as the one thing the page
 has picked out for her. Finding it means recognising the sky, which is the entire fiction of
 this page.
 
-An earlier version gave itself away twice over. Orion was gold against a white starfield,
+An earlier version gave itself away twice over. The constellation was gold against a white starfield,
 which marked the answer before she knew there was a question, and the brightness ramped
 from **70°** out, which turned the whole thing into a hot-and-cold gradient you could follow
 to the finish without ever noticing you were looking at a constellation. Pulling that ramp
@@ -267,8 +284,8 @@ sight, and moving around in it is answered by nothing but the sky moving.
 
 ### The sight is the tolerance
 
-A ring at the middle of the screen, `FRAME_DEG` **4°** across — a little more than the belt
-is long — at a constant opacity and a constant colour.
+A ring at the middle of the screen, `FRAME_DEG` **4°** across, at a constant opacity and a
+constant colour.
 
 It is deliberately **not** feedback. For a while it faded up with the warmth instead of
 sitting there from the first frame, on the reasoning that an empty frame in the middle of
@@ -279,7 +296,7 @@ mark that is simply always there says far less. It is furniture, not a signal, a
 about how close she is reaches it.
 
 **And it is now the actual target.** The unlock used to be a ±10° box on heading and
-elevation around the belt's centre — twenty degrees across, five times the ring — so it
+elevation around the figure's centre — twenty degrees across, five times the ring — so it
 fired with the constellation nowhere near the sight and the ring was decoration rather than
 the thing being asked for. `toFigure()` now measures the angular distance from the middle of
 the screen to **the figure itself**: the eight stars and the arcs drawn between them, the
@@ -289,8 +306,9 @@ in the ring counts, and so does the space between two stars, because the arc run
 it.
 
 `GRAB_DEG` is the ring's own radius, **2°**, and no more — there is no padding around it.
-That is about 159 square degrees of sky spread along the hunter, against roughly 400 for the
-old box, so it is meaningfully tighter as well as honest. `?grab=N` widens it for field
+That is about **124 square degrees** of sky spread along the scales (it was 159 for Orion's
+larger figure), against roughly 400 for the old box, so it is meaningfully tighter as well as
+honest. `?grab=N` widens it for field
 testing, which matters because the compass is not quiet and 2° is a small thing to hold.
 
 The difficulty is therefore all in the first discovery, which is where it belongs: once she
@@ -300,8 +318,8 @@ hard every time would be a tax, and a puzzle that explains itself in the first t
 was never a puzzle.
 
 **The hold indicator is the constellation lines drawing themselves in.** They pay out along
-the figure as a single thread, belt first, so holding steady visibly knits the hunter
-together and letting go unpicks him. The fill is `p ** 2.5` — slow at first, rushing at the
+the figure as a single thread, the beam first, so holding steady visibly draws the scales and
+letting go unpicks them. The fill is `p ** 2.5` — slow at first, rushing at the
 end — so the last second feels like the thing closing rather than a bar ticking over. No
 arrows, no timed text hints, and no word anywhere on the page that isn't "Log in" or "Next".
 
@@ -355,7 +373,7 @@ the sky draws into a box in the corner. Its width and height are explicit for th
 
 ### There is no way past it
 
-The gate is absolute: facing the belt is the only way in. If the compass is denied or
+The gate is absolute: finding her sign is the only way in. If the compass is denied or
 missing, the page says so and stops there — no bypass, no escape hatch. The only
 recovery is granting motion & orientation access and reloading.
 
@@ -391,7 +409,7 @@ Query parameters on the gate, none of which appear in the QR:
 ## Regenerating the star field
 
 `scripts/generate-star-field.mjs` downloads BSC5, keeps everything brighter than magnitude
-5.0, drops Orion's own eight (they are carried by name in `CAT`, because the figure's lines
+5.0, drops Libra's own four (they are carried by name in `CAT`, because the figure's lines
 need to know which star is which), and prints the replacement for the `const STARS = ...`
 block:
 
@@ -399,7 +417,7 @@ block:
 node scripts/generate-star-field.mjs > /tmp/stars.js
 ```
 
-Paste the output over the existing block. The script's `LATITUDE` and `BELT_ALT` are only
+Paste the output over the existing block. The script's `LATITUDE` and `CLEAR_ALT` are only
 used to report how many stars happen to be up at that moment — the data itself is the whole
 sphere and does not depend on them. A BSC5 row with blank coordinates parses as `0`, not `NaN` — the script
 rejects blank fields before converting, and skipping that check lands a knot of fictitious
