@@ -509,3 +509,31 @@ wall. `?hint=1` turns on three things, and nothing else turns them on:
 None of it is mentioned on the page, and the real run is bit-for-bit what it was: with the
 flag off, the middle of the screen dead on the figure leaves the sight at its constant
 `rgba(226,232,245,.26)`, draws nothing, and reports `lit 0.00`.
+
+
+### The landing
+
+The payoff used to stop dead the moment the scales finished, with the figure left wherever
+she happened to be holding it — often half off the edge. Now it lands, over the ~1.2s after
+the drawing completes.
+
+**It centres.** The view eases to `Q_LAND` over 900ms. That direction is not `TARGET_V`:
+that is the *triangle's* centroid, chosen for the aiming tolerance, and the scales hang a
+long way below it, so landing on it leaves the whole drawing low with the pans down by the
+Next button. `Q_LAND` is the centroid of everything that ends up drawn — the six stars and
+every point of the scales — so it is derived from the same catalogue positions as the rest
+of the sky and moves with them. Nothing about it is a screen coordinate.
+
+The ease is a slerp, which needs that direction as a quaternion rather than three basis
+vectors; lerping those would need re-orthonormalising every frame and would still swing the
+horizon the long way round. `qFromBasis` inverts what `basisFrom` builds, and was checked by
+round-tripping 4000 random views, which exercises all four branches of the matrix-to-
+quaternion conversion: worst basis error 1.2e-15.
+
+**A splash of sparks.** Seven per star over 1200ms, each leaving its star along a great
+circle — out quickly, then coasting, fading as it goes, with its own small delay so they
+don't all go together. They live in the sky, not on the screen, because the view is still
+easing underneath them and anything held in screen coordinates would slide with it. Travel
+is 1.7–4.5 degrees of sky, so it scales with the field of view rather than with the pixels.
+
+`prefers-reduced-motion` keeps the sparks and snaps the view instead of easing it.

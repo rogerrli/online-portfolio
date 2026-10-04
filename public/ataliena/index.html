@@ -866,7 +866,19 @@ function qFromBasis(Rv, Uv, Fv) {
   const n = Math.hypot(x, y, z, w) || 1;
   return [x/n, y/n, z/n, w/n];
 }
-const Q_REST_Q = qFromBasis(Q_REST.R, Q_REST.U, Q_REST.F);
+/* Where the landing puts the middle of the screen. Not TARGET_V: that is the triangle's
+   centroid, picked for the aiming tolerance, and the scales hang a long way below it — land
+   on it and the whole drawing sits low, with the pans down by the Next button. So this is
+   the centroid of everything that ends up drawn, stars and scales together. */
+const Q_LAND = (function () {
+  const acc = [0, 0, 0];
+  const add = v => { acc[0] += v[0]; acc[1] += v[1]; acc[2] += v[2]; };
+  for (const k in SIGN) add(SIGN[k].v);
+  for (const path of SCALES) for (const v of path) add(v);
+  const f = unit(acc), up = [0,1,0];
+  const r = unit(cross3(f, up));
+  return qFromBasis(r, cross3(r, f), f);
+})();
 
 /* ============================ starfield (pre-sky screens) ============================ */
 (function field() {
@@ -1159,8 +1171,8 @@ function burst() {
       const th = Math.random() * 6.2832, c = Math.cos(th), sn = Math.sin(th);
       sparks.push({
         v, d: [t1[0]*c + t2[0]*sn, t1[1]*c + t2[1]*sn, t1[2]*c + t2[2]*sn],
-        far: (0.9 + Math.random() * 1.8) * DEG,    // how far out it gets, in radians of sky
-        r: 0.6 + Math.random() * 0.9,
+        far: (1.7 + Math.random() * 2.8) * DEG,    // how far out it gets, in radians of sky
+        r: 0.8 + Math.random() * 1.1,
         lag: Math.random() * 0.18,                 // so they don't all leave together
       });
     }
@@ -1177,7 +1189,7 @@ function spray(p, prog) {
     const ca = Math.cos(a), sa = Math.sin(a);
     const q = project([s.v[0]*ca + s.d[0]*sa, s.v[1]*ca + s.d[1]*sa, s.v[2]*ca + s.d[2]*sa]);
     if (!q) continue;
-    ctx.globalAlpha = (1 - u) * 0.85;
+    ctx.globalAlpha = (1 - u) * 0.95;
     ctx.beginPath(); ctx.arc(q[0], q[1], s.r, 0, 6.2832); ctx.fill();
   }
   ctx.globalAlpha = 1;
@@ -1279,8 +1291,8 @@ function succeed() {
       if (sparks === null) burst();
       const g = clamp((e - SCALES_MS) / SETTLE_MS, 0, 1);
       const k = calmQ.matches ? 1 : 1 - Math.pow(1 - g, 3);
-      if (qStart) basisFrom(qSlerp(qStart, Q_REST_Q, k));
-      else ({ R, U, F } = Q_REST);                 // preview, which never had a view to ease
+      if (qStart) basisFrom(qSlerp(qStart, Q_LAND, k));
+      else basisFrom(Q_LAND);                      // preview, which never had a view to ease
       sprayP = clamp((e - SCALES_MS) / BURST_MS, 0, 1);
     }
     paint(now);
