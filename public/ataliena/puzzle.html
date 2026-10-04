@@ -412,11 +412,21 @@ function nextEntry(step){
   const e=entries[navOrder[(((start+step)%n)+n)%n]];
   dir=e.dir;cur=e.cells[0];
 }
+/* Typing advances within the entry, and moves on to the next unfinished one as soon as
+   this entry has no gaps left. The test is "nothing empty here any more", not "she typed
+   the final square": filling a hole in the middle that happens to complete the word
+   should move her on too.
+
+   Leaving the cursor parked on a finished word meant reaching for the arrows after every
+   single answer, which on a phone is a reach past the keyboard each time. nextEntry(1)
+   already walks every Across then every Down, skips whatever is full, and wraps. */
 function type(ch){if(MASTER)return;
   fill[cur]=ch;bad.delete(cur);
   const e=entries[curEntry()],p=e.cells.indexOf(cur);
   const nxt=e.cells.slice(p+1).find(i=>!fill[i]);
-  if(nxt!==undefined)cur=nxt;else if(p<e.cells.length-1)cur=e.cells[p+1];
+  if(nxt!==undefined)cur=nxt;
+  else if(e.cells.every(i=>fill[i]))nextEntry(1);
+  else cur=e.cells.find(i=>!fill[i]);
   save();render();
 }
 function back(){if(MASTER)return;
