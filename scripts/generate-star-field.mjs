@@ -21,7 +21,7 @@ const LATITUDE  = 40.7;   // Boerum Hill, Brooklyn
 /* The sky is frozen on the sign crossing the meridian, which is just the mean right
    ascension of its stars — no solving needed, and nothing here depends on it anyway: the
    data is the whole sphere, and the instant only decides what the stderr line reports. */
-const MERIDIAN  = 15.3377;
+const MERIDIAN  = 15.3394;
 const MAG_LIMIT = 5.0;    // naked-eye, generously: fainter than this is scenery nobody reads
 /* The whole sphere, not just the half that is up. Carrying only the risen half left the sky
    dead below the horizon line, which shrank the search and read as broken when she tilted
@@ -33,7 +33,8 @@ const MAG_LIMIT = 5.0;    // naked-eye, generously: fainter than this is scenery
    these are the same coordinates CAT holds, so anything that lands on one of them is one of
    the scales and would otherwise be drawn twice. */
 const SIGN = [
-  [14.8480, -16.04], [15.2834,  -9.38], [15.5921, -14.79], [15.0678, -25.28], [15.8971, -16.73],
+  [14.8480, -16.04], [15.2834,  -9.38], [15.5921, -14.79],
+  [15.0678, -25.28], [15.6171, -28.13], [15.6443, -29.78],
 ];
 const isSign = (ra, dec) =>
   SIGN.some(([r, d]) => Math.abs(ra - r) < 0.004 && Math.abs(dec - d) < 0.06);

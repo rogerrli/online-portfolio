@@ -170,11 +170,17 @@ anchor — sitting in a sky of 1621 others. Nothing marks it, nothing warms unti
 already holding still on it, and there is no text. That is the intent, chosen with the
 numbers above in view.
 
-**The figure.** Checked against Stellarium's western `constellationship.fab`:
-`Lib 5  77853 76333  76333 74785  74785 72622  72622 73714  73714 76333` — θ–γ, γ–β, β–α²,
-α²–σ, σ–γ. A **quadrilateral** (β, γ, σ, α²) with a tail out to **θ Lib**. An earlier version
-drew a triangle with a tail: it closed γ to α², an edge that does not exist, left out σ–γ,
-and left out θ entirely, which is why it did not look like Libra.
+**The figure**, as NOIRLab and the usual star charts draw it: a **triangle** of the three
+brightest — Zubeneschamali at the apex, Zubenelakrab and Zubenelgenubi below — with two cords
+hanging off the lower corners, one to Brachium and one down through υ to **τ Lib**. Which is
+a balance: a frame held at the top, two arms, a weight on the end of each.
+
+Worth recording, because it cost two goes. The first version closed a triangle the wrong way
+and had no cords at all. The second was checked against **Stellarium**, which draws Libra as
+a quadrilateral closing σ back to γ with a tail out to θ and no υ or τ — a perfectly real
+convention, and not the one on the charts she will have seen. Constellation lines are
+convention rather than fact, so "checked against a source" is worth nothing unless it is the
+*right* source.
 
 **The moment.** The sky is frozen on the sign crossing the meridian — due south, at its
 highest. A star is on the meridian when the sidereal time equals its right ascension, so
