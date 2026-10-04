@@ -456,6 +456,7 @@ Query parameters on the gate, none of which appear in the QR:
 | `?force=1` | Skips the mobile-only check (desktop has no compass, so it will just sit there). |
 | `?sight=N` | Overrides the sighting angle, 0–90. Use this to find the angle that holds steadiest in the hand; 90 is the original out-of-the-back behaviour. |
 | `?grab=N` | How near the middle of the screen has to be to the figure, in degrees. The default is the sight's own radius, 2. Raise it if the compass is too restless to hold something that small. |
+| `?hint=1` | **Practice mode.** Turns the gate into something that can actually be tested — see below. |
 
 ## Regenerating the star field
 
@@ -485,3 +486,26 @@ npx -y qrcode@1 -t svg -o docs/ataliena-qr.svg -e M -m 4 "https://liroger.com/at
 
 `-e M` is ~15% error correction, enough to survive ordinary print and scuffing. Verify
 any regenerated code actually decodes before printing it.
+
+
+### Practice mode
+
+The gate is built to give nothing away, which makes it very hard to test from the outside.
+Libra's brightest star is magnitude 2.61 and a hundred and one stars beat it; nothing on the
+page moves until the sight has been held on the figure for a full second; and the sight never
+reacts. So from behind the phone there is no way to tell a near miss from facing the wrong
+wall. `?hint=1` turns on three things, and nothing else turns them on:
+
+- **The figure, dashed, at all times.** Dashed rather than solid so it reads as scaffolding
+  and not as the thing the hold draws — which is still underneath it, filling in as normal,
+  so the hold can be watched working.
+- **A pointer, when the figure is off screen.** Drawn from the target in camera space, so
+  its x and y give the way to swing even when z is negative and the sign is flat behind her;
+  there is no separate case for that.
+- **A sight that answers.** It goes gold the instant the middle of the screen lands on the
+  figure, and the warmth starts from the same instant rather than after the one-second wait
+  (`GLOW_AFTER` is zero under the flag).
+
+None of it is mentioned on the page, and the real run is bit-for-bit what it was: with the
+flag off, the middle of the screen dead on the figure leaves the sight at its constant
+`rgba(226,232,245,.26)`, draws nothing, and reports `lit 0.00`.

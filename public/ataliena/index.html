@@ -64,6 +64,15 @@ body.sky #sky{display:block}
 body.sky #frame{display:block}
 body[data-state="done"] #frame,
 body[data-state="lights"] #frame{display:none}
+/* Practice mode only (?hint=1). The real gate's sight never reacts — a mark that lights up
+   as she closes in says "you're nearly there", which is the one thing the page keeps to
+   itself. Testing needs the opposite, so here it answers the moment the sight is on the
+   figure, with no hold and no wait. */
+body.hint #frame{transition:border-color .12s linear,box-shadow .12s linear}
+body.hint.on #frame{
+  border-color:rgba(242,193,78,.95);
+  box-shadow:0 0 14px rgba(242,193,78,.45);
+}
 
 /* ---------- layout ---------- */
 .wrap{
@@ -237,6 +246,8 @@ const HOLD_POW = 2.5;   // the hold fills slowly at first, then rushes at the en
    a search signal at all; it is the page noticing she has stopped, which is the one thing it
    is fair to tell her. */
 const GLOW_AFTER = 1000;
+/* ...except in practice mode, where the point is to be told immediately. */
+const glowAfter = () => HINT ? 0 : GLOW_AFTER;
 const EASE_MS  = 70;    // how hard the sky is smoothed when the heading is trustworthy
 const SHAKY_MS = 190;   // ...and when it is not. It was 520, to hide compass jitter the view
                         // no longer carries; that much lag is a cost with nothing to show
@@ -263,6 +274,17 @@ const PUZZLE   = "/ataliena/puzzle.html";
 
 const qs = new URLSearchParams(location.search);
 if (qs.has("debug")) document.body.classList.add("dbg");
+if (qs.has("hint")) document.body.classList.add("hint");
+
+/* ?hint=1 — practice mode, for testing the gate rather than playing it.
+   The gate is built to give nothing away, which makes it very hard to check from the
+   outside that the aim is even close: Libra's brightest star is magnitude 2.61, a hundred
+   and one stars beat it, and nothing on the page moves until the sight has been held on the
+   figure for a full second. This turns three things on, and only this flag turns them on:
+   the figure drawn in faintly at all times so it can be picked out of the field, a pointer
+   to it when it is off screen, and a sight that answers the instant it lands rather than
+   after the wait. Nothing on the page mentions it. */
+const HINT = qs.has("hint");
 
 /* Only an explicit light preference holds her at the door; "no preference" goes
    straight through. Decorative motion is the only thing reduced-motion turns off —
@@ -1061,12 +1083,53 @@ function sign(p, lit) {
   }
 }
 
+/* ---------- practice mode (?hint=1) ---------- */
+/* The figure, dashed, at all times. Dashed rather than solid so it reads as scaffolding and
+   not as the thing the hold draws — which is still underneath it, filling in as normal, so
+   the hold can be watched working. */
+function ghost(p) {
+  ctx.strokeStyle = `rgba(${p.star[0]},${p.star[1]},${p.star[2]},.32)`;
+  ctx.lineWidth = 1; ctx.lineCap = "round"; ctx.setLineDash([4, 5]);
+  for (const [a, b] of FIGURE) {
+    const pa = project(SIGN[a].v), pb = project(SIGN[b].v);
+    if (!pa || !pb) continue;
+    ctx.beginPath(); ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pb[0], pb[1]); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+/* Which way to turn, when the figure is not on screen. The target in camera space: its x
+   and y give the direction to swing even when z is negative and it is flat behind her, so
+   there is no separate case for that — a target behind and to the right still wants a
+   rightward turn. */
+function pointer(p) {
+  if (!TARGET_V) return;
+  const z = dot3(TARGET_V, F), x = dot3(TARGET_V, R), y = dot3(TARGET_V, U);
+  if (z > 0.04) {
+    const qx = cx + focal * x / z, qy = cy - focal * y / z;
+    if (qx > 44 && qx < W - 44 && qy > 44 && qy < H - 44) return;   // already in view
+  }
+  const n = Math.hypot(x, y) || 1;
+  const a = Math.atan2(-y / n, x / n);
+  const r = Math.min(W, H) * 0.34;
+  ctx.save();
+  ctx.translate(cx + r * Math.cos(a), cy + r * Math.sin(a));
+  ctx.rotate(a);
+  ctx.strokeStyle = `rgba(${p.star[0]},${p.star[1]},${p.star[2]},.8)`;
+  ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(-6, -8); ctx.lineTo(6, 0); ctx.lineTo(-6, 8); ctx.stroke();
+  ctx.restore();
+}
+
 function paint(t) {
   const day = lightQ.matches && body.dataset.state !== "done";
   const p = day ? DAY : NIGHT;
   ctx.clearRect(0, 0, W, H);
   if (day) { ({ R, U, F } = Q_REST); sign(p, 0.3); figure(p, 0.3, 1); return; }
-  horizon(p); backdrop(p, t); figure(p, lit, drawn); scales(p, shown); sign(p, lit);
+  horizon(p); backdrop(p, t);
+  if (HINT && body.dataset.state === "seek") ghost(p);
+  figure(p, lit, drawn); scales(p, shown); sign(p, lit);
+  if (HINT && body.dataset.state === "seek") pointer(p);
 }
 
 /* ============================ the hold ============================ */
@@ -1105,6 +1168,7 @@ function loop(now) {
     // A stalled sensor must not let a stale "on the sign" quietly finish the hold.
     const fresh = (now - lastAt) < 900;
     const ok = off <= GRAB_DEG && fresh;
+    if (HINT) body.classList.toggle("on", ok);
     /* The hold accumulates rather than restarting. Zeroing it on a single frame outside
        the tolerance threw away four seconds of patience for one flick of a noisy compass;
        unwinding faster than it fills still loses it properly when she turns away. */
@@ -1114,7 +1178,7 @@ function loop(now) {
   /* Nothing at all for the first second, so that holding still is what is answered rather
      than getting warmer. After that the warmth and the figure come in together over what is
      left of the hold. */
-  const p    = clamp((held - GLOW_AFTER) / (HOLD_MS - GLOW_AFTER), 0, 1);
+  const p    = clamp((held - glowAfter()) / (HOLD_MS - glowAfter()), 0, 1);
   lit += (p - lit) * (1 - Math.exp(-dt / 140));
   const want = Math.pow(p, HOLD_POW);
   drawn = want >= drawn ? want : drawn + (want - drawn) * (1 - Math.exp(-dt / 220));
