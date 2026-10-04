@@ -41,9 +41,6 @@ python3 verify.py --html ../../public/ataliena/puzzle-beta.html
   four-letter, and checks slots exist for the eight fixed answers.
 - **`fill.py`** — backtracking over slots, most constrained first, forward checking on
   crossings, random restarts, with the eight answers pinned.
-- **`candidates/live-grid.json`** — the grid that shipped. The nine losing candidates
-  were deleted once it was chosen; each cost about 400 layout searches, but the grid
-  that matters lives in `puzzle.html` and the rest were only ever scaffolding.
 - **`verify.py`** — the gate. Proves every across and down is a real word, and reports
   word count, length histogram, symmetry, scores, unchecked squares and whether
   `MARKED`/`SPECIAL` match where the fixed answers actually landed. Exit 1 on failure.
@@ -116,6 +113,17 @@ Three tiers, not two:
 Workflow: take the lowest-name fill, review its names one at a time, sort them into
 those three, re-run. Each round's calls are permanent, so the floor drops every time.
 Chasing a name-free grid did not converge; this does.
+
+## Where the grid actually lives
+
+`public/ataliena/puzzle.html`, in `LAYOUT` and `SOL_ENC`, and nowhere else. The ten
+candidate files this search produced are gone, including the winner: it held the same
+layout and solution as the page, which makes it a copy that can drift from the thing it
+copies. `verify.py --html` and `clues.py` both read the page, so the page is the source
+of truth and the only place a grid is stored.
+
+A future grid comes out of `build.py` as JSON and goes straight into a page via
+`emit.py`. There is no reason for it to be kept on disk afterwards.
 
 ## Emitting
 
