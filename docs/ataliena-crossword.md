@@ -537,3 +537,48 @@ easing underneath them and anything held in screen coordinates would slide with 
 is 1.7–4.5 degrees of sky, so it scales with the field of view rather than with the pixels.
 
 `prefers-reduced-motion` keeps the sparks and snaps the view instead of easing it.
+
+
+### The sky tracks the calendar
+
+`LST` used to be the mean right ascension of the sign's stars — by definition the moment
+Libra crosses the meridian, so the sky was frozen there: always due south, always 36 degrees
+up, every night of the year. Always solvable, never true. It now comes from the device's
+clock through `lstAt()`, the IAU mean-sidereal-time polynomial plus the longitude.
+
+**The sky keeps turning while she stands there.** Rather than replacing 1621 stars every
+frame, everything is placed once at load and then rotated as one rigid body about the
+celestial pole — which is exactly what the sky does. One quaternion a frame instead of a
+catalogue. Checked against a full `altaz` recomputation over 10 stars and 7 time offsets from
+one minute to twenty-four hours: worst position error **1.5e-15**, machine epsilon.
+
+**There are two frames now.** `R/U/F` is the view in the *sky's* frame — every star, the
+figure, the scales and the unlock test live there, where the figure never moves. `Re/Ue/Fe`
+is the same view in the *earth's* frame: the horizon is drawn through it, and the heading and
+elevation are read from it, because that is what a compass measures.
+
+**She will be aiming at the floor.** Libra is a spring constellation; on 5 October it sets as
+the sky gets dark, so from about 20:15 it is below the horizon for the rest of the night, and
+by midnight it is 44 degrees down. The gate does not mind — the unlock tests the camera's
+forward vector and never looks at the sign of the altitude, and aiming downward is the
+*better* compass pose, since trust is `|cos(beta)|` and the phone comes back toward flat
+(0.69 at 44 degrees down, against 0.59 for the old meridian aim). Stars below the horizon
+are drawn at `GROUND` = 0.4 so the ground reads as ground. Not zero: the sky has to stay
+continuous to be worth sweeping, and the sign itself is down there.
+
+### The azimuth bug this uncovered
+
+`altaz` computed its azimuth as `atan2(-cos(dec)sin(H), sin(dec) - sin(phi)sin(alt))`. That
+denominator is the correct one multiplied by `cos(phi)`, and scaling only the denominator of
+an `atan2` squashes the angle. At this latitude it cost **up to 8 degrees of azimuth** — four
+times the grab tolerance.
+
+It had been there since the Orion version and never showed, because the error is *exactly
+zero at H = 0*, and the sky was frozen on the meridian, where the sign's hour angle is zero
+by construction. Only a live sky puts the figure at other hour angles.
+
+Checked three ways: against the textbook identity
+`cos(alt)cos(az) = cos(phi)sin(dec) - sin(phi)cos(dec)cos(H)`; against an independent
+construction of the star's vector in the hour-angle frame, which agrees to the last digit at
+every hour angle; and indirectly by the rigid-rotation test above, which only reaches machine
+epsilon if the placement really is a rotation of itself — a wrong `altaz` cannot pass it.
