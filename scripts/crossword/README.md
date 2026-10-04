@@ -62,6 +62,10 @@ cache instead: ~12,000.
 Also: `fill.py`'s `BRANCH` cap makes the search incomplete, so a failure means "not
 found within these limits", never "no fill exists".
 
+`polish.py` is gone. It cleared a weak entry's neighbourhood and re-searched it from the
+clean vocabulary, and replaced nothing at either radius — the finding survives in the
+table above, which is all it was ever worth.
+
 ## What the search actually found, in order
 
 Every plausible-sounding constraint added here made things worse. Recorded so the
@@ -71,7 +75,7 @@ same ground is not re-walked:
 | --- | --- |
 | Score floor 55 (93k words) | 0 fills in 22 layouts |
 | Curated list, names dropped (97k) | 0 fills in 18 layouts |
-| Local repair of weak entries (`polish.py`) | 0 of 9 replaced, at radius 1 and radius 2 |
+| Local repair of weak entries | 0 of 9 replaced, at radius 1 and radius 2 |
 | Clean-first candidate ordering | 0 fills in 33 layouts |
 | Host friction capped at 22 | excluded candidate 1, the only grid that filled |
 | Full list, floor 50, 6 threes, ranked after | **fills** |
@@ -109,6 +113,17 @@ Three tiers, not two:
 Workflow: take the lowest-name fill, review its names one at a time, sort them into
 those three, re-run. Each round's calls are permanent, so the floor drops every time.
 Chasing a name-free grid did not converge; this does.
+
+## Where the grid actually lives
+
+`public/ataliena/puzzle.html`, in `LAYOUT` and `SOL_ENC`, and nowhere else. The ten
+candidate files this search produced are gone, including the winner: it held the same
+layout and solution as the page, which makes it a copy that can drift from the thing it
+copies. `verify.py --html` and `clues.py` both read the page, so the page is the source
+of truth and the only place a grid is stored.
+
+A future grid comes out of `build.py` as JSON and goes straight into a page via
+`emit.py`. There is no reason for it to be kept on disk afterwards.
 
 ## Emitting
 
