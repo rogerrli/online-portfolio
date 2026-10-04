@@ -22,10 +22,15 @@ file, edited in place.
 ## Alpha and beta
 
 `public/ataliena/puzzle-alpha.html` is a frozen copy of the puzzle as it stood once the
-clue-difficulty pass finished, served at `/ataliena/puzzle-alpha`. It exists so a harder
-rework can be attempted without risking the version that is known to work: if the rework
-never lands, the gate keeps pointing at `puzzle.html` and nothing is lost. Git tag
-`puzzle-alpha` marks the same state.
+clue-difficulty pass finished, served at `/ataliena/puzzle-alpha`. Git tag `puzzle-alpha`
+marks the same state.
+
+**The beta rework landed, so `puzzle.html` is now the beta**: a rebuilt grid of 66 words
+with 6 three-letter entries, against alpha's 77 and 24. The gate is unchanged and still
+navigates to `/ataliena/puzzle.html`, which is what the printed QR depends on. Alpha stays
+reachable at `/ataliena/puzzle-alpha` as the fallback it was always meant to be.
+
+Beta carries `KEY` `-v3` and alpha keeps `-v2`, so the two cannot overwrite each other.
 
 Alpha is not maintained. Fixes to the engine go into `puzzle.html`; alpha is a fallback,
 not a second product.

@@ -1,0 +1,50 @@
+# Words that must never appear in the puzzle. One per line, uppercase.
+# Roger's calls, kept here so the same question is not asked twice and so a
+# rebuild cannot quietly reintroduce them. make_wordlist.py drops these outright;
+# unlike the category filters, banning a named handful costs no fillability.
+GATWA
+LARISSA
+UDALL
+TESSIE
+# Round 2 — names she would have no way into
+KRALL
+INABA
+ELVA
+TEM
+RTE
+# TEAACT and AIRES are deliberately NOT banned and NOT approved: Roger will take them
+# if need be. Left out of both lists, they stay available to the filler while still
+# counting against a fill's quality score, so a grid only uses them when it must.
+# Round 2 — not names, but arbitrary phrases and weak fill, banned on the same
+# principle. My call rather than Roger's; one line each to revert.
+SETAT
+ATROOT
+DEMIE
+EBOND
+# Round 3 — no route in for her
+DALIS
+TOTIE
+# ISIS, SEMITE and RETCH were banned here on tone and Roger reversed it: a tonal
+# objection is not strong enough evidence to forbid a word the grid genuinely needs.
+# They now sit in neither list, like TEAACT and AIRES — available to the filler,
+# still counted against a fill's quality, so they only appear where nothing else
+# fits, and the final grid gets a look before it ships.
+# Round 4 — arbitrary phrases and non-words
+ARS
+ONER
+ADAI
+ONEON
+ONELAP
+# Round 4 — name with no route in (Skai Jackson)
+SKAI
+# Round 5 — obscure names and vocabulary
+LEDERER
+SOAVE
+TYNE
+NIETO
+RIC
+# Round 7 — Roger's call on the locked grid's weakest
+ALTHING
+ADUT
+SELES
+OLINE
