@@ -41,6 +41,9 @@ python3 verify.py --html ../../public/ataliena/puzzle-beta.html
   four-letter, and checks slots exist for the eight fixed answers.
 - **`fill.py`** — backtracking over slots, most constrained first, forward checking on
   crossings, random restarts, with the eight answers pinned.
+- **`candidates/live-grid.json`** — the grid that shipped. The nine losing candidates
+  were deleted once it was chosen; each cost about 400 layout searches, but the grid
+  that matters lives in `puzzle.html` and the rest were only ever scaffolding.
 - **`verify.py`** — the gate. Proves every across and down is a real word, and reports
   word count, length histogram, symmetry, scores, unchecked squares and whether
   `MARKED`/`SPECIAL` match where the fixed answers actually landed. Exit 1 on failure.
@@ -62,6 +65,10 @@ cache instead: ~12,000.
 Also: `fill.py`'s `BRANCH` cap makes the search incomplete, so a failure means "not
 found within these limits", never "no fill exists".
 
+`polish.py` is gone. It cleared a weak entry's neighbourhood and re-searched it from the
+clean vocabulary, and replaced nothing at either radius — the finding survives in the
+table above, which is all it was ever worth.
+
 ## What the search actually found, in order
 
 Every plausible-sounding constraint added here made things worse. Recorded so the
@@ -71,7 +78,7 @@ same ground is not re-walked:
 | --- | --- |
 | Score floor 55 (93k words) | 0 fills in 22 layouts |
 | Curated list, names dropped (97k) | 0 fills in 18 layouts |
-| Local repair of weak entries (`polish.py`) | 0 of 9 replaced, at radius 1 and radius 2 |
+| Local repair of weak entries | 0 of 9 replaced, at radius 1 and radius 2 |
 | Clean-first candidate ordering | 0 fills in 33 layouts |
 | Host friction capped at 22 | excluded candidate 1, the only grid that filled |
 | Full list, floor 50, 6 threes, ranked after | **fills** |
