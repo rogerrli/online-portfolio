@@ -18,3 +18,9 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
+      # Natalie solves while UI work continues. Her progress lives in localStorage, so
+      # deploys are harmless — but LAYOUT, SOL_ENC and KEY must not move, and a LAYOUT
+      # change restores her letters into the wrong squares without any visible error.
+      # Needs no word list, so it costs nothing here. See issue #145.
+      - name: Crossword grid is frozen
+        run: python3 scripts/crossword/verify.py --html public/ataliena/puzzle.html --frozen-only

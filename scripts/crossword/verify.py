@@ -14,6 +14,9 @@ Exit status is 1 if any hard check fails, so it can gate a commit.
 import argparse
 import base64
 import collections
+import hashlib
+import json
+import os
 import re
 import sys
 
@@ -47,6 +50,56 @@ def rot13(s):
         else:
             out.append(ch)
     return "".join(out)
+
+
+FROZEN = "shipped-grid.json"
+
+
+def fingerprint(layout, sol_enc, key):
+    return hashlib.sha256("\n".join([layout, sol_enc, key]).encode()).hexdigest()
+
+
+def check_frozen(path):
+    """Fail if the shipped grid has changed.
+
+    She solves while UI work continues, and her progress lives in localStorage rather
+    than in the deployed file — so CSS, the clue bar, the keyboard handling and the
+    clue text can all change under her safely. Three things cannot:
+
+      LAYOUT   restoring progress checks only the saved array's LENGTH, so a different
+               block pattern on the same board restores her letters into cells that
+               now mean something else. Silent, and unexplainable on screen.
+      SOL_ENC  squares she filled correctly would become wrong, and the win check
+               would never fire.
+      KEY      her progress would be orphaned: still on her device, unreachable.
+
+    Returns a list of problems, empty when all is well.
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    ref_path = os.path.join(here, FROZEN)
+    if not os.path.exists(ref_path):
+        return [f"{FROZEN} is missing — the shipped grid is unprotected"]
+    ref = json.load(open(ref_path))
+    src = open(path, encoding="utf-8").read()
+    got = {}
+    for name in ("LAYOUT", "SOL_ENC", "KEY"):
+        m = re.search(r'const ' + name + r'="([^"]*)"', src)
+        if not m:
+            return [f"{name} not found in {path}"]
+        got[name] = m.group(1)
+    if fingerprint(got["LAYOUT"], got["SOL_ENC"], got["KEY"]) == ref["sha256"]:
+        return []
+    bad = []
+    if got["LAYOUT"] != ref["layout"]:
+        bad.append("LAYOUT changed — her saved letters would be restored into the "
+                   "wrong squares, silently. See issue #145.")
+    if got["KEY"] != ref["key"]:
+        bad.append(f"KEY changed from {ref['key']!r} to {got['KEY']!r} — her progress "
+                   "would be orphaned.")
+    if not bad:
+        bad.append("SOL_ENC changed — squares she filled correctly would become wrong.")
+    bad.append(f"If the grid is being replaced deliberately, regenerate {FROZEN}.")
+    return bad
 
 
 def from_html(path):
@@ -86,7 +139,19 @@ def main():
     ap.add_argument("--solution")
     ap.add_argument("--wordlist", default="stwl.dict")
     ap.add_argument("--min-score", type=int, default=40)
+    ap.add_argument("--frozen-only", action="store_true",
+                    help="check only that the shipped grid is unchanged; needs no word list")
     args = ap.parse_args()
+
+    if args.frozen_only:
+        if not args.html:
+            print("FAIL --frozen-only needs --html")
+            return 1
+        problems = check_frozen(args.html)
+        for p_ in problems:
+            print(f"FAIL  {p_}")
+        print("shipped grid unchanged" if not problems else f"{len(problems)} problem(s)")
+        return 1 if problems else 0
 
     if args.html:
         data = from_html(args.html)
@@ -164,6 +229,9 @@ def main():
     unchecked = [i for i in range(N * N) if not is_block(layout, i) and not (i in in_dir["A"] and i in in_dir["D"])]
     if unchecked:
         fail.append(f"{len(unchecked)} unchecked squares (in one direction only)")
+
+    if args.html:
+        fail.extend(check_frozen(args.html))
 
     matched, total, _ = symmetry(layout)
     pct = 100.0 * matched / total

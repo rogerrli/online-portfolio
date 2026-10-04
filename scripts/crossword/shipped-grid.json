@@ -1,0 +1,7 @@
+{
+  "_comment": "The shipped grid. verify.py fails if the live page stops matching this. See issue #145: LAYOUT, SOL_ENC and KEY cannot change once she has started solving, and a LAYOUT change in particular fails silently.",
+  "sha256": "93c9105fe09f86b23f7f97e2f2d981e8f0baf036a18cb1ff6965bbbbeb384240",
+  "layout": "#.....####....#......##.............#............#.....#..............#.......#....###....###.....##....####....#....####....##.....###....###....#.......#..............#.....#............#.............##......#....####.....#",
+  "key": "gift-crossword-first-impressions-v3",
+  "frozen": "2026-10-04"
+}
