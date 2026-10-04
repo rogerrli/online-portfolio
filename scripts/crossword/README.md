@@ -114,6 +114,25 @@ Workflow: take the lowest-name fill, review its names one at a time, sort them i
 those three, re-run. Each round's calls are permanent, so the floor drops every time.
 Chasing a name-free grid did not converge; this does.
 
+## The shipped grid is frozen
+
+`shipped-grid.json` records a SHA-256 of the live `LAYOUT`, `SOL_ENC` and `KEY`, and
+`verify.py --frozen-only` fails if the page stops matching. CI runs it on every pull
+request; it needs no word list.
+
+This exists because one of those three fails silently. Restoring saved progress checks
+only the array's length, so a different block pattern on the same 15x15 board puts her
+letters back into cells that now mean something else — a scrambled grid, with nothing
+on screen to explain it. The other two are merely bad: a changed `SOL_ENC` makes correct
+squares wrong, a changed `KEY` orphans her progress on her own device.
+
+Everything else is fair game while she solves: CSS, the clue bar, keyboard handling,
+`MARKED`, `SPECIAL` and all clue text. Her progress is in `localStorage`, not in the
+deployed file.
+
+Replacing the grid deliberately means regenerating `shipped-grid.json` — which should
+be a deliberate act, and is now impossible to do by accident.
+
 ## Where the grid actually lives
 
 `public/ataliena/puzzle.html`, in `LAYOUT` and `SOL_ENC`, and nowhere else. The ten
