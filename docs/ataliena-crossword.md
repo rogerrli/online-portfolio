@@ -121,7 +121,7 @@ permission is requested. It's plain CSS plus one `matchMedia` listener, so turni
 mode on swaps straight to the night sky with no reload, which is the reward for working it
 out. "No preference" is not light, and falls through to the sky as normal.
 
-There is no password and no text input. **The login is facing where Libra rises.**
+There is no password and no text input. **The login is facing her sign, due south.**
 
 1. **Tap to start.** Nothing but the words, on the starfield. This screen exists
    because iOS will not hand over compass data outside a user gesture —
@@ -170,44 +170,73 @@ anchor — sitting in a sky of 1621 others. Nothing marks it, nothing warms unti
 already holding still on it, and there is no text. That is the intent, chosen with the
 numbers above in view.
 
-`CAT` holds the real catalogue — right ascension, declination, magnitude — and the page
-solves for the sidereal time at which **Brachium**, the last of the four to rise, sits
-`CLEAR_ALT` (3°) above the horizon, then places every star where it actually is at that
-moment. The whole of the scales is then up and no higher than it has to be: the figure lands
-between 3° and 12.5° altitude on true azimuths 109–120°, east-south-east, where her sign
-rises.
+**The figure.** Checked against Stellarium's western `constellationship.fab`:
+`Lib 5  77853 76333  76333 74785  74785 72622  72622 73714  73714 76333` — θ–γ, γ–β, β–α²,
+α²–σ, σ–γ. A **quadrilateral** (β, γ, σ, α²) with a tail out to **θ Lib**. An earlier version
+drew a triangle with a tail: it closed γ to α², an edge that does not exist, left out σ–γ,
+and left out θ entirely, which is why it did not look like Libra.
 
-Keeping it low is not only the picture. The sight leans 45°, so every degree of altitude is a
-degree more wrist: the figure's centre sits at 8.3°, which puts the phone at **53° from
-flat**. Catching Libra higher in the sky would have been prettier and much worse to hold.
+**The moment.** The sky is frozen on the sign crossing the meridian — due south, at its
+highest. A star is on the meridian when the sidereal time equals its right ascension, so
+`LST` is simply the mean right ascension of the figure's stars. Everything lands around 33°
+altitude on true azimuth 180.0°.
+
+Three things come out of that, all about her rather than about elegance. Due south is a
+direction she can reason about. On the meridian the figure stands in the orientation a star
+chart draws it, north up, rather than tipped on its side the way it is while rising. And it
+is the only place a natural aim keeps the compass out of trouble — see *The sight does not
+lean any more*.
 
 Both compass sources read from **magnetic** north, so the whole sky is shifted by the 13°W
 declination at Boerum Hill once, at setup. There is then only one set of angles in the file.
 
-### The sighting axis
+### The sight does not lean any more
 
-The first build sighted straight out of the back of the phone, which is the obvious reading
-of "a window onto the sky". On a real phone it was unusable: the heading twitched and could
-not be held.
+`SIGHT_DEG` is **90**: straight out of the back of the phone, which is how anybody points a
+phone at a thing.
 
-The cause is not the puzzle but the hardware. Core Location derives its heading from the
-**device's top edge**, projected onto the horizontal plane. Sighting out of the back puts
-the horizon on screen only when the phone is upright — and upright is exactly when that top
-edge points at the zenith, leaving no horizontal projection for the heading to be computed
-from. The gate was asking her to stand in the one place the compass cannot see.
+It leaned 45° for a while. Sighting out of the back only puts a target that sits *on the
+horizon* on screen when the phone is bolt upright, and upright is where Core Location's
+heading dies — it reads from the device's top edge projected onto the horizontal, and upright
+that edge points at the zenith with nothing left to project. The lean bought a sane wrist
+angle at the price of **aiming 45° below whatever she was looking at**, which fights somebody
+who already knows where the constellations are.
 
-Leaning the sight toward the top edge fixes it. At `SIGHT_DEG` **45°** the horizon arrives
-on screen with the phone held at an ordinary reading angle, the top edge has plenty of
-horizontal to point along, and the dead zone is nowhere near. `trust` in the debug readout
-is `|cos(beta)|`, the length of that horizontal projection: 1.00 flat, **0.71 at the 45°
-sight**, 0.00 at the upright pose the gate used to demand.
+It stops being a trade once the target is not on the horizon. With the sign caught at the
+meridian, 33° up, a natural aim tips the phone back *past* vertical and swings the top edge
+away from the zenith again. `trust` — `|cos(beta)|`, the length of that horizontal
+projection — goes from **0.14** aiming straight at something on the horizon to **0.54** here.
+And the flip that made upright unusable is fixed at the source now; see below.
 
-Nothing about the puzzle changes. She still faces where her sign rises, it still lands in the
-sight, the sky is still a window she pans by turning. Only the wrist angle moves.
+`?sight=N` still overrides it.
 
-`?sight=N` overrides the dial, so the sweet spot can be found on her actual phone without a
-deploy. Worth knowing while testing: **landscape is the steadiest pose of all**, because
-rolling the phone on its side lays the top edge flat and `trust` goes to 1.00.
+### The sky used to flip through vertical
+
+The one that made it feel broken. `webkitCompassHeading` is the bearing of the device's **top
+edge projected onto the horizontal plane**. Hold the phone upright and that projection
+collapses; tip it past vertical and it **reverses**, so the reading jumps 180° and anything
+driven straight off it spins. Going from looking down to looking up span the sky right round.
+
+iOS also reports `alpha`, which is gyro-led: continuous, smooth, with no such discontinuity —
+just measured from an arbitrary start rather than from north. So the view is driven from
+`alpha`, and the compass is demoted to supplying one number, `northOff`, the offset between
+them.
+
+That offset is a **constant** by construction. She can turn all she likes and it does not
+move, because turning moves `alpha` and the compass together. So when it does move, that is
+the instrument and not her:
+
+- a jump of about 180° is the flip. Correct it rather than following it.
+- anything else is drift, folded in slowly and weighted by how much horizontal the top edge
+  has left to point along — believed where it is worth believing, coasted on where it is not.
+  The gyro holds a heading perfectly well across the few seconds of a hold.
+
+Simulated against a compass that reverses at vertical, sweeping the phone from 30° below the
+horizon to 60° above: the compass jumps the full 180°, and the computed heading moves **0.00°
+at every step**.
+
+With a smooth input the heavy smoothing that was hiding the jitter is pure lag, so `SHAKY_MS`
+comes down from 520ms to 190ms.
 
 ### Holding still on a shaky reading
 
@@ -306,9 +335,12 @@ in the ring counts, and so does the space between two stars, because the arc run
 it.
 
 `GRAB_DEG` is the ring's own radius, **2°**, and no more — there is no padding around it.
-That is about **124 square degrees** of sky spread along the scales (it was 159 for Orion's
-larger figure), against roughly 400 for the old box, so it is meaningfully tighter as well as
-honest. `?grab=N` widens it for field
+The quadrilateral's **own interior counts too**. Correcting the figure gave Libra a real
+enclosed area for the first time, and without that the dead centre of the constellation reads
+2.4° from anything and does not register, which is a daft way to miss. It is not padding — it
+is the shape's own area, which is what "a star, or the space between two stars" meant. That
+brings the target to about **344 square degrees**, shaped like Libra, against roughly 400 for
+the old box that was not. `?grab=N` widens it for field
 testing, which matters because the compass is not quiet and 2° is a small thing to hold.
 
 The difficulty is therefore all in the first discovery, which is where it belongs: once she
@@ -370,6 +402,19 @@ the sky draws into a box in the corner. Its width and height are explicit for th
 - A reading older than 900ms doesn't count toward the hold, so a stalled sensor or a
   backgrounded page can't let a stale "facing east" quietly finish the login.
 - `prefers-reduced-motion` only stops the stars twinkling. The sky tracking is the puzzle.
+
+### The scales, at the end
+
+Once she is in, the figure stops being a shape and becomes the thing it has been all along: a
+ring is drawn above Zubeneschamali, where a balance hangs from, and a pan under each of
+Zubenelakrab and Zubenelgenubi, the two arms. `SCALES` is built in degrees around the real
+stars and converted to sky directions once, so it stays pinned to them, with "down" meaning
+toward the horizon so the pans hang the way pans do.
+
+**It is tied to one frozen moment and does not survive moving it.** The first attempt put the
+post on the midpoint of an edge and the pans under the wrong two stars, because it was
+designed for the shape Libra makes while *rising*, which is nothing like the kite it makes on
+the meridian.
 
 ### There is no way past it
 

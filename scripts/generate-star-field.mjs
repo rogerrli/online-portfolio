@@ -6,8 +6,8 @@
  * Telescope Data Center. Public domain, and the canonical list of everything visible to
  * the naked eye.
  *
- * The gate freezes the sky at one instant — the moment the scales of Libra clear the horizon
- * in the east, seen from Boerum Hill. The whole celestial sphere is carried, below the
+ * The gate freezes the sky at one instant — the moment Libra crosses the meridian, due south
+ * and at its highest, seen from Boerum Hill. The whole celestial sphere is carried, below the
  * horizon as well as above it, so the sky never runs out, and the instant only decides what
  * the stderr line reports. What matters here is which stars to leave out.
  *
@@ -18,7 +18,10 @@
 
 const SRC       = "http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz";
 const LATITUDE  = 40.7;   // Boerum Hill, Brooklyn
-const CLEAR_ALT = 3;      // where Brachium is caught, degrees above the horizon
+/* The sky is frozen on the sign crossing the meridian, which is just the mean right
+   ascension of its stars — no solving needed, and nothing here depends on it anyway: the
+   data is the whole sphere, and the instant only decides what the stderr line reports. */
+const MERIDIAN  = 15.3377;
 const MAG_LIMIT = 5.0;    // naked-eye, generously: fainter than this is scenery nobody reads
 /* The whole sphere, not just the half that is up. Carrying only the risen half left the sky
    dead below the horizon line, which shrank the search and read as broken when she tilted
@@ -30,7 +33,7 @@ const MAG_LIMIT = 5.0;    // naked-eye, generously: fainter than this is scenery
    these are the same coordinates CAT holds, so anything that lands on one of them is one of
    the scales and would otherwise be drawn twice. */
 const SIGN = [
-  [14.8480, -16.04], [15.2834,  -9.38], [15.5921, -14.79], [15.0678, -25.28],
+  [14.8480, -16.04], [15.2834,  -9.38], [15.5921, -14.79], [15.0678, -25.28], [15.8971, -16.73],
 ];
 const isSign = (ra, dec) =>
   SIGN.some(([r, d]) => Math.abs(ra - r) < 0.004 && Math.abs(dec - d) < 0.06);
@@ -71,12 +74,7 @@ for (const line of text.split("\n")) {
   stars.push({ ra, dec, mag });
 }
 
-// the sidereal time at which Brachium, the last of the four to rise, sits CLEAR_ALT up
-let lo = 8, hi = 14, lst = 0;
-for (let i = 0; i < 60; i++) {
-  lst = (lo + hi) / 2;
-  if (altaz(15.0678, -25.28, lst) < CLEAR_ALT) lo = lst; else hi = lst;
-}
+const lst = MERIDIAN;
 
 const up = stars.sort((a, b) => a.mag - b.mag)
                 .map(s => `${s.ra.toFixed(4)},${s.dec.toFixed(2)},${s.mag.toFixed(2)}`);
@@ -88,7 +86,7 @@ process.stderr.write(
 const body = [];
 for (let i = 0; i < up.length; i += 6) body.push("  " + up.slice(i, i + 6).join(" "));
 process.stdout.write(
-  `/* The sky over Boerum Hill at the moment the scales clear the horizon: every star in the\n` +
+  `/* The sky over Boerum Hill at the moment the scales cross the meridian: every star in the\n` +
   `   Yale Bright Star Catalog brighter than magnitude ${MAG_LIMIT.toFixed(1)}, as "right ascension in hours,\n` +
   `   declination in degrees, visual magnitude". The whole sphere, below the horizon as well as\n` +
   `   above it, so the sky never runs out and the far southern stars that never rise here are\n` +
