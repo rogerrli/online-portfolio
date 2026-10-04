@@ -12,19 +12,19 @@
 /* ---------- EDIT ME: title, intro, clues live in the <script> below ---------- */
 :root{
   --paper:#E8ECF6; --ink:#1C2647; --muted:#5B6688; --line:#1C2647;
-  --cell:#FFFFFF; --word:#CBD5F0; --cur:#F2C14E; --wrong:#D2453C; --star:#C9971F;
+  --cell:#FFFFFF; --word:#CBD5F0;  --special:#F7E6BC;  --marked:#E6EAD7; --cur:#F2C14E; --wrong:#D2453C; --star:#C9971F;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --paper:#141A31; --ink:#E4E8F5; --muted:#9AA4C4; --line:#060914;
-    --cell:#232B4A; --word:#34416E; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
+    --cell:#232B4A; --word:#34416E; --special:#4A3C1B; --marked:#2C3A33; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
   }
 }
 :root[data-theme="dark"]{
   --paper:#141A31; --ink:#E4E8F5; --muted:#9AA4C4; --line:#060914;
-  --cell:#232B4A; --word:#34416E; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
+  --cell:#232B4A; --word:#34416E; --special:#4A3C1B; --marked:#2C3A33; --cur:#B88A1C; --wrong:#FF7A70; --star:#F2C14E;
 }
 *,*::before,*::after{box-sizing:inherit}
 html,body{margin:0}
@@ -73,10 +73,22 @@ h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,
 .grid{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));border:2px solid var(--line);background:var(--line);gap:1px;width:100%;aspect-ratio:1;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .c{position:relative;background:var(--cell);display:flex;align-items:center;justify-content:center;font-weight:400;line-height:1;overflow:hidden;font-size:clamp(.8rem,2.6vw,1.4rem);text-transform:uppercase;cursor:pointer}
 .c.b{background:var(--line);cursor:default}
+/* The special answer used a 2px inset border, which landed exactly on the clue
+   number at top:1px/left:2px and made "40" the hardest number in the grid to
+   read. A background says the same thing and covers nothing. Declared before
+   .c.w and .c.cur so selecting the entry still looks like selecting one. */
+.c.sp{background:var(--special)}
+/* The seven photo answers, washed in only while the special clue is selected:
+   a hint offered at the moment she asks the question, not a permanent
+   decoration that gives the structure away from square one. */
+.c.mk{background:var(--marked)}
 .c.w{background:var(--word)}
 .c.cur{background:var(--cur);color:#1C2647}
 .c.bad .l{color:var(--wrong);text-decoration:line-through;text-decoration-thickness:2px}
 .c .n{position:absolute;top:1px;left:2px;font-size:clamp(.42rem,1.1vw,.62rem);font-weight:400;line-height:1}
+/* Full-screen, never interactive, and only displayed while a burst is running. */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;display:none}
+#fx.on{display:block}
 .tools{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 @media (hover:hover){button:hover{background:var(--word)}}
@@ -108,14 +120,11 @@ button:focus-visible,.cl li:focus-visible{outline:3px solid var(--cur);outline-o
 .cl li.on{background:var(--word)}
 .cl li.done .t{opacity:.5}
 .film{width:.95em;height:.95em;flex:none;margin-top:.22em;color:var(--star)}
-.c.sp::after{content:"";position:absolute;inset:2px;border:2px solid var(--star);pointer-events:none}
 .cl li.special{border:1.5px solid var(--star);margin:4px 0}
 .cl li.special .t{font-weight:700}
 .star{width:1em;height:1em;flex:none;margin-top:.18em;color:var(--star)}
 .cl li.todo .t{font-style:italic;color:var(--muted)}
-.win{display:none;margin-top:14px;padding:12px 14px;border:1.5px solid var(--star);border-radius:6px}
-.win.show{display:block}
-body.master .tools,body.master .win,body.master .danger{display:none}
+body.master .tools,body.master .danger{display:none}
 @media print{body.master .c .l{visibility:visible}}
 #kb{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;font-size:16px}
 @media (max-width:860px){
@@ -138,7 +147,7 @@ body.master .tools,body.master .win,body.master .danger{display:none}
   @page{margin:.5in}
   body{background:#fff}
   .wrap{padding:0;max-width:none}
-  .bar,.tools,.win,.danger,#kb{display:none!important}
+  .bar,.tools,.danger,#kb,#fx{display:none!important}
   .layout{grid-template-columns:4.6in 1fr;gap:.3in}
   .board{position:static}
   .grid{width:4.6in}
@@ -176,7 +185,6 @@ body.master .tools,body.master .win,body.master .danger{display:none}
         <span class="status" id="status"></span>
         <span class="clock" id="clock" aria-label="Time spent"></span>
       </div>
-      <div class="win" id="win"></div>
     </div>
     <div class="clues">
       <section class="cl"><h2>Across</h2><ol id="across"></ol></section>
@@ -188,6 +196,7 @@ body.master .tools,body.master .win,body.master .danger{display:none}
     <button id="clear" type="button">Clear puzzle</button>
   </div>
 </div>
+<canvas id="fx" aria-hidden="true"></canvas>
 <input id="kb" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-label="Type a letter">
 <script>
 /* =================== EDIT HERE =================== */
@@ -301,6 +310,11 @@ for(let r=0;r<N;r++)for(let c=0;c<N;c++){
 entries.forEach((e,ei)=>e.cells.forEach(i=>cellEntry[i][e.dir]=ei));
 
 const spEntry=entries.find(e=>e.key===SPECIAL);
+/* Every square belonging to a photo answer, so render() can wash them in while the
+   special clue is selected rather than making her trace clue numbers back into the
+   grid to find them. */
+const markedCells=new Set();
+MARKED.forEach(k=>{const e=entries.find(x=>x.key===k);if(e)e.cells.forEach(i=>markedCells.add(i));});
 // state
 let fill=Array(N*N).fill(""), bad=new Set();
 if(MASTER){fill=sol.map(s=>s||"");}
@@ -315,6 +329,66 @@ const CLOCK_KEY=KEY+"-time";
 let spent=0,runningSince=null;
 try{spent=Number(localStorage.getItem(CLOCK_KEY))||0;}catch(e){}
 const solved=()=>sol.every((s,i)=>!s||fill[i]===s);
+/* Fires once, on the transition into a finished grid — never on load. Re-opening a
+   solved puzzle should show the message without ambushing her with the animation
+   again, and MASTER is the answer key, which has nothing to celebrate. */
+let celebrated=MASTER||solved();
+const STAR_PATH="M8 .8l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.7l-4.4 2.5 1.1-4.9L.9 5.9l5-.5z";
+const BURST_MS=1900;
+function celebrate(){
+  const cv=document.getElementById("fx");
+  if(!cv||!cv.getContext)return;
+  // Reduced motion gets the message and none of the movement.
+  if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const ctx=cv.getContext("2d"),dpr=Math.min(window.devicePixelRatio||1,2);
+  /* Shown before measuring: the canvas is display:none until then, so its own box is
+     0x0 and cannot be used to size itself. Fall back through the viewport sources,
+     and if they all come back empty — an offscreen or headless context — leave rather
+     than animating into a zero-sized buffer with the overlay stuck on. */
+  cv.classList.add("on");
+  const w=cv.clientWidth||window.innerWidth||document.documentElement.clientWidth||0;
+  const h=cv.clientHeight||window.innerHeight||document.documentElement.clientHeight||0;
+  if(!w||!h){cv.classList.remove("on");return;}
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+"px";cv.style.height=h+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  /* Read the palette at fire time so a burst in dark mode is the dark gold, and
+     reuse the star the special answer already wears rather than inventing a shape. */
+  const cs=getComputedStyle(document.documentElement);
+  const colors=["--star","--cur","--ink"].map(v=>(cs.getPropertyValue(v)||"").trim()||"#C9971F");
+  const star=new Path2D(STAR_PATH);
+  const cx=w/2,cy=h*0.42,reach=Math.hypot(w,h)/2;
+  const n=Math.max(40,Math.min(90,Math.round(w*h/11000)));
+  const parts=Array.from({length:n},()=>{
+    const a=Math.random()*Math.PI*2,sp=(0.5+Math.random()*0.8)*reach/(BURST_MS*0.6);
+    return {x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+            rot:Math.random()*Math.PI,vr:(Math.random()-0.5)*0.007,
+            s:7+Math.random()*13,c:colors[(Math.random()*colors.length)|0]};
+  });
+  /* requestAnimationFrame stops while the tab is hidden, so a burst interrupted by
+     her switching apps would never reach its last frame and the overlay would sit
+     there frozen. A plain timer finishes the job whatever the frame loop is doing. */
+  const sweep=setTimeout(()=>{ctx.clearRect(0,0,w,h);cv.classList.remove("on");},BURST_MS+400);
+  /* Every position is a function of elapsed time, not an accumulation of frames.
+     Integrating per frame with a clamped dt — needed so a stalled tab does not
+     teleport everything — meant that under any throttling the stars crawled: 78px
+     of spread on a 756px canvas after a second, a clump rather than a burst. Solved
+     from t, a slow frame rate costs smoothness and nothing else. */
+  const GRAV=0.00034;
+  let t0=null;
+  (function frame(ts){
+    if(t0===null)t0=ts;
+    const t=ts-t0,k=t/BURST_MS;
+    ctx.clearRect(0,0,w,h);
+    for(const p of parts){
+      const x=p.x+p.vx*t,y=p.y+p.vy*t+0.5*GRAV*t*t;
+      ctx.save();ctx.globalAlpha=Math.max(0,1-k*k);
+      ctx.translate(x,y);ctx.rotate(p.rot+p.vr*t);ctx.scale(p.s/16,p.s/16);ctx.translate(-8,-8);
+      ctx.fillStyle=p.c;ctx.fill(star);ctx.restore();
+    }
+    if(t<BURST_MS)requestAnimationFrame(frame);
+    else{clearTimeout(sweep);ctx.clearRect(0,0,w,h);cv.classList.remove("on");}
+  })(performance.now());
+}
 const spentNow=()=>spent+(runningSince===null?0:performance.now()-runningSince);
 function clockSave(){if(MASTER)return;try{localStorage.setItem(CLOCK_KEY,String(Math.round(spentNow())));}catch(e){}}
 function clockStop(){if(runningSince!==null){spent+=performance.now()-runningSince;runningSince=null;clockSave();}}
@@ -374,7 +448,8 @@ function render(){
   const ei=curEntry(),e=entries[ei];
   cellsEl.forEach((d,i)=>{if(isB(i))return;
     d.querySelector(".l").textContent=fill[i];
-    d.classList.toggle("w",e.cells.includes(i));d.classList.toggle("cur",i===cur);d.classList.toggle("bad",bad.has(i));});
+    d.classList.toggle("w",e.cells.includes(i));d.classList.toggle("cur",i===cur);d.classList.toggle("bad",bad.has(i));
+    d.classList.toggle("mk",e.key===SPECIAL&&markedCells.has(i));});
   liEls.forEach((li,j)=>{
     li.classList.toggle("on",j===ei);li.classList.toggle("done",entries[j].cells.every(i=>fill[i]));
     // The answer so far, redrawn only when it actually changed — render() runs on
@@ -389,7 +464,14 @@ function render(){
   document.getElementById("status").textContent=filled===total?"All squares filled":`${filled} of ${total} squares filled`;
   const won=sol.every((s,i)=>!s||fill[i]===s);
   drawClock();
-  const w=document.getElementById("win");w.textContent=WIN_MESSAGE;w.classList.toggle("show",won);
+  /* The instruction becomes the payoff in the place she has been reading all along:
+     the greeting stays, the "look closer" line is replaced by the message that sends
+     her to the VIEWFINDER. The old bordered box under the clue list was easy to miss,
+     and this is the moment the whole gift turns on. */
+  if(!MASTER){
+    document.getElementById("intro").textContent=won?INTRO.split("\n")[0]+"\n"+WIN_MESSAGE:INTRO;
+    if(won&&!celebrated){celebrated=true;celebrate();}else if(!won)celebrated=false;
+  }
 }
 function move(dr,dc){let r=Math.floor(cur/N),c=cur%N;do{r+=dr;c+=dc;}while(r>=0&&r<N&&c>=0&&c<N&&isB(r*N+c));if(r>=0&&r<N&&c>=0&&c<N)cur=r*N+c;}
 /* entries[] is built in grid order, so it interleaves directions — 1A, 1D, 2D, 3D,
