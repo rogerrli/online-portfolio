@@ -212,6 +212,7 @@ body.dbg #debug{display:block}
    into the sensors' frame once, here, so there is only ever one set of angles in play. */
 const DECLINATION = 13;
 const LATITUDE    = 40.7;   // Boerum Hill, Brooklyn
+const LONGITUDE   = -73.99; // ...and its longitude, which the sidereal clock needs
 /* Where the scales are caught: crossing the meridian, due south and at their highest, about
    33 degrees up. Due south is a direction she can reason about, and on the meridian the
    figure stands in the orientation a star chart draws it — north up — rather than tipped on
@@ -239,6 +240,9 @@ const SIGHT_DEG= (() => {
 
 const HOLD_MS  = 5000;  // how long it must be held
 const SCALES_MS= 1700;  // and how long the scales take to draw themselves in afterwards
+const SETTLE_MS= 900;   // ...then the view eases round until the figure is in the middle
+const BURST_MS = 1200;  // ...and the sign throws off a handful of sparks over this long
+const SPARKS   = 7;     // per star. A splash, not fireworks.
 const HOLD_POW = 2.5;   // the hold fills slowly at first, then rushes at the end
 /* Nothing brightens until she has held it this long. Warmth used to ramp with proximity,
    which is a hot-and-cold gradient you can walk up — turn until it glows more — and that is
@@ -391,7 +395,15 @@ function altaz(c, lst) {
   const H = (lst - c[0]) * 15 * DEG, d = c[1] * DEG;
   const sh = Math.sin(PHI) * Math.sin(d) + Math.cos(PHI) * Math.cos(d) * Math.cos(H);
   const alt = Math.asin(clamp(sh, -1, 1));
-  const az  = Math.atan2(-Math.cos(d) * Math.sin(H), Math.sin(d) - Math.sin(PHI) * sh);
+  /* cos(alt)cos(az) = cos(phi)sin(dec) - sin(phi)cos(dec)cos(H).
+     This used to read `Math.sin(d) - Math.sin(PHI) * sh`, which is that same quantity
+     multiplied by cos(phi) — and scaling only the denominator of an atan2 squashes the
+     angle. It cost up to 8 degrees of azimuth here, four times the grab tolerance.
+     It never showed because it is exactly zero at H = 0, and the sky was frozen on the
+     meridian, where the sign's hour angle is zero by construction. A live sky has the
+     figure at every other hour angle, so it had to be found before this could ship. */
+  const az  = Math.atan2(-Math.cos(d) * Math.sin(H),
+                         Math.cos(PHI) * Math.sin(d) - Math.sin(PHI) * Math.cos(d) * Math.cos(H));
   return [norm(az / DEG), alt / DEG];
 }
 
@@ -400,19 +412,57 @@ function altaz(c, lst) {
    eyeballing a shape is what earns the picture: the beam comes out tipped, Brachium hanging
    low off the southern pan, the whole figure between 3 and 12 degrees up on azimuths 109 to
    120 — east-south-east, where her sign rises. */
-/* The sidereal time the whole sky is frozen at. A star is on the meridian when the sidereal
-   time equals its right ascension, so the figure crosses when the clock reads the mean right
-   ascension of its stars — no solving, just the definition. Everything on screen is placed
-   through this one number, so Libra and the stars around it belong to the same moment rather
-   than being a constellation pasted onto a backdrop. */
-const LST = Object.values(CAT).reduce((a, c) => a + c[0], 0) / Object.keys(CAT).length;
+/* The sidereal time the sky is placed at — now, from the device's own clock.
+
+   It used to be frozen at the mean right ascension of the sign's stars, which is by
+   definition the moment Libra crosses the meridian: always due south, always 36 degrees up,
+   every night of the year. That was always solvable and never true. This is the real sky.
+
+   The cost is not small and is deliberate. Libra is a spring constellation; on her birthday
+   it sets as the sky gets dark, so from mid-evening she is aiming below the horizon, through
+   the earth, at a constellation that is genuinely under her feet. The gate does not mind —
+   the unlock tests the camera's forward vector and never looks at the sign of the altitude,
+   and aiming downward is the *better* compass pose, since trust is |cos(beta)| and the phone
+   comes back toward flat. The sky below the horizon is dimmed so that reads as deliberate.
+
+   Local mean sidereal time, in hours: Greenwich mean sidereal time at the given instant,
+   plus the longitude. The IAU polynomial, which is good to well under a second of time over
+   any span this page cares about. */
+function lstAt(ms) {
+  const jd = ms / 86400000 + 2440587.5;
+  const d  = jd - 2451545.0, t = d / 36525;
+  const g  = 280.46061837 + 360.98564736629 * d + 0.000387933 * t * t - t * t * t / 38710000;
+  return norm(g + LONGITUDE) / 15;
+}
+const T0  = Date.now();
+const LST = lstAt(T0);
+
+/* ...and it keeps turning while she is standing there. Rather than replacing 1621 stars
+   every frame, the whole sky is placed once above and then rotated as one rigid body about
+   the celestial pole, which is exactly what it does. One quaternion a frame instead of a
+   catalogue. 1.0027379 is sidereal hours per solar hour: the sky gains a turn a year. */
+const SIDEREAL = 1.0027379;
+/* The pole sits due north at the latitude's altitude — and the whole sky carries the
+   magnetic declination, so the axis it turns about carries it too. */
+const POLE = dir(DECLINATION, LATITUDE);
+function skyQuat(ms) {
+  const hours = (ms - T0) / 3600000 * SIDEREAL;
+  const a = -hours * 15 * DEG / 2;        // sign checked against altaz; see the docs
+  const sn = Math.sin(a);
+  return [POLE[0]*sn, POLE[1]*sn, POLE[2]*sn, Math.cos(a)];
+}
+const qConj = q => [-q[0], -q[1], -q[2], q[3]];
 
 /* Twinkle from the star's own coordinates rather than a random seed: no shuffling between
    reloads, and nothing to carry. */
 const phase = (ra, dec) => ({ ph: (ra * 7.13 + dec * 3.7) % 6.2832, sp: 0.7 + (ra * 1.7) % 1.4 });
 
 const SIGN = {};
-let TARGET_AZ = 0, TARGET_ALT = 0, TARGET_V = null;
+/* Only the vector. There were a TARGET_AZ and a TARGET_ALT here too, read by the debug
+   line; with a live sky they would be the sign's position at the moment the page loaded and
+   wrong ever after, which is exactly the kind of stale global someone trusts later. The
+   readout derives them from this, carried round by the sky, each frame. */
+let TARGET_V = null;
 (function placeSign() {
   for (const k in CAT) {
     const [az, alt] = altaz(CAT[k], LST);
@@ -428,8 +478,6 @@ let TARGET_AZ = 0, TARGET_ALT = 0, TARGET_V = null;
   const c = unit(["zubeneschamali","zubenelakrab","zubenelgenubi"]
     .reduce((a, k) => [a[0]+SIGN[k].v[0], a[1]+SIGN[k].v[1], a[2]+SIGN[k].v[2]], [0,0,0]));
   TARGET_V = c;
-  TARGET_ALT = Math.asin(clamp(c[1], -1, 1)) / DEG;
-  TARGET_AZ = norm(Math.atan2(c[0], -c[2]) / DEG);
 })();
 
 /* The sky over Boerum Hill at the moment the scales cross the meridian: every star in the
@@ -846,6 +894,37 @@ const Q_REST = (function () {
   return { R, U, F: f };
 })();
 
+/* The same view as a quaternion, so the landing can slerp to it. Lerping the three basis
+   vectors instead would need re-orthonormalising every frame and would still swing the
+   horizon the long way round. basisFrom takes the camera axes to R, U and -F, so those are
+   the columns of the rotation this inverts. */
+function qFromBasis(Rv, Uv, Fv) {
+  const m00=Rv[0], m10=Rv[1], m20=Rv[2];
+  const m01=Uv[0], m11=Uv[1], m21=Uv[2];
+  const m02=-Fv[0], m12=-Fv[1], m22=-Fv[2];
+  const tr = m00 + m11 + m22;
+  let x, y, z, w, k;
+  if (tr > 0)                   { k = Math.sqrt(tr + 1) * 2;            w = k/4; x = (m21-m12)/k; y = (m02-m20)/k; z = (m10-m01)/k; }
+  else if (m00 > m11 && m00 > m22) { k = Math.sqrt(1+m00-m11-m22) * 2; x = k/4; w = (m21-m12)/k; y = (m01+m10)/k; z = (m02+m20)/k; }
+  else if (m11 > m22)           { k = Math.sqrt(1+m11-m00-m22) * 2;     y = k/4; w = (m02-m20)/k; x = (m01+m10)/k; z = (m12+m21)/k; }
+  else                          { k = Math.sqrt(1+m22-m00-m11) * 2;     z = k/4; w = (m10-m01)/k; x = (m02+m20)/k; y = (m12+m21)/k; }
+  const n = Math.hypot(x, y, z, w) || 1;
+  return [x/n, y/n, z/n, w/n];
+}
+/* Where the landing puts the middle of the screen. Not TARGET_V: that is the triangle's
+   centroid, picked for the aiming tolerance, and the scales hang a long way below it — land
+   on it and the whole drawing sits low, with the pans down by the Next button. So this is
+   the centroid of everything that ends up drawn, stars and scales together. */
+const Q_LAND = (function () {
+  const acc = [0, 0, 0];
+  const add = v => { acc[0] += v[0]; acc[1] += v[1]; acc[2] += v[2]; };
+  for (const k in SIGN) add(SIGN[k].v);
+  for (const path of SCALES) for (const v of path) add(v);
+  const f = unit(acc), up = [0,1,0];
+  const r = unit(cross3(f, up));
+  return qFromBasis(r, cross3(r, f), f);
+})();
+
 /* ============================ starfield (pre-sky screens) ============================ */
 (function field() {
   const host = document.getElementById("field");
@@ -893,10 +972,21 @@ addEventListener("orientationchange", () => setTimeout(resize, 120));
 /* ============================ the view ============================ */
 let qRaw = null, qView = null, beta = null, gamma = null, evName = "-", absolute = false;
 let gotReading = false, watching = false, lastAt = 0;
+/* Two frames now, because the sky turns and the ground does not.
+
+   R/U/F are the view in the **sky's** frame: every star, the figure, the scales and the
+   unlock test live here, placed once at load and carried along as the sky rotates. Re/Ue/Fe
+   are the same view in the **earth's** frame: the horizon is drawn through these, and the
+   heading and elevation are read from these, because that is what the compass measures. */
 let R = Q_REST.R, U = Q_REST.U, F = Q_REST.F;
+let Re = Q_REST.R, Ue = Q_REST.U, Fe = Q_REST.F;
+let ZEN = [0,1,0];      // straight up, expressed in the sky's frame — which way is down
 
 function basisFrom(q) {
-  R = qRot(q, [1,0,0]); U = qRot(q, [0,1,0]); F = qRot(q, [0,0,-1]);
+  Re = qRot(q, [1,0,0]); Ue = qRot(q, [0,1,0]); Fe = qRot(q, [0,0,-1]);
+  const back = qConj(skyQuat(Date.now()));
+  R = qRot(back, Re); U = qRot(back, Ue); F = qRot(back, Fe);
+  ZEN = qRot(back, [0,1,0]);
 }
 function project(v) {
   const z = v[0]*F[0] + v[1]*F[1] + v[2]*F[2];
@@ -978,22 +1068,34 @@ const mix = (a, b, t) => `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1
 const sizeOf  = m => clamp(3.3 - 0.52 * m, 0.5, 3.8);
 const alphaOf = m => clamp(0.98 - 0.135 * m, 0.18, 1);
 
+/* The one thing on screen that is not in the sky, so it is the one thing projected through
+   the earth's frame. Everything else slides past it as the night goes on. */
+function projectEarth(v) {
+  const z = dot3(v, Fe);
+  if (z <= 0.04) return null;
+  return [cx + focal * dot3(v, Re) / z, cy - focal * dot3(v, Ue) / z];
+}
 function horizon(p) {
   ctx.beginPath();
   let pen = false;
   for (let a = 0; a <= 360; a += 3) {
-    const q = project(dir(a, 0));
+    const q = projectEarth(dir(a, 0));
     if (!q) { pen = false; continue; }
     if (pen) ctx.lineTo(q[0], q[1]); else { ctx.moveTo(q[0], q[1]); pen = true; }
   }
   ctx.strokeStyle = p.hz; ctx.lineWidth = 1; ctx.stroke();
 }
 
+/* How much of a star is left once it is under the horizon. Not nothing: the sky has to stay
+   continuous to be worth sweeping, and on her birthday the sign itself is down there, so
+   putting out the lights would be putting out the puzzle. Enough that the ground reads as
+   ground, so aiming into it feels deliberate rather than broken. */
+const GROUND = 0.4;
 function backdrop(p, t) {
   for (const s of SKY) {
     const q = project(s.v);
     if (!q || q[0] < -8 || q[0] > W + 8 || q[1] < -8 || q[1] > H + 8) continue;
-    const a = alphaOf(s.mag);
+    const a = alphaOf(s.mag) * (dot3(s.v, ZEN) > 0 ? 1 : GROUND);
     const o = calmQ.matches ? a : a * (0.78 + 0.22 * Math.sin(t / 1000 * s.sp + s.ph));
     ctx.beginPath(); ctx.arc(q[0], q[1], sizeOf(s.mag), 0, 6.2832);
     ctx.fillStyle = `rgba(${p.bg},${o.toFixed(3)})`; ctx.fill();
@@ -1121,15 +1223,56 @@ function pointer(p) {
   ctx.restore();
 }
 
+/* ---------- the landing ---------- */
+/* Sparks live in the sky, not on the screen: each one is a direction leaving its star along
+   a great circle. The view is still easing round underneath them, so anything held in screen
+   coordinates would slide with it. */
+let sparks = null, sprayP = 0;
+function burst() {
+  sparks = [];
+  if (calmQ.matches) return;                       // decorative, so reduced motion keeps it
+  for (const k in SIGN) {
+    const v = SIGN[k].v;
+    const a = Math.abs(v[1]) < 0.9 ? [0,1,0] : [1,0,0];
+    const t1 = unit(cross3(v, a)), t2 = cross3(v, t1);   // a tangent frame at the star
+    for (let i = 0; i < SPARKS; i++) {
+      const th = Math.random() * 6.2832, c = Math.cos(th), sn = Math.sin(th);
+      sparks.push({
+        v, d: [t1[0]*c + t2[0]*sn, t1[1]*c + t2[1]*sn, t1[2]*c + t2[2]*sn],
+        far: (1.7 + Math.random() * 2.8) * DEG,    // how far out it gets, in radians of sky
+        r: 0.8 + Math.random() * 1.1,
+        lag: Math.random() * 0.18,                 // so they don't all leave together
+      });
+    }
+  }
+}
+
+function spray(p, prog) {
+  if (!sparks || prog <= 0) return;
+  ctx.fillStyle = `rgb(${p.star[0]},${p.star[1]},${p.star[2]})`;
+  for (const s of sparks) {
+    const u = clamp((prog - s.lag) / (1 - s.lag), 0, 1);
+    if (u <= 0 || u >= 1) continue;
+    const a = s.far * (1 - Math.pow(1 - u, 3));    // out quickly, then coasting
+    const ca = Math.cos(a), sa = Math.sin(a);
+    const q = project([s.v[0]*ca + s.d[0]*sa, s.v[1]*ca + s.d[1]*sa, s.v[2]*ca + s.d[2]*sa]);
+    if (!q) continue;
+    ctx.globalAlpha = (1 - u) * 0.95;
+    ctx.beginPath(); ctx.arc(q[0], q[1], s.r, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
 function paint(t) {
   const day = lightQ.matches && body.dataset.state !== "done";
   const p = day ? DAY : NIGHT;
   ctx.clearRect(0, 0, W, H);
-  if (day) { ({ R, U, F } = Q_REST); sign(p, 0.3); figure(p, 0.3, 1); return; }
+  if (day) { ({ R, U, F } = Q_REST); ({ R: Re, U: Ue, F: Fe } = Q_REST); sign(p, 0.3); figure(p, 0.3, 1); return; }
   horizon(p); backdrop(p, t);
   if (HINT && body.dataset.state === "seek") ghost(p);
   figure(p, lit, drawn); scales(p, shown); sign(p, lit);
   if (HINT && body.dataset.state === "seek") pointer(p);
+  spray(p, sprayP);
 }
 
 /* ============================ the hold ============================ */
@@ -1155,10 +1298,15 @@ function loop(now) {
     qView = qSlerp(qView, qRaw, 1 - Math.exp(-dt / ease));
     basisFrom(qView);
 
-    const heading = norm(Math.atan2(F[0], -F[2]) / DEG);
-    const elev    = Math.asin(clamp(F[1], -1, 1)) / DEG;
-    dAz  = delta(TARGET_AZ, heading);
-    dAlt = elev - TARGET_ALT;
+    // heading and elevation are what the compass measures, so they come off the earth frame
+    const heading = norm(Math.atan2(Fe[0], -Fe[2]) / DEG);
+    const elev    = Math.asin(clamp(Fe[1], -1, 1)) / DEG;
+    /* ...while the sign has moved since the page loaded, so where it is now is the stored
+       position carried round by the sky. Only the readout uses these; the unlock is
+       toFigure, which works in the sky's frame where the figure never moves. */
+    const tv = qRot(skyQuat(Date.now()), TARGET_V);
+    dAz  = delta(norm(Math.atan2(tv[0], -tv[2]) / DEG), heading);
+    dAlt = elev - Math.asin(clamp(tv[1], -1, 1)) / DEG;
     off  = toFigure(F);
 
     shake.push(heading);
@@ -1204,11 +1352,27 @@ function succeed() {
   if (navigator.vibrate) { try { navigator.vibrate([18, 70, 18]); } catch (e) {} }
   /* One last beat. The stick figure stops being a shape and becomes the thing it has been
      all along. The main loop has stopped by now, so this runs its own. */
-  const t0 = performance.now();
+  const t0 = performance.now(), qStart = qView;
+  const END = SCALES_MS + Math.max(SETTLE_MS, BURST_MS);
   (function finish(now) {
-    shown = clamp((now - t0) / SCALES_MS, 0, 1);
+    const e = now - t0;
+    shown = clamp(e / SCALES_MS, 0, 1);
+    /* Once it is drawn, it lands: the view eases round until the figure is in the middle of
+       the screen — wherever she happened to be holding it — and the sign throws off a
+       handful of sparks. */
+    if (shown >= 1) {
+      if (sparks === null) burst();
+      const g = clamp((e - SCALES_MS) / SETTLE_MS, 0, 1);
+      const k = calmQ.matches ? 1 : 1 - Math.pow(1 - g, 3);
+      /* Q_LAND is where to look in the *sky's* frame, and the view is carried in the
+         earth's, so it has to be brought across — and re-brought every frame, because the
+         sky keeps turning while it eases. */
+      const land = qMul(skyQuat(Date.now()), Q_LAND);
+      basisFrom(qStart ? qSlerp(qStart, land, k) : land);
+      sprayP = clamp((e - SCALES_MS) / BURST_MS, 0, 1);
+    }
     paint(now);
-    if (shown < 1) requestAnimationFrame(finish);
+    if (e < END) requestAnimationFrame(finish);
   })(t0);
 }
 
