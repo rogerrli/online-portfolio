@@ -786,10 +786,49 @@ const SKY = BACKDROP.concat(Object.values(SIGN));
    pans hang the way pans do. It is tied to this frozen moment: the shape Libra makes on the
    meridian is not the shape it makes while rising, and an earlier version of this drew the
    pans under the wrong stars for exactly that reason. */
+/* ---------- the figure's own frame ----------
+   Which way is up *for the scales*, as opposed to for the observer. These are not the same
+   direction and the drawing used to mix them: the figure is pinned to real stars, so the
+   beam lies at whatever angle the sky has it at and that angle now changes through the
+   night, while the pans were built in azimuth and altitude and so hung toward the real
+   horizon no matter what. A sideways beam with level trays, which is exactly as odd as it
+   sounds.
+
+   So the figure gets a frame of its own, read off the stars. The beam is the line between
+   the two lower corners of the triangle, the ones the cords hang from; up is square to it,
+   turned so that it points at the apex, which is the end the ring is on. Everything the
+   scales are made of is then built in this frame, and the landing rolls the view until this
+   up is the screen's up — so it comes to rest standing, with its pans hanging under it, at
+   any hour of any night. */
+const FRAME_UP = (() => {
+  const A = SIGN.zubeneschamali.v;                        // the apex, where the ring is
+  const G = SIGN.zubenelakrab.v, L = SIGN.zubenelgenubi.v; // the beam's two ends
+  const C = unit([A[0]+G[0]+L[0], A[1]+G[1]+L[1], A[2]+G[2]+L[2]]);
+  const along = [L[0]-G[0], L[1]-G[1], L[2]-G[2]];
+  const beam = unit([along[0] - C[0]*dot3(along, C),      // the beam, square to the view
+                     along[1] - C[1]*dot3(along, C),
+                     along[2] - C[2]*dot3(along, C)]);
+  const up = unit(cross3(beam, C));
+  const M = unit([G[0]+L[0], G[1]+L[1], G[2]+L[2]]);      // the middle of the beam
+  // ...turned so it points at the apex rather than away from it
+  return dot3(up, [A[0]-M[0], A[1]-M[1], A[2]-M[2]]) >= 0 ? up : [-up[0], -up[1], -up[2]];
+})();
+
 const SCALES = (() => {
+  /* Degrees right and up **of the figure**, not of the horizon. An exact great-circle step,
+     so a pan several degrees down is where it should be rather than where a flat tangent
+     guess would put it. */
   const near = (k, dRight, dUp) => {
-    const s = SIGN[k], alt = s.alt + dUp;
-    return dir(s.az + dRight / Math.cos(alt * DEG), alt);
+    const v = SIGN[k].v;
+    const th = Math.hypot(dRight, dUp) * DEG;
+    if (th === 0) return v;
+    const u = unit([FRAME_UP[0] - v[0]*dot3(FRAME_UP, v),   // the figure's up, here
+                    FRAME_UP[1] - v[1]*dot3(FRAME_UP, v),
+                    FRAME_UP[2] - v[2]*dot3(FRAME_UP, v)]);
+    const r = cross3(v, u);                                 // ...and the figure's right
+    const d = unit([r[0]*dRight + u[0]*dUp, r[1]*dRight + u[1]*dUp, r[2]*dRight + u[2]*dUp]);
+    const c = Math.cos(th), sn = Math.sin(th);
+    return unit([v[0]*c + d[0]*sn, v[1]*c + d[1]*sn, v[2]*c + d[2]*sn]);
   };
   const paths = [];
 
@@ -802,7 +841,11 @@ const SCALES = (() => {
   }
   paths.push(ring);
 
-  // a pan at the end of each cord
+  /* A pan at the end of each cord, each hanging a fixed drop under its own star — so the two
+     sit at the heights their stars put them at, and the balance comes out tilted. That is
+     left alone on purpose: a scale that is carrying something is tilted, and the stars are
+     not going to be nudged to make a tidier picture. What had to be right was the frame they
+     hang in, not the levelness. */
   for (const k of ["brachium", "tau"]) {
     const w = 2.0, drop = 1.9, bowl = 1.3;
     paths.push([near(k, -w, -drop), near(k, 0, -0.2), near(k, w, -drop)]);   // the cords
@@ -916,12 +959,30 @@ function qFromBasis(Rv, Uv, Fv) {
    on it and the whole drawing sits low, with the pans down by the Next button. So this is
    the centroid of everything that ends up drawn, stars and scales together. */
 const Q_LAND = (function () {
-  const acc = [0, 0, 0];
-  const add = v => { acc[0] += v[0]; acc[1] += v[1]; acc[2] += v[2]; };
-  for (const k in SIGN) add(SIGN[k].v);
-  for (const path of SCALES) for (const v of path) add(v);
-  const f = unit(acc), up = [0,1,0];
-  const r = unit(cross3(f, up));
+  const pts = Object.values(SIGN).map(s => s.v);
+  for (const path of SCALES) for (const v of path) pts.push(v);
+
+  /* Centre on what the drawing *spans*, not on the average of its points. An average is
+     weighted by where the points happen to be dense, and they are very dense in two places:
+     each bowl is fifteen points and the ring is twenty-one, so the mean sat well below the
+     middle and pushed the whole figure up into the title. Halfway between the extremes is
+     what "centred" means to someone looking at it. */
+  const seed = unit(pts.reduce((a, v) => [a[0]+v[0], a[1]+v[1], a[2]+v[2]], [0,0,0]));
+  const up = unit([FRAME_UP[0] - seed[0]*dot3(FRAME_UP, seed),
+                   FRAME_UP[1] - seed[1]*dot3(FRAME_UP, seed),
+                   FRAME_UP[2] - seed[2]*dot3(FRAME_UP, seed)]);
+  const right = cross3(seed, up);
+  let x0 =  Infinity, x1 = -Infinity, y0 =  Infinity, y1 = -Infinity;
+  for (const v of pts) {
+    const x = dot3(v, right), y = dot3(v, up);
+    if (x < x0) x0 = x; if (x > x1) x1 = x;
+    if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  const f = unit([seed[0] + right[0]*mx + up[0]*my,
+                  seed[1] + right[1]*mx + up[1]*my,
+                  seed[2] + right[2]*mx + up[2]*my]);
+  const r = unit(cross3(f, FRAME_UP));   // stand it up, rather than levelling the horizon
   return qFromBasis(r, cross3(r, f), f);
 })();
 
