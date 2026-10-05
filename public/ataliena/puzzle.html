@@ -41,10 +41,14 @@ h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,
    to go and find the VIEWFINDER. */
 body.solved .intro{border:1.5px solid var(--star);border-radius:6px;padding:12px 14px;margin-top:1rem}
 body.solved .clues{display:none}
-/* The bar goes with it. A clue under a finished grid, with no list left to match
-   it against, is just the last square she happened to touch. Its arrows go too,
-   and nothing is lost: tapping any square still selects it. */
+/* The bar goes with it, so the message has the screen at the moment she finishes —
+   but only until she asks. Tapping a square afterwards is a question about that
+   answer, so the bar comes back to answer it. The clue list stays gone: she is
+   asking "what was this one", not "show me all sixty-six again". */
 body.solved .bar{display:none}
+body.solved.peeking .bar{display:flex}
+/* Clearing is the one thing she will not want from a finished grid. */
+body.solved .danger{display:none}
 .cass{width:92px;height:52px;flex:none;color:var(--star)}
 .layout{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:32px;align-items:start}
 .board{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
@@ -342,6 +346,8 @@ const solved=()=>sol.every((s,i)=>!s||fill[i]===s);
    solved puzzle should show the message without ambushing her with the animation
    again, and MASTER is the answer key, which has nothing to celebrate. */
 let celebrated=MASTER||solved();
+/* Set when she taps a square on a finished grid, which brings the clue bar back. */
+let peeking=false;
 const STAR_PATH="M8 .8l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.7l-4.4 2.5 1.1-4.9L.9 5.9l5-.5z";
 const BURST_MS=1900;
 function celebrate(){
@@ -429,7 +435,7 @@ for(let i=0;i<N*N;i++){
   if(!isB(i)){d.setAttribute("role","gridcell");
     if(num[i]){const s=document.createElement("span");s.className="n";s.textContent=num[i];d.appendChild(s);}
     const l=document.createElement("span");l.className="l";d.appendChild(l);
-    d.addEventListener("click",()=>{if(cur===i){toggle();firstEmpty();}else{cur=i;if(cellEntry[i][dir]===null)toggle();}render();focusKb();});
+    d.addEventListener("click",()=>{peeking=true;if(cur===i){toggle();firstEmpty();}else{cur=i;if(cellEntry[i][dir]===null)toggle();}render();focusKb();});
   }
   if(spEntry&&spEntry.cells.includes(i))d.classList.add("sp");
   gridEl.appendChild(d);cellsEl.push(d);
@@ -480,6 +486,8 @@ function render(){
   if(!MASTER){
     document.getElementById("intro").textContent=won?INTRO.split("\n")[0]+"\n"+WIN_MESSAGE:INTRO;
     document.body.classList.toggle("solved",won);
+    document.body.classList.toggle("peeking",won&&peeking);
+    if(!won)peeking=false;
     if(won&&!celebrated){celebrated=true;celebrate();}else if(!won)celebrated=false;
   }
 }
