@@ -477,15 +477,29 @@ bright stars at right ascension zero.
 
 ## Regenerating the QR code
 
-`docs/ataliena-qr.svg` is vector, so it scales to any print size. Reissue it only if the
-URL changes — which also orphans saved progress, see above:
+Two files, same code: `docs/ataliena-qr.svg` is the one to print, because it is vector and
+scales to any size, and `docs/ataliena-qr.png` is the one that opens anywhere without
+argument.
+
+The SVG carries an explicit `width` and `height` as well as its `viewBox`. It was written
+with the `viewBox` alone, which left it with no intrinsic size — renderers either drew it
+37 pixels square or refused it, and it could not be opened at all in most viewers. The
+`viewBox` still governs scaling; the dimensions only give it a size to fall back on.
+
+Reissue either only if the URL changes — which also orphans saved progress, see above:
 
 ```bash
 npx -y qrcode@1 -t svg -o docs/ataliena-qr.svg -e M -m 4 "https://liroger.com/ataliena"
+npx -y qrcode@1 -t png -o docs/ataliena-qr.png -e M -m 4 -w 1024 "https://liroger.com/ataliena"
 ```
 
-`-e M` is ~15% error correction, enough to survive ordinary print and scuffing. Verify
-any regenerated code actually decodes before printing it.
+The SVG comes out without `width`/`height`; add them back.
+
+`-e M` is ~15% error correction, enough to survive ordinary print and scuffing.
+
+**Verify by decoding, not by looking.** Both current files were read back with jsQR and
+return `https://liroger.com/ataliena` exactly. A code that renders is not evidence of a
+code that scans, and the URL is baked into a printed card that cannot be reissued.
 
 
 ### Practice mode
