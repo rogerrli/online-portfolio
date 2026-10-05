@@ -582,3 +582,41 @@ Checked three ways: against the textbook identity
 construction of the star's vector in the hour-angle frame, which agrees to the last digit at
 every hour angle; and indirectly by the rigid-rotation test above, which only reaches machine
 epsilon if the placement really is a rotation of itself — a wrong `altaz` cannot pass it.
+
+
+### Standing the scales up
+
+The payoff drew Libra as a balance and it read as goofy, because two different "down"s were
+in play. The **figure** is pinned to real stars, so the beam lies at whatever angle the sky
+has it at — and since the sky went live, that angle changes through the night. The **pans**
+were built with `near(k, dRight, dUp)` in azimuth and altitude, so they hung toward the real
+horizon no matter what. A sideways beam with level trays.
+
+Rotating the view alone would not have fixed it: roll the camera to stand the beam up and the
+trays stop hanging down. Both ends had to move.
+
+**The figure gets a frame of its own**, `FRAME_UP`, read off the stars rather than chosen.
+The beam is the line between the two lower corners of the triangle, the ones the cords hang
+from; up is square to it, turned so it points at the apex, which is the end the ring is on.
+Everything the scales are made of is built in that frame, with an exact great-circle step so
+a pan several degrees down lands where it should.
+
+**The landing rolls to it.** `Q_LAND` takes `FRAME_UP` as its up instead of the horizon's, so
+the view comes to rest with the figure standing.
+
+This holds at any hour, and that is not a coincidence to be re-checked each time: the landing
+composes `skyQuat(t)` with `Q_LAND`, and `basisFrom` undoes `skyQuat(t)` again, so the two
+cancel exactly. Measured across a full twenty-four hours in seven steps, the settled view is
+identical to the digit: beam tilt 0.024px, apex 106px above the beam, every time.
+
+**The tilt is left in.** The two cord stars are at different heights — Brachium 11.5 degrees
+below the beam, tau 16.9 — so the pans come out about a hundred pixels apart and the balance
+reads as carrying something on one side. Levelling them was tried and backed out: a scale
+that is weighed down is tilted, and the stars are not going to be nudged to make a tidier
+picture. What had to be right was the frame they hang in, not the levelness.
+
+**Centred on what it spans, not on its points.** `Q_LAND` used to average every point, which
+is weighted by where they are dense — each bowl is fifteen points and the ring twenty-one, so
+the mean sat low and pushed the figure up into the title. It now takes the midpoint of the
+extremes in the figure's own frame. Measured: drawing midpoint (511, 383) against a screen
+centre of (512, 384), with the ring clearing the title by some 50px.
