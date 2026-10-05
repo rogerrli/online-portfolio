@@ -41,6 +41,10 @@ h1{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:clamp(2rem,
    to go and find the VIEWFINDER. */
 body.solved .intro{border:1.5px solid var(--star);border-radius:6px;padding:12px 14px;margin-top:1rem}
 body.solved .clues{display:none}
+/* The bar goes with it. A clue under a finished grid, with no list left to match
+   it against, is just the last square she happened to touch. Its arrows go too,
+   and nothing is lost: tapping any square still selects it. */
+body.solved .bar{display:none}
 .cass{width:92px;height:52px;flex:none;color:var(--star)}
 .layout{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:32px;align-items:start}
 .board{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
