@@ -13,7 +13,7 @@ import { BeyondWorkSection } from '@/components/BeyondWorkSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
-import { RoleTitle } from '@/components/RoleTitle'
+import { RoleTitle, type Title } from '@/components/RoleTitle'
 import { Section } from '@/components/Section'
 import { SectionRail } from '@/components/SectionRail'
 import { TagList } from '@/components/TagList'
@@ -123,16 +123,28 @@ const EXPERIENCE: Role[] = [
 // Titles for the cycling hero heading. Deliberately hand-written rather
 // than derived from EXPERIENCE: the heading offers a role ("your next …")
 // instead of listing history, so a full résumé of past titles reads as a
-// claim to every one of those careers at once. Two professional entries
+// claim to every one of those careers at once. The professional entries
 // carry the pitch, then one sincere and one joke widen it past the job.
 //
 // Order matters. The first entry is what loads before the cycle starts and
 // the only one visitors with prefers-reduced-motion ever see, so it leads
 // with the straightest professional title — and the joke sits last, where
 // it lands as a punchline.
-const ROLE_TITLES = [
+//
+// The second entry is a pair rather than a string: it reads "engineer who
+// speaks product", then the same words rearrange into "product manager who
+// speaks engineer". The two halves of the winding path described below are
+// one claim read from either end, so the entry is staged as a single title
+// turning around instead of two titles sliding past each other.
+const ROLE_TITLES: Title[] = [
   'full stack engineer',
-  'engineer who speaks product',
+  {
+    head: 'engineer',
+    between: 'who speaks',
+    tail: 'product',
+    tailSuffix: 'manager',
+  },
+  'engineer who builds with agents',
   'teammate',
   'dungeon master',
 ]
