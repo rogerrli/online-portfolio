@@ -46,9 +46,11 @@ interface Role {
 const EXPERIENCE: Role[] = [
   {
     title: 'Senior Software Engineer',
-    dates: 'May 2023 to Present',
-    description: 'Frontend development in React, using Tailwind and Base UI.',
-    tags: ['React', 'Tailwind', 'Base UI', 'Claude Code', 'Cursor'],
+    company: 'Oscar',
+    dates: 'May 2023 to Oct 2026',
+    description:
+      'Frontend development in React, using Tailwind and Base UI. Starting in 2026, used Claude Code to build UX and end-to-end tests, and wrote custom skills to keep a larger volume of shipped code manageable.',
+    tags: ['React', 'Tailwind', 'Base UI', 'Claude Code', 'Cursor', 'E2E Testing'],
   },
   {
     title: 'Product Manager',
