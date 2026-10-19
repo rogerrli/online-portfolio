@@ -8,7 +8,7 @@ export function WorkingWithAiSection() {
       <div className="flex flex-col gap-4 border-t border-border pt-6">
         <p className="max-w-[60ch]">
           AI is part of how I build software day to day, not just a talking
-          point &mdash; this site itself, including this section, was built
+          point. This site itself, including this section, was built
           collaboratively with Claude Code. The commit history&rsquo;s public
           on{' '}
           <ExternalLink
@@ -26,7 +26,7 @@ export function WorkingWithAiSection() {
           to package up recurring workflows, set up scheduled routines for
           tasks that shouldn&rsquo;t need a manual kickoff, and spend real
           time on how a fleet of agents gets organized and handed off
-          between &mdash; not just what one agent can do in isolation.
+          between, rather than just what one agent can do in isolation.
         </p>
       </div>
     </Section>

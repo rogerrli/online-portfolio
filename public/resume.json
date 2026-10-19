@@ -26,10 +26,11 @@
   },
   "work": [
     {
-      "name": "",
+      "name": "Oscar",
       "position": "Senior Software Engineer",
       "startDate": "2023-05-01",
-      "summary": "Frontend development in React, using Tailwind and Base UI."
+      "endDate": "2026-10-01",
+      "summary": "Frontend development in React and TypeScript, using Tailwind and Base UI. Built interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX and end-to-end tests, and wrote custom skills to keep a larger volume of shipped code manageable."
     },
     {
       "name": "Jumbo",
@@ -93,6 +94,7 @@
         "Python (OpenCV)",
         "MySQL",
         "React JS",
+        "TypeScript",
         "Angular JS",
         "HTML/CSS",
         "Java",

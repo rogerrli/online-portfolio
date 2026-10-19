@@ -12,13 +12,13 @@ const INTERESTS: Interest[] = [
     emoji: '🔧',
     label: 'Machine Shop',
     description:
-      'I like building things with my hands, too — I keep a small home machine shop for personal projects.',
+      'I like building things with my hands, too. I keep a small home machine shop for personal projects.',
   },
   {
     emoji: '🎲',
     label: 'Dungeon Master',
     description:
-      "I've run tabletop D&D campaigns for years — different medium, same instinct for building systems people want to explore.",
+      "I've run tabletop D&D campaigns for years: different medium, same instinct for building systems people want to explore.",
   },
 ]
 

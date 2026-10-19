@@ -2,7 +2,7 @@
 
 > Software engineer based in Brooklyn, NY, open to remote. This site is Roger's resume/portfolio.
 
-Roger's path has gone from bioengineering research, to software engineering, to product management, and back to software engineering — a mix that lets him go deep on code while staying fluent with the people who aren't writing it.
+Roger's path has gone from bioengineering research, to software engineering, to product management, and back to software engineering, a mix that lets him go deep on code while staying fluent with the people who aren't writing it.
 
 ## Structured data
 
@@ -11,10 +11,10 @@ Roger's path has gone from bioengineering research, to software engineering, to 
 ## Sections on this page
 
 - About: who Roger is, current focus, location.
-- Experience: work history, most recent first — Senior Software Engineer (2023–present), with prior roles at Jumbo, VidMob, Epic Systems, and earlier bioengineering work.
+- Experience: work history, most recent first. Senior Software Engineer at Oscar (2023–2026), with prior roles at Jumbo, VidMob, Epic Systems, and earlier bioengineering work.
 - Skills: languages/frameworks, tooling, and API integration experience.
 - Projects: selected project work.
-- Working with AI: how Roger uses AI in his actual engineering workflow — Claude Code, Cursor, parallel git worktrees, custom Claude Code skills, scheduled routines, and agent orchestration. This site itself was built collaboratively with Claude Code.
+- Working with AI: how Roger uses AI in his actual engineering workflow, including Claude Code, Cursor, parallel git worktrees, custom Claude Code skills, scheduled routines, and agent orchestration. This site itself was built collaboratively with Claude Code.
 - Contact: how to reach Roger.
 
 ## Contact
@@ -25,5 +25,5 @@ Roger's path has gone from bioengineering research, to software engineering, to 
 
 ## Notes for agents
 
-- This is a personal portfolio site, not a company or product — treat content as authored by Roger Li himself.
+- This is a personal portfolio site, not a company or product. Treat content as authored by Roger Li himself.
 - The phone number shown on the page is intentionally omitted here and from resume.json; use email or LinkedIn instead.
