@@ -30,7 +30,7 @@
       "position": "Senior Software Engineer",
       "startDate": "2023-05-01",
       "endDate": "2026-10-01",
-      "summary": "Frontend development in React and TypeScript, using Tailwind and Base UI. Built interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX and end-to-end tests, and wrote custom skills to keep a larger volume of shipped code manageable."
+      "summary": "Frontend development in React, TypeScript and JavaScript, using Tailwind and a shared Base UI component library. Built responsive, accessible interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX, Playwright end-to-end tests and Jest unit tests, and wrote custom skills to keep a larger volume of shipped code manageable."
     },
     {
       "name": "Jumbo",
@@ -65,14 +65,14 @@
       "position": "Integration Engineer - Project Manager",
       "startDate": "2016-02-01",
       "endDate": "2016-11-01",
-      "summary": "Guided clients through new software rollouts, recommended configurations that fit their workflows, and hit fixed launch dates."
+      "summary": "Guided healthcare clients through software rollouts, recommending configurations that fit their workflows, and hit fixed launch dates."
     },
     {
       "name": "Healmet",
       "position": "Bioengineer",
       "startDate": "2015-08-01",
       "endDate": "2016-01-01",
-      "summary": "Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG), similar to what an Apple Watch does today."
+      "summary": "Helped plan a prototype for detecting basic vitals: heart rate, oxygen saturation, and EKG."
     },
     {
       "name": "University Hospitals Cleveland Medical Center",
@@ -82,60 +82,82 @@
       "summary": "Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured."
     }
   ],
+  "education": [
+    {
+      "institution": "Case Western Reserve University",
+      "studyType": "B.S.",
+      "area": "Biomedical Engineering",
+      "endDate": "2015-05-01"
+    }
+  ],
   "certificates": [
-    { "name": "Certified Scrum Manager" },
-    { "name": "Certified Scrum Product Owner" }
+    {
+      "name": "Certified Scrum Manager"
+    },
+    {
+      "name": "Certified Scrum Product Owner"
+    }
   ],
   "skills": [
     {
       "name": "Languages",
       "keywords": [
-        "Groovy / Grails",
-        "Python (OpenCV)",
-        "MySQL",
-        "React JS",
         "TypeScript",
-        "Angular JS",
-        "HTML/CSS",
+        "JavaScript",
+        "Node.js",
+        "Python (OpenCV)",
         "Java",
+        "Groovy / Grails",
+        "SQL / MySQL",
+        "HTML/CSS",
         "MATLAB"
       ]
     },
     {
-      "name": "Other",
+      "name": "Frontend",
       "keywords": [
-        "AI Coding",
-        "Scrum Dev Cycle",
-        "Data Modeling",
-        "Image/Signal Processing",
-        "Postman Expert",
-        "Jira & Confluence",
-        "GitHub"
+        "React JS",
+        "Angular JS",
+        "Tailwind",
+        "Base UI",
+        "Design Systems",
+        "Component Libraries",
+        "Jotai (state management)",
+        "Accessibility",
+        "Responsive Design",
+        "Web Performance",
+        "Vite",
+        "Webpack"
       ]
     },
     {
-      "name": "API Experience",
+      "name": "Testing & Practices",
       "keywords": [
-        "OAuth1 and OAuth2",
-        "Amazon (Ads)",
-        "Box",
-        "Dropbox",
+        "Playwright (end-to-end)",
+        "Jest (unit)",
+        "CI/CD",
+        "Git / GitHub",
+        "Agile / Scrum",
+        "Jira & Confluence",
+        "Figma",
+        "Data Modeling",
+        "Image/Signal Processing",
+        "AI Coding"
+      ]
+    },
+    {
+      "name": "APIs",
+      "keywords": [
+        "GraphQL",
+        "REST",
+        "OAuth1 / OAuth2",
+        "Postman",
         "Facebook Graph/Marketing",
-        "Google Drive",
-        "HubSpot",
-        "Instagram",
-        "Intercom",
-        "JW Player",
-        "MailChimp/Mandrill",
-        "Pinterest (Ads)",
+        "Ads APIs (Amazon, Pinterest, Snapchat, Spotify, TikTok, Twitter)",
+        "File storage (Box, Dropbox, Google Drive)",
         "Salesforce",
-        "Slack",
-        "Snapchat (Ads)",
-        "Spotify (Ads)",
-        "TikTok (Ads)",
-        "Twitter (Ads)",
-        "VidMob",
-        "Vimeo"
+        "HubSpot",
+        "Slack"
       ]
     }
   ]

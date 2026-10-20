@@ -82,21 +82,25 @@ function entryRow(title, dates, titleSize) {
 
 doc.font("Helvetica-Bold").fontSize(22).fillColor("black").text(resume.basics.name);
 doc.font("Helvetica").fontSize(13).fillColor(ACCENT).text(resume.basics.label);
-doc.moveDown(0.4);
+doc.moveDown(0.3);
 
+// Location leads the contact line: ATS and recruiter filters sort on it, so a
+// resume that omits it gets dropped from location-scoped searches.
+const { city, region } = resume.basics.location ?? {};
 const contactParts = [
+  [city, region].filter(Boolean).join(", "),
   resume.basics.email,
   resume.basics.url?.replace(/^https?:\/\//, ""),
   ...resume.basics.profiles.map((p) => `${p.network}: ${p.username}`),
-];
+].filter(Boolean);
 doc.font("Helvetica").fontSize(9.5).fillColor(MUTED).text(contactParts.join("   ·   "));
-doc.moveDown(0.9);
+doc.moveDown(0.75);
 
 if (resume.basics.summary) {
   doc.font("Helvetica").fontSize(10.5).fillColor("black").text(resume.basics.summary, {
     align: "left",
   });
-  doc.moveDown(1.1);
+  doc.moveDown(0.85);
 }
 
 function sectionHeading(title) {
@@ -109,7 +113,7 @@ function sectionHeading(title) {
     .strokeColor("#cccccc")
     .lineWidth(1)
     .stroke();
-  doc.moveDown(0.65);
+  doc.moveDown(0.55);
 }
 
 if (resume.work?.length) {
@@ -122,28 +126,42 @@ if (resume.work?.length) {
     if (job.summary) {
       doc.font("Helvetica").fontSize(10).fillColor("black").text(job.summary);
     }
-    doc.moveDown(0.8);
-  }
-}
-
-if (resume.education?.length) {
-  sectionHeading("Education");
-  for (const edu of resume.education) {
-    const line = [edu.studyType, edu.area].filter(Boolean).join(" ");
-    entryRow(edu.institution, formatDate(edu.endDate), 10.5);
-    doc.font("Helvetica").fontSize(10).fillColor(MUTED).text(line);
     doc.moveDown(0.5);
   }
 }
 
-if (resume.certificates?.length) {
-  sectionHeading("Certificates");
-  doc
-    .font("Helvetica")
-    .fontSize(10)
-    .fillColor("black")
-    .text(resume.certificates.map((c) => c.name).join("   ·   "));
-  doc.moveDown(1.0);
+// Education and certifications share one heading. Giving the two certificates a
+// section of their own cost a heading, a divider and its spacing for a single
+// line of text, which is the room the page needed; both terms still appear
+// verbatim in the text, which is what keyword scans read.
+if (resume.education?.length || resume.certificates?.length) {
+  sectionHeading(
+    [
+      resume.education?.length && "Education",
+      resume.certificates?.length && "Certifications",
+    ]
+      .filter(Boolean)
+      .join(" & "),
+  );
+
+  for (const edu of resume.education ?? []) {
+    const line = [edu.studyType, edu.area].filter(Boolean).join(" ");
+    entryRow(edu.institution, formatDate(edu.endDate), 10.5);
+    doc.font("Helvetica").fontSize(10).fillColor(MUTED).text(line);
+    doc.moveDown(0.35);
+  }
+
+  if (resume.certificates?.length) {
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(10)
+      .fillColor("black")
+      .text("Certifications: ", { continued: true })
+      .font("Helvetica")
+      .fillColor(MUTED)
+      .text(resume.certificates.map((c) => c.name).join(", "));
+    doc.moveDown(0.7);
+  }
 }
 
 if (resume.skills?.length) {
@@ -157,7 +175,7 @@ if (resume.skills?.length) {
       .font("Helvetica")
       .fillColor(MUTED)
       .text(group.keywords.join(", "));
-    doc.moveDown(0.4);
+    doc.moveDown(0.3);
   }
 }
 
