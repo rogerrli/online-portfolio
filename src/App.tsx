@@ -49,17 +49,20 @@ const EXPERIENCE: Role[] = [
     company: 'Oscar',
     dates: 'May 2023 to Oct 2026',
     description:
-      'Frontend development in React and TypeScript, using Tailwind and Base UI. Built interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX and end-to-end tests, and wrote custom skills to keep a larger volume of shipped code manageable.',
+      'Frontend development in React, TypeScript and JavaScript, using Tailwind and a shared Base UI component library. Built responsive, accessible interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX, Playwright end-to-end tests and Jest unit tests, and wrote custom skills to keep a larger volume of shipped code manageable.',
     tags: [
       'React',
       'TypeScript',
       'Tailwind',
       'Base UI',
+      'Jotai',
+      'Accessibility',
       'Data Viz',
       'Reporting',
       'Claude Code',
       'Cursor',
-      'E2E Testing',
+      'Playwright',
+      'Jest',
     ],
   },
   {
