@@ -2,7 +2,7 @@
 
 > Software engineer based in Brooklyn, NY, open to remote. This site is Roger's resume/portfolio.
 
-Roger's path has gone from bioengineering research, to software engineering, to product management, and back to software engineering, a mix that lets him go deep on code while staying fluent with the people who aren't writing it.
+Roger's path has gone from bioengineering research, to software engineering, to product management, and back to software engineering. He builds across the stack and does his best work on the frontend, where product sense matters most, a mix that lets him go deep on code while staying fluent with the people who aren't writing it.
 
 ## Structured data
 

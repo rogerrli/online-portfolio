@@ -5,7 +5,7 @@
     "label": "Senior Software Engineer",
     "email": "li.rojie@gmail.com",
     "url": "https://liroger.com",
-    "summary": "Software engineer with a background in bioengineering research and product management. I build frontend features now, and the PM years mean I can run the roadmap and client conversations around them too.",
+    "summary": "Software engineer with a background in bioengineering research and product management. I build across the stack and do my best work on the frontend, where product sense matters most; the PM years mean I can run the roadmap and client conversations too.",
     "location": {
       "city": "Brooklyn",
       "region": "New York",
@@ -30,112 +30,177 @@
       "position": "Senior Software Engineer",
       "startDate": "2023-05-01",
       "endDate": "2026-10-01",
-      "summary": "Frontend development in React and TypeScript, using Tailwind and Base UI. Built interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX and end-to-end tests, and wrote custom skills to keep a larger volume of shipped code manageable."
+      "highlights": [
+        "Built data analysis and reporting interfaces used by hundreds of people at large government clients, enabling more complex analysis by chaining one query’s output into the next and drawing regions on a map to explore the data inside them",
+        "Owned features from the React/TypeScript frontend through the API layer: wrote Elasticsearch queries directly and added API-layer transformations over ClickHouse data so that logic stayed out of the frontend",
+        "Helped build and enforce the team’s design system (Tailwind, Base UI), and built app-wide dark mode by reworking the color system into semantic tokens compatible with shadcn conventions",
+        "Used Claude Code to build UI features and end-to-end test coverage, and helped introduce new skills and workflows that let the team keep up with a much larger throughput of code"
+      ]
     },
     {
       "name": "Jumbo",
       "position": "Product Manager",
       "startDate": "2022-05-01",
       "endDate": "2023-05-01",
-      "summary": "Shipped several iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for the engineers, pushed hard on protecting user data, and used analytics to pick what to build next."
+      "highlights": [
+        "Led the shift from a consumer iOS app with thousands of users to a B2B2C model serving business partners, prioritizing the protection of existing users’ data throughout",
+        "Set weekly roadmaps for a 5-person engineering team and used analytics to steer feature decisions toward KPI goals across about a dozen iOS releases"
+      ]
     },
     {
       "name": "VidMob",
       "position": "Product Manager",
       "startDate": "2020-09-01",
       "endDate": "2022-04-01",
-      "summary": "Planned the roadmap across 3 teams as both product owner and scrum master. Talked to clients directly and used their feedback and usage data to prioritize the backlog."
+      "highlights": [
+        "Planned the roadmap across 3 teams as both product owner and scrum master",
+        "Worked directly with clients, using their feedback and usage data to prioritize the backlog"
+      ]
     },
     {
       "name": "VidMob",
       "position": "Solutions Engineer",
       "startDate": "2019-10-01",
       "endDate": "2021-10-01",
-      "summary": "Built proof-of-concepts so product teams knew what a feature would cost before committing to it. Overhauled the API docs and wrote a new public-facing version. Technical lead for partnerships scoping new integrations."
+      "highlights": [
+        "Built proofs of concept so product teams could see what a feature would cost before committing to it",
+        "Overhauled the API documentation and launched a public-facing version, giving partners and prospects a self-serve reference",
+        "Technical lead for partnerships, scoping new integrations"
+      ]
     },
     {
       "name": "VidMob",
-      "position": "Full Stack Engineer",
+      "position": "Full Stack Engineer → Engineering Lead",
       "startDate": "2017-05-01",
       "endDate": "2019-09-01",
-      "summary": "Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations that replaced manual work, and eventually led the engineering team."
+      "highlights": [
+        "Led a team of 5 engineers",
+        "Built about a dozen integrations with ad platforms and business tools (Facebook, Google, Salesforce, and others) using OAuth1/OAuth2, replacing manual handoffs with automated syncs",
+        "Rebuilt the email notification system and designed and built other features end to end in Groovy/Grails"
+      ]
     },
     {
       "name": "Epic Systems",
-      "position": "Integration Engineer - Project Manager",
+      "position": "Integration Engineer",
       "startDate": "2016-02-01",
       "endDate": "2016-11-01",
-      "summary": "Guided clients through new software rollouts, recommended configurations that fit their workflows, and hit fixed launch dates."
+      "highlights": [
+        "Guided healthcare organizations through EHR rollouts, recommending configurations to fit clinical workflows and meeting fixed go-live dates"
+      ]
     },
     {
       "name": "Healmet",
       "position": "Bioengineer",
       "startDate": "2015-08-01",
       "endDate": "2016-01-01",
-      "summary": "Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG), similar to what an Apple Watch does today."
+      "highlights": [
+        "Helped plan a wearable prototype for measuring vital signs (heart rate, oxygen saturation, EKG)"
+      ]
     },
     {
       "name": "University Hospitals Cleveland Medical Center",
       "position": "Research Assistant",
       "startDate": "2013-08-01",
       "endDate": "2015-05-01",
-      "summary": "Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured."
+      "highlights": [
+        "Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "MTA Train Board",
+      "keywords": ["Python", "FastAPI", "GTFS-Realtime"],
+      "highlights": [
+        "Built a wall-mounted touchscreen arrival board backed by a FastAPI service that polls the MTA’s real-time feeds, showing only trains you can actually catch given walk time to each station and prioritizing the commute by time of day"
+      ]
+    },
+    {
+      "name": "liroger.com",
+      "keywords": ["React", "TypeScript", "Vite", "Tailwind", "shadcn"],
+      "highlights": [
+        "Rebuilt my personal site as a code-owned app, developed with parallel Claude Code sessions on separate git worktrees, with work planned as GitHub issues and shipped through PRs"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Case Western Reserve University",
+      "studyType": "B.S.",
+      "area": "Biomedical Engineering",
+      "startDate": "2011-08-01",
+      "endDate": "2015-05-01"
     }
   ],
   "certificates": [
-    { "name": "Certified Scrum Manager" },
+    { "name": "Certified Scrum Master" },
     { "name": "Certified Scrum Product Owner" }
   ],
   "skills": [
     {
       "name": "Languages",
       "keywords": [
-        "Groovy / Grails",
-        "Python (OpenCV)",
-        "MySQL",
-        "React JS",
         "TypeScript",
-        "Angular JS",
-        "HTML/CSS",
+        "JavaScript",
+        "Python",
         "Java",
-        "MATLAB"
+        "Groovy",
+        "SQL",
+        "HTML/CSS"
       ]
     },
     {
-      "name": "Other",
+      "name": "Frameworks",
       "keywords": [
-        "AI Coding",
-        "Scrum Dev Cycle",
-        "Data Modeling",
-        "Image/Signal Processing",
-        "Postman Expert",
-        "Jira & Confluence",
-        "GitHub"
+        "React",
+        "Node.js",
+        "FastAPI",
+        "Grails",
+        "Tailwind",
+        "shadcn / Base UI",
+        "AngularJS"
       ]
     },
     {
-      "name": "API Experience",
+      "name": "Data",
+      "keywords": ["Elasticsearch", "ClickHouse", "MySQL"]
+    },
+    {
+      "name": "AI tooling",
+      "keywords": ["Claude Code (parallel agents, custom skills, automated workflows)"]
+    },
+    {
+      "name": "APIs",
       "keywords": [
-        "OAuth1 and OAuth2",
-        "Amazon (Ads)",
+        "OAuth1/OAuth2",
+        "Facebook",
+        "Google",
+        "Salesforce",
+        "HubSpot",
+        "Slack",
         "Box",
         "Dropbox",
-        "Facebook Graph/Marketing",
+        "Amazon (Ads)",
         "Google Drive",
-        "HubSpot",
         "Instagram",
         "Intercom",
         "JW Player",
         "MailChimp/Mandrill",
         "Pinterest (Ads)",
-        "Salesforce",
-        "Slack",
         "Snapchat (Ads)",
         "Spotify (Ads)",
         "TikTok (Ads)",
         "Twitter (Ads)",
         "VidMob",
         "Vimeo"
+      ]
+    },
+    {
+      "name": "Other",
+      "keywords": [
+        "API design and documentation",
+        "data modeling",
+        "image/signal processing (OpenCV, MATLAB)"
       ]
     }
   ]
