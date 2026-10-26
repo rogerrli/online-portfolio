@@ -194,6 +194,20 @@ function line(text, x, options = {}) {
 
 /** A bold label followed by a muted run, sharing one line. */
 function runs(label, labelSize, rest, restSize = labelSize) {
+  // Both draws below pass lineBreak: false, so an over-wide line does not wrap
+  // onto a second line — pdfkit clips it at the page edge and the text simply
+  // stops, silently. The single-page guard only watches vertical space, so
+  // nothing else would catch it. Measured here instead of trusted.
+  const labelWidth = pick("Helvetica-Bold", labelSize).widthOfString(label);
+  const restWidth = rest ? pick("Helvetica", restSize).widthOfString(rest) : 0;
+  if (labelWidth + restWidth > CONTENT_WIDTH) {
+    throw new Error(
+      `"${label.trim()}" line is ${Math.ceil(labelWidth + restWidth)}pt wide ` +
+        `against ${Math.floor(CONTENT_WIDTH)}pt of column, so it would be ` +
+        "clipped. Shorten it in public/resume.json, or move entries to another group.",
+    );
+  }
+
   pick("Helvetica-Bold", labelSize)
     .fillColor("black")
     .text(label, LEFT, y, { lineBreak: false, continued: Boolean(rest) });

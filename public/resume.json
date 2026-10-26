@@ -172,7 +172,8 @@
         "Grails",
         "Tailwind",
         "shadcn / Base UI",
-        "AngularJS"
+        "AngularJS",
+        "Playwright and Jest"
       ]
     },
     {
@@ -217,16 +218,13 @@
       ]
     },
     {
-      "name": "Practices",
+      "name": "Other",
       "keywords": [
-        "Playwright and Jest (end-to-end and unit testing)",
-        "accessibility",
-        "responsive design",
-        "state management (Jotai)",
-        "Agile / Scrum",
         "API design and documentation",
         "data modeling",
-        "image/signal processing (OpenCV, MATLAB)"
+        "image/signal processing (OpenCV, MATLAB)",
+        "accessibility",
+        "Agile / Scrum"
       ]
     }
   ]
