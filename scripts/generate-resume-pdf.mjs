@@ -148,7 +148,10 @@ const pick = (font, size) => doc.font(font).fontSize(size);
 function wrapToLines(text, width, font, size) {
   pick(font, size);
   const lines = [];
-  let current = "";
+  // null rather than "" so that a leading space — the empty first token of
+  // " Engineering Lead" — joins the line instead of being mistaken for an
+  // empty line and dropped, which would shift the run left by a space.
+  let current = null;
   for (const word of text.split(" ")) {
     // Nothing downstream can break a single word, so it would silently run off
     // the page rather than wrap.
@@ -157,16 +160,15 @@ function wrapToLines(text, width, font, size) {
         `"${word}" is wider than its ${Math.round(width)}pt column in resume.pdf and would run off the page.`,
       );
     }
-    const candidate = current ? `${current} ${word}` : word;
-    if (current && doc.widthOfString(candidate) > width) {
+    const candidate = current === null ? word : `${current} ${word}`;
+    if (current !== null && doc.widthOfString(candidate) > width) {
       lines.push(current);
       current = word;
     } else {
       current = candidate;
     }
   }
-  if (current) lines.push(current);
-  return lines;
+  return current === null ? [] : [...lines, current];
 }
 
 /** Draws text wrapped to `width`, leaving `y` on its last line. */
