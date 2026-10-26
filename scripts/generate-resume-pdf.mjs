@@ -77,6 +77,13 @@ const BASELINE_FRACTION = 718 / (718 + 207);
 // Skills groups name this many keywords before falling back to a count.
 const SKILLS_PREVIEW = 8;
 
+// Groups whose keyword list is deliberately longer than SKILLS_PREVIEW, and so
+// renders as a preview plus "and N more". Every other group has to fit, which
+// is what makes a keyword added past the cap fail the build instead of quietly
+// never being drawn. Renaming a group here throws too, on purpose: the rename
+// should be a decision about the summary, not a way to lose it.
+const SUMMARIZED_GROUPS = new Set(["APIs"]);
+
 // Baseline rhythm: top-of-line to top-of-line within a wrapped block.
 const LEADING = { body: 10.7, skills: 11.2 };
 
@@ -482,9 +489,21 @@ if (resume.education?.length || resume.certificates?.length) {
  */
 function skillLine(group) {
   const shown = group.keywords.slice(0, SKILLS_PREVIEW);
-  const hidden = group.keywords.length - shown.length;
-  if (hidden === 0) return shown.join(", ");
-  const count = hidden >= 10 ? `${Math.floor(hidden / 10) * 10}+` : hidden;
+  const dropped = group.keywords.slice(SKILLS_PREVIEW);
+  if (dropped.length === 0) return shown.join(", ");
+
+  if (!SUMMARIZED_GROUPS.has(group.name)) {
+    throw new Error(
+      `Skills group "${group.name}" has ${group.keywords.length} keywords but ` +
+        `only the first ${SKILLS_PREVIEW} are drawn, so ` +
+        `${dropped.map((k) => `"${k}"`).join(", ")} would never reach the ` +
+        "page. Fold entries together so the group fits, or add it to " +
+        "SUMMARIZED_GROUPS if it should render as a count.",
+    );
+  }
+
+  const count =
+    dropped.length >= 10 ? `${Math.floor(dropped.length / 10) * 10}+` : dropped.length;
   return `${shown.join(", ")}, and ${count} more`;
 }
 
