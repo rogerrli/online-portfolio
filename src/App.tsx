@@ -14,6 +14,7 @@ import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 import { RoleTitle } from '@/components/RoleTitle'
+import { MetaRow } from '@/components/MetaRow'
 import { Section } from '@/components/Section'
 import { SectionRail } from '@/components/SectionRail'
 import { TagList } from '@/components/TagList'
@@ -47,8 +48,8 @@ interface Employer {
   company: string
   roles: Role[]
   /**
-   * The whole stretch at an employer held across several roles. Set only for
-   * those, where the group shows one span and the roles nest under it.
+   * The whole stretch at an employer, shown on the group heading. Required
+   * whenever `roles` holds more than one, which is what makes a group.
    */
   span?: string
 }
@@ -175,9 +176,17 @@ const EXPERIENCE: Employer[] = [
  * role, where the company belongs on the role's own line; in a multi-role
  * group the company already sits in the heading above.
  */
-function ExperienceRow({ role, company }: { role: Role; company?: string }) {
+function ExperienceRow({
+  id,
+  role,
+  company,
+}: {
+  id: string
+  role: Role
+  company?: string
+}) {
   return (
-    <AccordionItem value={`${company ?? ''}${role.title}`}>
+    <AccordionItem value={id}>
       <AccordionTrigger className="items-center py-4 text-base font-medium hover:text-accent-text">
         <span className="flex flex-1 flex-col items-start gap-0.5 pr-3 sm:flex-row sm:items-baseline sm:gap-3">
           <span className="group-hover/accordion-trigger:underline">{role.title}</span>
@@ -301,29 +310,30 @@ function App() {
         <Section id="experience" title="Experience">
           <Accordion className="border-t border-border">
             {EXPERIENCE.map((employer) =>
-              employer.span ? (
+              employer.roles.length > 1 ? (
                 /* Several roles at one employer: a heading carrying the whole
                    span, then the roles nested behind a left rule, so the
                    stretch reads as one job rather than three. */
                 <div key={employer.company} className="not-last:border-b">
-                  <div className="flex flex-col items-start gap-0.5 py-4 sm:flex-row sm:items-baseline sm:gap-3 sm:pr-7">
-                    <span className="font-medium">{employer.company}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {employer.roles.length} roles
-                    </span>
-                    <span className="font-mono text-sm text-muted-foreground sm:ml-auto">
-                      {employer.span}
-                    </span>
-                  </div>
+                  <MetaRow
+                    what={employer.company}
+                    where={`${employer.roles.length} roles`}
+                    when={employer.span}
+                  />
                   <div className="border-l border-border pl-4">
                     {employer.roles.map((role) => (
-                      <ExperienceRow key={role.title} role={role} />
+                      <ExperienceRow
+                        key={`${employer.company}-${role.title}`}
+                        id={`${employer.company}-${role.title}`}
+                        role={role}
+                      />
                     ))}
                   </div>
                 </div>
               ) : (
                 <ExperienceRow
                   key={employer.company}
+                  id={employer.company}
                   role={employer.roles[0]}
                   company={employer.company}
                 />
@@ -333,19 +343,14 @@ function App() {
         </Section>
 
         <Section id="education" title="Education">
-          {/* One row dressed like an experience row minus the disclosure:
-              same three columns (what, where, when), same top rule, so the
-              page's two chronological lists read as siblings. The right
-              padding stands in for the chevron column those rows carry
-              (1rem icon + the trigger's 0.75rem pr-3), without which this
-              date sits 1.75rem further right than every date above it. */}
-          <div className="flex flex-col items-start gap-0.5 border-t border-border py-4 sm:flex-row sm:items-baseline sm:gap-3 sm:pr-7">
-            <span className="font-medium">B.S. Biomedical Engineering</span>
-            <span className="text-sm text-muted-foreground">Case Western Reserve University</span>
-            <span className="font-mono text-sm text-muted-foreground sm:ml-auto">
-              Aug 2011 &ndash; May 2015
-            </span>
-          </div>
+          {/* The top rule makes this read as a sibling of the experience
+              list above, which the accordion gives itself. */}
+          <MetaRow
+            className="border-t border-border"
+            what="B.S. Biomedical Engineering"
+            where="Case Western Reserve University"
+            when={<>Aug 2011 &ndash; May 2015</>}
+          />
         </Section>
 
         <SkillsSection />
