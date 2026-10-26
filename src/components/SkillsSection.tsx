@@ -12,27 +12,37 @@ interface SkillGroup {
 const SKILL_GROUPS: SkillGroup[] = [
   {
     label: 'Current Focus',
-    skills: ['React JS', 'TypeScript', 'HTML/CSS', 'AI Coding', 'GitHub'],
+    skills: [
+      'TypeScript',
+      'React',
+      'Node.js',
+      'Python / FastAPI',
+      'Tailwind',
+      'shadcn / Base UI',
+      'Elasticsearch',
+      'ClickHouse',
+      'Claude Code',
+    ],
   },
   {
     label: 'Also Worked With',
     skills: [
-      'Python (OpenCV)',
-      'MySQL',
+      'JavaScript',
       'Java',
-      'Angular JS',
       'Groovy / Grails',
+      'AngularJS',
+      'SQL / MySQL',
+      'HTML/CSS',
+      'Python (OpenCV)',
       'MATLAB',
       'Data Modeling',
       'Image/Signal Processing',
-      'Scrum Dev Cycle',
-      'Postman Expert',
-      'Jira & Confluence',
+      'API Design and Documentation',
     ],
   },
   {
     label: 'Certifications',
-    skills: ['Certified Scrum Manager', 'Certified Scrum Product Owner'],
+    skills: ['Certified Scrum Master', 'Certified Scrum Product Owner'],
   },
 ]
 
