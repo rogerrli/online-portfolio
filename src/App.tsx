@@ -14,6 +14,7 @@ import { ContactSection } from '@/components/ContactSection'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MobileNav } from '@/components/MobileNav'
 import { RoleTitle } from '@/components/RoleTitle'
+import { MetaRow } from '@/components/MetaRow'
 import { Section } from '@/components/Section'
 import { SectionRail } from '@/components/SectionRail'
 import { TagList } from '@/components/TagList'
@@ -36,92 +37,180 @@ const SECTION_IDS = NAV_LINKS.map((link) => link.id)
 
 interface Role {
   title: string
-  company?: string
   dates: string
-  description: string
+  /** The role's accomplishments, matching the bullets on the resume. */
+  highlights: string[]
   /** Short tech/skill tags shown as pills, e.g. ["React", "TypeScript"]. */
   tags?: string[]
 }
 
-const EXPERIENCE: Role[] = [
+interface Employer {
+  company: string
+  roles: Role[]
+  /**
+   * The whole stretch at an employer, shown on the group heading. Required
+   * whenever `roles` holds more than one, which is what makes a group.
+   */
+  span?: string
+}
+
+const EXPERIENCE: Employer[] = [
   {
-    title: 'Senior Software Engineer',
     company: 'Oscar',
-    dates: 'May 2023 to Oct 2026',
-    description:
-      'Frontend development in React, TypeScript and JavaScript, using Tailwind and a shared Base UI component library. Built responsive, accessible interfaces for viewing data from several angles for analysis, along with the reporting that came out of them. Starting in 2026, used Claude Code to build UX, Playwright end-to-end tests and Jest unit tests, and wrote custom skills to keep a larger volume of shipped code manageable.',
-    tags: [
-      'React',
-      'TypeScript',
-      'Tailwind',
-      'Base UI',
-      'Jotai',
-      'Accessibility',
-      'Data Viz',
-      'Reporting',
-      'Claude Code',
-      'Cursor',
-      'Playwright',
-      'Jest',
+    roles: [
+      {
+        title: 'Senior Software Engineer',
+        dates: 'May 2023 – Oct 2026',
+        highlights: [
+          'Built data analysis and reporting interfaces used by hundreds of people at large government clients, enabling more complex analysis by chaining one query’s output into the next and drawing regions on a map to explore the data inside them',
+          'Owned features from the React/TypeScript frontend through the API layer: wrote Elasticsearch queries directly and added API-layer transformations over ClickHouse data so that logic stayed out of the frontend',
+          'Helped build and enforce the team’s design system (Tailwind, Base UI), and built app-wide dark mode by reworking the color system into semantic tokens compatible with shadcn conventions',
+          'Used Claude Code to build UI features and end-to-end test coverage, and helped introduce new skills and workflows that let the team keep up with a much larger throughput of code',
+        ],
+        tags: [
+          'React',
+          'TypeScript',
+          'Tailwind',
+          'Base UI',
+          'Data Viz',
+          'Reporting',
+          'Claude Code',
+          'Cursor',
+          'E2E Testing',
+        ],
+      },
     ],
   },
   {
-    title: 'Product Manager',
     company: 'Jumbo',
-    dates: 'May 2022 to May 2023',
-    description:
-      'Shipped multiple iOS features and helped move the product from B2C to B2B2C. Set weekly roadmaps for engineers with a strong focus on protecting user data, and used analytics to steer the product toward our KPI goals.',
-    tags: ['iOS', 'Analytics', 'Product Strategy', 'A/B Testing'],
+    roles: [
+      {
+        title: 'Product Manager',
+        dates: 'May 2022 – May 2023',
+        highlights: [
+          'Led the shift from a consumer iOS app with thousands of users to a B2B2C model serving business partners, prioritizing the protection of existing users’ data throughout',
+          'Set weekly roadmaps for a 5-person engineering team and used analytics to steer feature decisions toward KPI goals across about a dozen iOS releases',
+        ],
+        tags: ['iOS', 'Analytics', 'Product Strategy', 'A/B Testing'],
+      },
+    ],
   },
   {
-    title: 'Product Manager',
     company: 'VidMob',
-    dates: 'Sep 2020 to April 2022',
-    description:
-      "Planned the roadmap across 3 teams as both product owner and scrum master. Worked directly with clients and dug into data to find the product's next highest-value move. Kept a hand in the two prior roles at the company as needed.",
-    tags: ['Roadmapping', 'Scrum'],
+    span: 'May 2017 – Apr 2022',
+    roles: [
+      {
+        title: 'Product Manager',
+        dates: 'Sep 2020 – Apr 2022',
+        highlights: [
+          'Planned the roadmap across 3 teams as both product owner and scrum master',
+          'Worked directly with clients, using their feedback and usage data to prioritize the backlog',
+        ],
+        tags: ['Roadmapping', 'Scrum'],
+      },
+      {
+        title: 'Solutions Engineer',
+        dates: 'Oct 2019 – Oct 2021',
+        highlights: [
+          'Built proofs of concept so product teams could see what a feature would cost before committing to it',
+          'Overhauled the API documentation and launched a public-facing version, giving partners and prospects a self-serve reference',
+          'Technical lead for partnerships, scoping new integrations',
+        ],
+        tags: ['API Design', 'Postman', 'OAuth1/OAuth2', 'Documentation'],
+      },
+      {
+        title: 'Full Stack Engineer → Engineering Lead',
+        dates: 'May 2017 – Sep 2019',
+        highlights: [
+          'Led a team of 5 engineers',
+          'Built about a dozen integrations with ad platforms and business tools (Facebook, Google, Salesforce, and others) using OAuth1/OAuth2, replacing manual handoffs with automated syncs',
+          'Rebuilt the email notification system and designed and built other features end to end in Groovy/Grails',
+        ],
+        tags: ['React JS', 'Angular JS', 'Groovy/Grails', 'Java', 'MySQL', 'HTML/CSS'],
+      },
+    ],
   },
   {
-    title: 'Solutions Engineer',
-    company: 'VidMob',
-    dates: 'Oct 2019 to Oct 2021',
-    description:
-      'Built proof-of-concepts so product teams could weigh cost, risk, and value before committing to new features. Overhauled our API docs, including a new public-facing version. Served as the technical lead for partnerships scoping new integrations.',
-    tags: ['API Design', 'Postman', 'OAuth1/OAuth2', 'Documentation'],
-  },
-  {
-    title: 'Full Stack Engineer',
-    company: 'VidMob',
-    dates: 'May 2017 to Sept 2019',
-    description:
-      'Designed and built new features and systems end to end. Rebuilt the email notification system, shipped about a dozen integrations to cut manual workflows, and eventually led the engineering team.',
-    tags: ['React JS', 'Angular JS', 'Groovy/Grails', 'Java', 'MySQL', 'HTML/CSS'],
-  },
-  {
-    title: 'Integration Engineer - Project Manager',
     company: 'Epic Systems',
-    dates: 'Feb 2016 to Nov 2016',
-    description:
-      'Guided clients through new software rollouts, recommending configurations tailored to their needs and hitting fixed launch dates. Juggled this across multiple clients at once.',
-    tags: ['Client Implementation', 'Healthcare IT', 'Configuration', 'Project Management'],
+    roles: [
+      {
+        title: 'Integration Engineer',
+        dates: 'Feb 2016 – Nov 2016',
+        highlights: [
+          'Guided healthcare organizations through EHR rollouts, recommending configurations to fit clinical workflows and meeting fixed go-live dates',
+        ],
+        tags: ['Client Implementation', 'Healthcare IT', 'Configuration', 'Project Management'],
+      },
+    ],
   },
   {
-    title: 'Bioengineer',
     company: 'Healmet',
-    dates: 'Aug 2015 to Jan 2016',
-    description:
-      'Helped plan a prototype for detecting basic vitals (heart rate, oxygen saturation, EKG) similar to what an Apple Watch does today.',
-    tags: ['Signal Processing', 'MATLAB', 'Hardware Prototyping', 'EKG'],
+    roles: [
+      {
+        title: 'Bioengineer',
+        dates: 'Aug 2015 – Jan 2016',
+        highlights: [
+          'Helped plan a wearable prototype for measuring vital signs (heart rate, oxygen saturation, EKG)',
+        ],
+        tags: ['Signal Processing', 'MATLAB', 'Hardware Prototyping', 'EKG'],
+      },
+    ],
   },
   {
-    title: 'Research Assistant',
     company: 'University Hospitals Cleveland Medical Center',
-    dates: 'Aug 2013 to May 2015',
-    description:
-      'Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured.',
-    tags: ['Image Processing', 'OCT Imaging'],
+    roles: [
+      {
+        title: 'Research Assistant',
+        dates: 'Aug 2013 – May 2015',
+        highlights: [
+          'Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured',
+        ],
+        tags: ['Image Processing', 'OCT Imaging'],
+      },
+    ],
   },
 ]
+
+/**
+ * One collapsible role. `company` is set only for employers with a single
+ * role, where the company belongs on the role's own line; in a multi-role
+ * group the company already sits in the heading above.
+ */
+function ExperienceRow({
+  id,
+  role,
+  company,
+}: {
+  id: string
+  role: Role
+  company?: string
+}) {
+  return (
+    <AccordionItem value={id}>
+      <AccordionTrigger className="items-center py-4 text-base font-medium hover:text-accent-text">
+        <span className="flex flex-1 flex-col items-start gap-0.5 pr-3 sm:flex-row sm:items-baseline sm:gap-3">
+          <span className="group-hover/accordion-trigger:underline">{role.title}</span>
+          {company && (
+            <span className="text-sm font-normal text-muted-foreground no-underline">
+              {company}
+            </span>
+          )}
+          <span className="font-mono text-sm font-normal text-muted-foreground no-underline sm:ml-auto">
+            {role.dates}
+          </span>
+        </span>
+      </AccordionTrigger>
+      <AccordionContent>
+        <ul className="list-disc space-y-1.5 pl-4 text-muted-foreground marker:text-border">
+          {role.highlights.map((highlight) => (
+            <li key={highlight}>{highlight}</li>
+          ))}
+        </ul>
+        <TagList tags={role.tags} />
+      </AccordionContent>
+    </AccordionItem>
+  )
+}
 
 // Titles for the cycling hero heading. Deliberately hand-written rather
 // than derived from EXPERIENCE: the heading offers a role ("your next …")
@@ -210,53 +299,58 @@ function App() {
           </h1>
           <p className="max-w-[60ch] text-muted-foreground">
             My path here has been a little winding: bioengineering
-            research, then software, then product, now back to software,
-            and that mix is what makes me useful: I can go deep on
-            code and still talk fluently with the people who aren&rsquo;t
-            writing it.
+            research, then software, then product, now back to software.
+            I build across the stack and do my best work on the frontend,
+            where product sense matters most. That mix is what makes me
+            useful: I can go deep on code and still talk fluently with the
+            people who aren&rsquo;t writing it.
           </p>
         </section>
 
         <Section id="experience" title="Experience">
           <Accordion className="border-t border-border">
-            {EXPERIENCE.map((role, i) => (
-              <AccordionItem key={`${role.title}-${i}`} value={`${role.title}-${i}`}>
-                <AccordionTrigger className="items-center py-4 text-base font-medium hover:text-accent-text">
-                  <span className="flex flex-1 flex-col items-start gap-0.5 pr-3 sm:flex-row sm:items-baseline sm:gap-3">
-                    <span className="group-hover/accordion-trigger:underline">{role.title}</span>
-                    {role.company && (
-                      <span className="text-sm font-normal text-muted-foreground no-underline">
-                        {role.company}
-                      </span>
-                    )}
-                    <span className="font-mono text-sm font-normal text-muted-foreground no-underline sm:ml-auto">
-                      {role.dates}
-                    </span>
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p>{role.description}</p>
-                  <TagList tags={role.tags} />
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+            {EXPERIENCE.map((employer) =>
+              employer.roles.length > 1 ? (
+                /* Several roles at one employer: a heading carrying the whole
+                   span, then the roles nested behind a left rule, so the
+                   stretch reads as one job rather than three. */
+                <div key={employer.company} className="not-last:border-b">
+                  <MetaRow
+                    what={employer.company}
+                    where={`${employer.roles.length} roles`}
+                    when={employer.span}
+                  />
+                  <div className="border-l border-border pl-4">
+                    {employer.roles.map((role) => (
+                      <ExperienceRow
+                        key={`${employer.company}-${role.title}`}
+                        id={`${employer.company}-${role.title}`}
+                        role={role}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <ExperienceRow
+                  key={employer.company}
+                  id={employer.company}
+                  role={employer.roles[0]}
+                  company={employer.company}
+                />
+              ),
+            )}
           </Accordion>
         </Section>
 
         <Section id="education" title="Education">
-          {/* One row dressed like an experience row minus the disclosure:
-              same three columns (what, where, when), same top rule, so the
-              page's two chronological lists read as siblings. The right
-              padding stands in for the chevron column those rows carry
-              (1rem icon + the trigger's 0.75rem pr-3), without which this
-              date sits 1.75rem further right than every date above it. */}
-          <div className="flex flex-col items-start gap-0.5 border-t border-border py-4 sm:flex-row sm:items-baseline sm:gap-3 sm:pr-7">
-            <span className="font-medium">B.S. Biomedical Engineering</span>
-            <span className="text-sm text-muted-foreground">Case Western Reserve University</span>
-            <span className="font-mono text-sm text-muted-foreground sm:ml-auto">
-              Aug 2011 to May 2015
-            </span>
-          </div>
+          {/* The top rule makes this read as a sibling of the experience
+              list above, which the accordion gives itself. */}
+          <MetaRow
+            className="border-t border-border"
+            what="B.S. Biomedical Engineering"
+            where="Case Western Reserve University"
+            when={<>Aug 2011 &ndash; May 2015</>}
+          />
         </Section>
 
         <SkillsSection />
