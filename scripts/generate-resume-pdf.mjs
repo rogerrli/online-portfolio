@@ -189,11 +189,41 @@ function wrapped(text, x, {
 
 /** Draws one line that is never wrapped, leaving `y` where it was. */
 function line(text, x, options = {}) {
+  // width: Infinity is what stops wrapped() wrapping, but it also switches off
+  // wrapToLines' too-wide guard, because no string is wider than Infinity.
+  // wrapped() then draws with lineBreak: false, which pdfkit clips at the page
+  // edge instead of wrapping, so without this check an over-long line loses its
+  // tail from the page and the build still reports success. Defaults mirror
+  // wrapped()'s so the measurement matches what gets drawn.
+  const { size = SIZE.body, font = "Helvetica" } = options;
+  const available = RIGHT - x;
+  const width = pick(font, size).widthOfString(text);
+  if (width > available) {
+    throw new Error(
+      `"${text}" is ${Math.ceil(width)}pt wide against ` +
+        `${Math.floor(available)}pt of column in resume.pdf and would be ` +
+        "clipped. Shorten it in public/resume.json.",
+    );
+  }
   wrapped(text, x, { ...options, width: Infinity });
 }
 
 /** A bold label followed by a muted run, sharing one line. */
 function runs(label, labelSize, rest, restSize = labelSize) {
+  // Both draws below pass lineBreak: false, so an over-wide line does not wrap
+  // onto a second line — pdfkit clips it at the page edge and the text simply
+  // stops, silently. The single-page guard only watches vertical space, so
+  // nothing else would catch it. Measured here instead of trusted.
+  const labelWidth = pick("Helvetica-Bold", labelSize).widthOfString(label);
+  const restWidth = rest ? pick("Helvetica", restSize).widthOfString(rest) : 0;
+  if (labelWidth + restWidth > CONTENT_WIDTH) {
+    throw new Error(
+      `"${label.trim()}" line is ${Math.ceil(labelWidth + restWidth)}pt wide ` +
+        `against ${Math.floor(CONTENT_WIDTH)}pt of column, so it would be ` +
+        "clipped. Shorten it in public/resume.json, or move entries to another group.",
+    );
+  }
+
   pick("Helvetica-Bold", labelSize)
     .fillColor("black")
     .text(label, LEFT, y, { lineBreak: false, continued: Boolean(rest) });
@@ -298,11 +328,18 @@ y += GAP.nameToLabel;
 line(resume.basics.label, LEFT, { size: SIZE.label, color: ACCENT });
 y += GAP.labelToContact;
 
+// Location leads the contact line. The approved PDF has no location, but ATS
+// and recruiter searches filter on it, and at SIZE.contact the line still runs
+// well short of CONTENT_WIDTH, so this costs no vertical space on a full page.
+const { city, region } = resume.basics.location ?? {};
 const contact = [
+  [city, region].filter(Boolean).join(", "),
   resume.basics.email,
   resume.basics.url?.replace(/^https?:\/\//, ""),
   ...resume.basics.profiles.map((p) => `${p.network}: ${p.username}`),
-].join(" · ");
+]
+  .filter(Boolean)
+  .join(" · ");
 line(contact, LEFT, { size: SIZE.contact, color: MUTED });
 
 if (resume.basics.summary) {
