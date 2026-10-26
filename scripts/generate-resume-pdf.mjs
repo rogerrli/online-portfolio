@@ -298,11 +298,18 @@ y += GAP.nameToLabel;
 line(resume.basics.label, LEFT, { size: SIZE.label, color: ACCENT });
 y += GAP.labelToContact;
 
+// Location leads the contact line. The approved PDF has no location, but ATS
+// and recruiter searches filter on it, and at SIZE.contact the line still runs
+// well short of CONTENT_WIDTH, so this costs no vertical space on a full page.
+const { city, region } = resume.basics.location ?? {};
 const contact = [
+  [city, region].filter(Boolean).join(", "),
   resume.basics.email,
   resume.basics.url?.replace(/^https?:\/\//, ""),
   ...resume.basics.profiles.map((p) => `${p.network}: ${p.username}`),
-].join(" · ");
+]
+  .filter(Boolean)
+  .join(" · ");
 line(contact, LEFT, { size: SIZE.contact, color: MUTED });
 
 if (resume.basics.summary) {
