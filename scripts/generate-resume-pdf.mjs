@@ -189,6 +189,22 @@ function wrapped(text, x, {
 
 /** Draws one line that is never wrapped, leaving `y` where it was. */
 function line(text, x, options = {}) {
+  // width: Infinity is what stops wrapped() wrapping, but it also switches off
+  // wrapToLines' too-wide guard, because no string is wider than Infinity.
+  // wrapped() then draws with lineBreak: false, which pdfkit clips at the page
+  // edge instead of wrapping, so without this check an over-long line loses its
+  // tail from the page and the build still reports success. Defaults mirror
+  // wrapped()'s so the measurement matches what gets drawn.
+  const { size = SIZE.body, font = "Helvetica" } = options;
+  const available = RIGHT - x;
+  const width = pick(font, size).widthOfString(text);
+  if (width > available) {
+    throw new Error(
+      `"${text}" is ${Math.ceil(width)}pt wide against ` +
+        `${Math.floor(available)}pt of column in resume.pdf and would be ` +
+        "clipped. Shorten it in public/resume.json.",
+    );
+  }
   wrapped(text, x, { ...options, width: Infinity });
 }
 
