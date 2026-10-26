@@ -155,7 +155,7 @@ const EXPERIENCE: Employer[] = [
         highlights: [
           'Helped plan a wearable prototype for measuring vital signs (heart rate, oxygen saturation, EKG)',
         ],
-        tags: ['Signal Processing', 'MATLAB', 'Hardware Prototyping', 'EKG'],
+        tags: ['Signal Processing', 'Hardware Prototyping', 'EKG'],
       },
     ],
   },

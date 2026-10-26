@@ -33,8 +33,6 @@ const SKILL_GROUPS: SkillGroup[] = [
       'AngularJS',
       'SQL / MySQL',
       'HTML/CSS',
-      'Python (OpenCV)',
-      'MATLAB',
       'Data Modeling',
       'Image/Signal Processing',
       'API Design and Documentation',

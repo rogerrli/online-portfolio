@@ -222,9 +222,10 @@
       "keywords": [
         "API design and documentation",
         "data modeling",
-        "image/signal processing (OpenCV, MATLAB)",
+        "image/signal processing",
         "accessibility",
-        "Agile / Scrum"
+        "Agile / Scrum",
+        "responsive design"
       ]
     }
   ]
