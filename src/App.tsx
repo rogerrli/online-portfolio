@@ -18,6 +18,7 @@ import { MetaRow } from '@/components/MetaRow'
 import { Section } from '@/components/Section'
 import { SectionRail } from '@/components/SectionRail'
 import { TagList } from '@/components/TagList'
+import { EDUCATION, EXPERIENCE, type Role } from '@/lib/resume'
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { useIsScrolled } from '@/hooks/useIsScrolled'
 import { cn, LINK_CLASS } from '@/lib/utils'
@@ -35,144 +36,6 @@ const NAV_LINKS = [
 
 const SECTION_IDS = NAV_LINKS.map((link) => link.id)
 
-interface Role {
-  title: string
-  dates: string
-  /** The role's accomplishments, matching the bullets on the resume. */
-  highlights: string[]
-  /** Short tech/skill tags shown as pills, e.g. ["React", "TypeScript"]. */
-  tags?: string[]
-}
-
-interface Employer {
-  company: string
-  roles: Role[]
-  /**
-   * The whole stretch at an employer, shown on the group heading. Required
-   * whenever `roles` holds more than one, which is what makes a group.
-   */
-  span?: string
-}
-
-const EXPERIENCE: Employer[] = [
-  {
-    company: 'Oscar',
-    roles: [
-      {
-        title: 'Senior Software Engineer',
-        dates: 'May 2023 – Oct 2026',
-        highlights: [
-          'Built data analysis and reporting interfaces used by hundreds of people at large government clients, enabling more complex analysis by chaining one query’s output into the next and drawing regions on a map to explore the data inside them',
-          'Owned features from the React/TypeScript frontend through the API layer: wrote Elasticsearch queries directly and added API-layer transformations over ClickHouse data so that logic stayed out of the frontend',
-          'Helped build and enforce the team’s design system (Tailwind, Base UI), and built app-wide dark mode by reworking the color system into semantic tokens compatible with shadcn conventions',
-          'Used Claude Code to build UI features and end-to-end test coverage, and helped introduce new skills and workflows that let the team keep up with a much larger throughput of code',
-        ],
-        tags: [
-          'React',
-          'TypeScript',
-          'Tailwind',
-          'Base UI',
-          'Jotai',
-          'Accessibility',
-          'Data Viz',
-          'Reporting',
-          'Claude Code',
-          'Cursor',
-          'Playwright',
-          'Jest',
-        ],
-      },
-    ],
-  },
-  {
-    company: 'Jumbo',
-    roles: [
-      {
-        title: 'Product Manager',
-        dates: 'May 2022 – May 2023',
-        highlights: [
-          'Led the shift from a consumer iOS app with thousands of users to a B2B2C model serving business partners, prioritizing the protection of existing users’ data throughout',
-          'Set weekly roadmaps for a 5-person engineering team and used analytics to steer feature decisions toward KPI goals across about a dozen iOS releases',
-        ],
-        tags: ['iOS', 'Analytics', 'Product Strategy', 'A/B Testing'],
-      },
-    ],
-  },
-  {
-    company: 'VidMob',
-    span: 'May 2017 – Apr 2022',
-    roles: [
-      {
-        title: 'Product Manager',
-        dates: 'Sep 2020 – Apr 2022',
-        highlights: [
-          'Planned the roadmap across 3 teams as both product owner and scrum master',
-          'Worked directly with clients, using their feedback and usage data to prioritize the backlog',
-        ],
-        tags: ['Roadmapping', 'Scrum'],
-      },
-      {
-        title: 'Solutions Engineer',
-        dates: 'Oct 2019 – Oct 2021',
-        highlights: [
-          'Built proofs of concept so product teams could see what a feature would cost before committing to it',
-          'Overhauled the API documentation and launched a public-facing version, giving partners and prospects a self-serve reference',
-          'Technical lead for partnerships, scoping new integrations',
-        ],
-        tags: ['API Design', 'Postman', 'OAuth1/OAuth2', 'Documentation'],
-      },
-      {
-        title: 'Full Stack Engineer → Engineering Lead',
-        dates: 'May 2017 – Sep 2019',
-        highlights: [
-          'Led a team of 5 engineers',
-          'Built about a dozen integrations with ad platforms and business tools (Facebook, Google, Salesforce, and others) using OAuth1/OAuth2, replacing manual handoffs with automated syncs',
-          'Rebuilt the email notification system and designed and built other features end to end in Groovy/Grails',
-        ],
-        tags: ['React JS', 'Angular JS', 'Groovy/Grails', 'Java', 'MySQL', 'HTML/CSS'],
-      },
-    ],
-  },
-  {
-    company: 'Epic Systems',
-    roles: [
-      {
-        title: 'Integration Engineer',
-        dates: 'Feb 2016 – Nov 2016',
-        highlights: [
-          'Guided healthcare organizations through EHR rollouts, recommending configurations to fit clinical workflows and meeting fixed go-live dates',
-        ],
-        tags: ['Client Implementation', 'Healthcare IT', 'Configuration', 'Project Management'],
-      },
-    ],
-  },
-  {
-    company: 'Healmet',
-    roles: [
-      {
-        title: 'Bioengineer',
-        dates: 'Aug 2015 – Jan 2016',
-        highlights: [
-          'Helped plan a wearable prototype for measuring vital signs (heart rate, oxygen saturation, EKG)',
-        ],
-        tags: ['Signal Processing', 'Hardware Prototyping', 'EKG'],
-      },
-    ],
-  },
-  {
-    company: 'University Hospitals Cleveland Medical Center',
-    roles: [
-      {
-        title: 'Research Assistant',
-        dates: 'Aug 2013 – May 2015',
-        highlights: [
-          'Supported a lab studying OCT imaging of coronary arteries, and improved how patient data was tracked and secured',
-        ],
-        tags: ['Image Processing', 'OCT Imaging'],
-      },
-    ],
-  },
-]
 
 /**
  * One collapsible role. `company` is set only for employers with a single
@@ -348,12 +211,15 @@ function App() {
         <Section id="education" title="Education">
           {/* The top rule makes this read as a sibling of the experience
               list above, which the accordion gives itself. */}
-          <MetaRow
-            className="border-t border-border"
-            what="B.S. Biomedical Engineering"
-            where="Case Western Reserve University"
-            when={<>Aug 2011 &ndash; May 2015</>}
-          />
+          {EDUCATION.map((entry) => (
+            <MetaRow
+              key={entry.institution}
+              className="border-t border-border"
+              what={entry.degree}
+              where={entry.institution}
+              when={entry.dates}
+            />
+          ))}
         </Section>
 
         <SkillsSection />

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Section } from '@/components/Section'
+import { CERTIFICATES } from '@/lib/resume'
 import { cn, LABEL_CLASS } from '@/lib/utils'
 
 interface SkillGroup {
@@ -39,8 +40,10 @@ const SKILL_GROUPS: SkillGroup[] = [
     ],
   },
   {
+    // Straight from the resume: these drifted once, when the site said
+    // "Certified Scrum Manager" and the resume said "Master".
     label: 'Certifications',
-    skills: ['Certified Scrum Master', 'Certified Scrum Product Owner'],
+    skills: CERTIFICATES,
   },
 ]
 
