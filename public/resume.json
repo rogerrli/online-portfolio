@@ -31,9 +31,9 @@
       "startDate": "2023-05-01",
       "endDate": "2026-10-01",
       "highlights": [
-        "Built data analysis and reporting interfaces used by hundreds of people at large government clients, enabling more complex analysis by chaining one query’s output into the next and drawing regions on a map to explore the data inside them",
+        "Built data analysis and reporting interfaces used by hundreds of people at large government clients, enabling more complex analysis by chaining one query\u2019s output into the next and drawing regions on a map to explore the data inside them",
         "Owned features from the React/TypeScript frontend through the API layer: wrote Elasticsearch queries directly and added API-layer transformations over ClickHouse data so that logic stayed out of the frontend",
-        "Helped build and enforce the team’s design system (Tailwind, Base UI), and built app-wide dark mode by reworking the color system into semantic tokens compatible with shadcn conventions",
+        "Helped build and enforce the team\u2019s design system (Tailwind, Base UI), and built app-wide dark mode by reworking the color system into semantic tokens compatible with shadcn conventions",
         "Used Claude Code to build UI features and end-to-end test coverage, and helped introduce new skills and workflows that let the team keep up with a much larger throughput of code"
       ]
     },
@@ -43,7 +43,7 @@
       "startDate": "2022-05-01",
       "endDate": "2023-05-01",
       "highlights": [
-        "Led the shift from a consumer iOS app with thousands of users to a B2B2C model serving business partners, prioritizing the protection of existing users’ data throughout",
+        "Led the shift from a consumer iOS app with thousands of users to a B2B2C model serving business partners, prioritizing the protection of existing users\u2019 data throughout",
         "Set weekly roadmaps for a 5-person engineering team and used analytics to steer feature decisions toward KPI goals across about a dozen iOS releases"
       ]
     },
@@ -70,7 +70,7 @@
     },
     {
       "name": "VidMob",
-      "position": "Full Stack Engineer → Engineering Lead",
+      "position": "Full Stack Engineer \u2192 Engineering Lead",
       "startDate": "2017-05-01",
       "endDate": "2019-09-01",
       "highlights": [
@@ -110,14 +110,24 @@
   "projects": [
     {
       "name": "MTA Train Board",
-      "keywords": ["Python", "FastAPI", "GTFS-Realtime"],
+      "keywords": [
+        "Python",
+        "FastAPI",
+        "GTFS-Realtime"
+      ],
       "highlights": [
-        "Built a wall-mounted touchscreen arrival board backed by a FastAPI service that polls the MTA’s real-time feeds, showing only trains you can actually catch given walk time to each station and prioritizing the commute by time of day"
+        "Built a wall-mounted touchscreen arrival board backed by a FastAPI service that polls the MTA\u2019s real-time feeds, showing only trains you can actually catch given walk time to each station and prioritizing the commute by time of day"
       ]
     },
     {
       "name": "liroger.com",
-      "keywords": ["React", "TypeScript", "Vite", "Tailwind", "shadcn"],
+      "keywords": [
+        "React",
+        "TypeScript",
+        "Vite",
+        "Tailwind",
+        "shadcn"
+      ],
       "highlights": [
         "Rebuilt my personal site as a code-owned app, developed with parallel Claude Code sessions on separate git worktrees, with work planned as GitHub issues and shipped through PRs"
       ]
@@ -133,8 +143,12 @@
     }
   ],
   "certificates": [
-    { "name": "Certified Scrum Master" },
-    { "name": "Certified Scrum Product Owner" }
+    {
+      "name": "Certified Scrum Master"
+    },
+    {
+      "name": "Certified Scrum Product Owner"
+    }
   ],
   "skills": [
     {
@@ -163,15 +177,22 @@
     },
     {
       "name": "Data",
-      "keywords": ["Elasticsearch", "ClickHouse", "MySQL"]
+      "keywords": [
+        "Elasticsearch",
+        "ClickHouse",
+        "MySQL"
+      ]
     },
     {
       "name": "AI tooling",
-      "keywords": ["Claude Code (parallel agents, custom skills, automated workflows)"]
+      "keywords": [
+        "Claude Code (parallel agents, custom skills, automated workflows)"
+      ]
     },
     {
       "name": "APIs",
       "keywords": [
+        "GraphQL",
         "OAuth1/OAuth2",
         "Facebook",
         "Google",
@@ -196,8 +217,13 @@
       ]
     },
     {
-      "name": "Other",
+      "name": "Practices",
       "keywords": [
+        "Playwright and Jest (end-to-end and unit testing)",
+        "accessibility",
+        "responsive design",
+        "state management (Jotai)",
+        "Agile / Scrum",
         "API design and documentation",
         "data modeling",
         "image/signal processing (OpenCV, MATLAB)"
